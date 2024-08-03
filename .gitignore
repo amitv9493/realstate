@@ -280,4 +280,3 @@ realstate_new/media/
 .env
 .envs/*
 !.envs/.local/
-
