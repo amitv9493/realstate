@@ -112,7 +112,7 @@ pre-commit==3.8.0
 prometheus_client==0.20.0
 prompt_toolkit==3.0.47
 proto-plus==1.24.0
-protobuf==4.25.4
+protobuf==5.27.3
 psycopg==3.2.1
 psycopg-c==3.2.1
 ptyprocess==0.7.0
