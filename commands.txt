@@ -1,0 +1,4 @@
+to create a requirements.txt file
+
+uv pip freeze | uv pip compile - -o requirements.txt
+celery -A realstate.celery worker -l info

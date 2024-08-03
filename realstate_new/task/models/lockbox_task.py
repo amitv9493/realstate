@@ -1,0 +1,73 @@
+from django.db import models
+
+from .basetask import BaseTask
+from .types import LockBoxType
+from .types import TaskTypeChoices
+
+
+class LockBoxTask(BaseTask):
+    task_type = models.CharField(max_length=50, choices=TaskTypeChoices.choices)
+    lockbox_code = models.CharField(max_length=50)
+    instructions = models.TextField()
+    lockbox_type = models.CharField(
+        max_length=50,
+        choices=LockBoxType.choices,
+    )
+    sign_option = models.BooleanField(default=False)
+    sign_address = models.TextField(blank=True)
+
+    # if task_type is REMOVE
+    pickup_address = models.TextField(blank=True)
+    dropoff_address = models.TextField(blank=True)
+
+    # if task_type is INSTALL
+    lockbox_collection_address = models.TextField(blank=True)
+    installation_address = models.TextField(blank=True)
+    installation_location = models.TextField(blank=True)
+
+    # if task_type is BUY
+
+    # in case of buy and sell
+    price = models.PositiveIntegerField(blank=True)
+
+
+class LockBoxTaskIR(LockBoxTask):
+    class LockBoxTaskIRManager(models.Manager):
+        def get_queryset(self):
+            return super().get_queryset().filter(task_type__in=["install", "remove"])
+
+    class Meta:
+        proxy = True
+        verbose_name = "Lock Box (Install / Remove)"
+        verbose_name_plural = "Lock Box (Install / Remove)"
+
+    objects = LockBoxTaskIRManager()
+
+
+class LockBoxTaskBS(LockBoxTask):
+    class LockBoxTaskBSManager(models.Manager):
+        def get_queryset(self):
+            return super().get_queryset().filter(task_type__in=["buy", "sell"])
+
+    class Meta:
+        proxy = True
+        verbose_name = "Lock Box (Buy / Sell)"
+
+    objects = LockBoxTaskBSManager()
+
+
+class LockBox(models.Model):
+    name = models.CharField(max_length=50)
+    type = models.CharField(max_length=50)
+    brand = models.CharField(max_length=50)
+    model = models.CharField(max_length=50)
+    price = models.PositiveIntegerField()
+    lockbox_task = models.ForeignKey(
+        LockBoxTaskBS,
+        on_delete=models.CASCADE,
+        related_name="lockbox",
+        verbose_name="Lock Boxes",
+    )
+
+    def __str__(self) -> str:
+        return super().__str__()
