@@ -152,7 +152,7 @@ LOGGING = {
 # -------------------------------------------------------------------------------
 # Tools that generate code samples can use SERVERS to point to the correct domain
 SPECTACULAR_SETTINGS["SERVERS"] = [
-    {"url": "https://65.20.90.117", "description": "Production server"},
+    {"url": "https://engagepluse.com", "description": "Production server"},
 ]
 # Your stuff...
 # ------------------------------------------------------------------------------
