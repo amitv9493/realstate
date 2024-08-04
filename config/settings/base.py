@@ -16,7 +16,7 @@ CONFIG.read(BASE_DIR / "config" / "project.conf")
 APPS_DIR = BASE_DIR / "realstate_new"
 env = environ.Env()
 
-READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
+READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=True)
 if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     env.read_env(str(BASE_DIR / ".env"))
@@ -384,15 +384,6 @@ paypalrestsdk.configure(
     },
 )
 
-
-EMAIL_FILE_PATH = BASE_DIR / "emails"
-# EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = CONFIG.get("smtp", "host")
-EMAIL_PORT = 587
-EMAIL_HOST_USER = CONFIG.get("smtp", "host_user")
-EMAIL_HOST_PASSWORD = CONFIG.get("smtp", "password")
-EMAIL_USE_TLS = True
 APPEND_SLASH = False
 PASSWORD_RESET_TIMEOUT = timedelta(days=5).total_seconds()  # seconds
 
@@ -405,3 +396,14 @@ SIMPLE_JWT = {
 PAYPAL_CLIENT_ID = CONFIG.get("paypal", "client_id")
 PAYPAL_CLIENT_SECRET = CONFIG.get("paypal", "client_secret")
 PAYPAL_WEBHOOK_ID = CONFIG.get("paypal", "webhook_id")
+
+CACHES = (
+    {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://redis:6379/1",
+            "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+            "KEY_PREFIX": "prod",
+        },
+    },
+)
