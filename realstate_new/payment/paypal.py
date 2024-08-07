@@ -1,16 +1,17 @@
 import logging
-import uuid
 
+from django.utils import timezone
 from paypalrestsdk import Payout
 
 _logger = logging.getLogger(__name__)
 
 
-def create_payment():
+def create_payment(user, amount):
+    batch_id = f"{str(timezone.localdate) - str(timezone.localtime) - {user.username}}"
     payout = Payout(
         {
             "sender_batch_header": {
-                "sender_batch_id": str(uuid.uuid4()),  # str(datetime.today().date()),
+                "sender_batch_id": batch_id,
                 "email_subject": "You have a payment",
                 "email_message": "You have received a payout! Thanks for using our service!",
             },

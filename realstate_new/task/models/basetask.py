@@ -48,3 +48,11 @@ class BaseTask(TrackingModel):
 
     class Meta:
         abstract = True
+
+    def process_payment_after_approve(
+        self,
+        amount,
+    ):
+        """This function initiates the payment after the task creater has approved the task submission."""  # noqa: E501
+        # TODO:
+        # Trigger after the task is approved by the creater.

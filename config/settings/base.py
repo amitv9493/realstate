@@ -388,11 +388,11 @@ APPEND_SLASH = False
 PASSWORD_RESET_TIMEOUT = timedelta(days=5).total_seconds()  # seconds
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=14),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
-
-
 PAYPAL_CLIENT_ID = CONFIG.get("paypal", "client_id")
 PAYPAL_CLIENT_SECRET = CONFIG.get("paypal", "client_secret")
 PAYPAL_WEBHOOK_ID = CONFIG.get("paypal", "webhook_id")

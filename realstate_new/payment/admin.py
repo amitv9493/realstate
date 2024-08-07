@@ -1,7 +1,6 @@
 from django.contrib import admin
 
 from .models import PayPalPayementHistory
-from .models import Transaction
 from .models import Wallet
 
 
@@ -9,6 +8,7 @@ from .models import Wallet
 class PayPalPayementHistoryAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "wallet",
         "date_created",
         "transmission_id",
         "transmission_time",
@@ -22,15 +22,3 @@ class PayPalPayementHistoryAdmin(admin.ModelAdmin):
 class WalletAdmin(admin.ModelAdmin):
     list_display = ("id", "balance", "user")
     list_filter = ("user",)
-
-
-@admin.register(Transaction)
-class TransactionAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "wallet",
-        "amount",
-        "transaction_type",
-        "timestamp",
-    )
-    list_filter = ("wallet", "timestamp")

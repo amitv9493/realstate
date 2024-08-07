@@ -1,52 +1,79 @@
 import logging
+from decimal import Decimal
 
-from django.conf import settings
-from django.http import HttpResponse
-from django.http import HttpResponseBadRequest
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import View
-from paypalrestsdk import notifications
+import paypalrestsdk
+import paypalrestsdk.exceptions
+from rest_framework import serializers
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from realstate_new.payment.models import PayPalPayementHistory
-
-__logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
-@method_decorator(csrf_exempt, name="dispatch")
-class ProcessWebhookView(View):
+class CreatePaymentView(APIView):
+    class PaymentSerializer(serializers.Serializer):
+        amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    serializer_class = PaymentSerializer
+
     def post(self, request):
-        if "paypal-transmission-id" not in request.headers:
-            return HttpResponseBadRequest()
+        amount = request.data.get("amount")
+        if not amount:
+            msg = "Amount is required to create payment."
+            raise serializers.ValidationError(msg)
 
-        auth_algo = request.headers["paypal-auth-algo"]
-        cert_url = request.headers["paypal-cert-url"]
-        transmission_id = request.headers["paypal-transmission-id"]
-        transmission_sig = request.headers["paypal-transmission-sig"]
-        transmission_time = request.headers["paypal-transmission-time"]
-        webhook_id = settings.PAYPAL_WEBHOOK_ID
-        event_body = request.body.decode()
-        valid = notifications.WebhookEvent.verify(
-            transmission_id=transmission_id,
-            timestamp=transmission_time,
-            webhook_id=webhook_id,
-            event_body=event_body,
-            cert_url=cert_url,
-            actual_sig=transmission_sig,
-            auth_algo=auth_algo,
+        payment = paypalrestsdk.Payment(
+            {
+                "intent": "sale",
+                "payer": {"payment_method": "paypal"},
+                "redirect_urls": {
+                    "return_url": "http://localhost:3000/payment/success",
+                    "cancel_url": "http://localhost:3000/payment/cancel",
+                },
+                "transactions": [
+                    {
+                        "amount": {"total": str(amount), "currency": "USD"},
+                        "description": "Payment for Item",
+                    },
+                ],
+            },
         )
-        if not valid:
-            PayPalPayementHistory.objects.create(
-                transmission_id=transmission_id,
-                # transmission_time =
-                event_body=event_body,
-                valid=valid,
-            )
-            msg = f"transcation with transmission id \
-                {transmission_id} was unable to verify"
-            __logger.critical(
-                msg,
-            )
-            return HttpResponseBadRequest()
 
-        return HttpResponse()
+        if payment.create():
+            return Response({"paymentId": payment.id})
+        return Response({"error": payment.error})
+
+
+class ExecutePaymentView(APIView):
+    class ConfirmPaymentSerializer(serializers.Serializer):
+        payment_id = serializers.CharField()
+        payer_id = serializers.CharField()
+        amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    serializer_class = ConfirmPaymentSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid(raise_exception=True):
+            data = serializer.validated_data
+            try:
+                payment = paypalrestsdk.Payment.find(data["payment_id"])
+            except paypalrestsdk.exceptions.ResourceNotFound:
+                msg = "given payment id is incorrect"
+                raise serializers.ValidationError(msg) from None
+
+            if payment.execute({"payer_id": data["payer_id"]}):
+                user = request.user
+                user.wallet.add_amount(Decimal(data["amount"]))
+                user.save(update_fields=["balance"])
+
+                return Response(
+                    {
+                        "success": True,
+                        "message": "Payment successful and wallet updated",
+                        "new_balance": str(user.wallet.balance),
+                    },
+                )
+
+        return Response({"error": payment.error})

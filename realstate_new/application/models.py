@@ -30,6 +30,13 @@ class JobApplication(models.Model):
         indexes = [
             models.Index(fields=["content_type", "object_id"]),
         ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["object_id", "content_type", "applicant"],
+                name="unique-application",
+                violation_error_message="The record already exists.",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.content_type!s} {self.status}"
