@@ -137,7 +137,7 @@ PyYAML==6.0.1
 qrcode==7.4.2
 redis==5.0.8
 referencing==0.35.1
-regex==2023.12.25
+regex==2024.7.24
 requests==2.32.3
 rest-framework-simplejwt==0.0.2
 rpds-py==0.19.1
