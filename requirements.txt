@@ -140,7 +140,7 @@ referencing==0.35.1
 regex==2024.7.24
 requests==2.32.3
 rest-framework-simplejwt==0.0.2
-rpds-py==0.19.1
+rpds-py==0.20.0
 rsa==4.9
 ruff==0.6.1
 ruff-pre-commit @ file:///home/amitpatel/.cache/pre-commit/repov17sevy5
