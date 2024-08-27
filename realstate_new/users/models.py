@@ -75,6 +75,10 @@ class User(AbstractUser):
         max_length=20,
         blank=True,
     )
+    phone_country_code = models.CharField(
+        max_length=20,
+        blank=True,
+    )
     fax = models.CharField(
         max_length=20,
         blank=True,

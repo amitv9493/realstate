@@ -57,10 +57,14 @@ class RegisterSerializer(serializers.ModelSerializer):
             "email",
             "first_name",
             "last_name",
+            "phone_country_code",
+            "phone",
         )
         extra_kwargs = {
-            "first_name": {"required": True},
-            "last_name": {"required": True},
+            "first_name": {"required": True, "allow_null": False},
+            "last_name": {"required": True, "allow_null": False},
+            "phone": {"required": True, "allow_null": False},
+            "phone_country_code": {"required": True, "allow_null": False},
         }
 
     def validate(self, attrs):
