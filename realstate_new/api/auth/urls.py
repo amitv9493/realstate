@@ -9,6 +9,9 @@ from .views import SendPasswordResetView
 from .views import UserResetPasswordView
 from .views import confirm_user
 
+app_name = "auth"
+
+
 urlpatterns = [
     path(
         "registration",

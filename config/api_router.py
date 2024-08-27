@@ -7,9 +7,8 @@ from rest_framework.routers import SimpleRouter
 router = DefaultRouter() if settings.DEBUG else SimpleRouter()
 
 
-app_name = "api"
 urlpatterns = [
-    path("auth/", include("realstate_new.api.auth.urls")),
+    path("auth/", include("realstate_new.api.auth.urls", "auth")),
     path("task/", include("realstate_new.api.task.urls")),
     path("user/", include("realstate_new.api.user.urls")),
     path("property/", include("realstate_new.api.property.urls")),
