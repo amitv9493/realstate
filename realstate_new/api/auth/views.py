@@ -103,12 +103,11 @@ class RegistrationView(PublicApi):
 
             message.attach_alternative(html_message, "text/html")
             message.send()
-            msg = "Registration Successfull, Please Check Your Mail For Verification"
             return Response(
                 {
-                    "msg": msg,
+                    "sttus": True,
                 },
-                status=status.HTTP_201_CREATED,
+                status=status.HTTP_200_OK,
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
