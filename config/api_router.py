@@ -4,6 +4,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 from rest_framework.routers import SimpleRouter
 
+app_name = "api"
 router = DefaultRouter() if settings.DEBUG else SimpleRouter()
 
 urlpatterns = [
