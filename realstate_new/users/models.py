@@ -73,11 +73,11 @@ class User(AbstractUser):
     )
     phone = models.CharField(
         max_length=20,
-        blank=True,
+        unique=True,
+        error_messages={"unique": _("A user with that phone number already exists.")},
     )
     phone_country_code = models.CharField(
         max_length=20,
-        blank=True,
     )
     fax = models.CharField(
         max_length=20,

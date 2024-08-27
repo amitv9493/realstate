@@ -39,7 +39,12 @@ class LoginSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True,
-        validators=[UniqueValidator(queryset=get_user_model().objects.all())],
+        validators=[
+            UniqueValidator(
+                queryset=get_user_model().objects.all(),
+                message="A user with this email address already exists.",
+            ),
+        ],
     )
     password = serializers.CharField(
         write_only=True,
@@ -63,8 +68,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "first_name": {"required": True, "allow_null": False},
             "last_name": {"required": True, "allow_null": False},
-            "phone": {"required": True, "allow_null": False},
-            "phone_country_code": {"required": True, "allow_null": False},
         }
 
     def validate(self, attrs):
@@ -81,6 +84,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             first_name=validated_data["first_name"],
             last_name=validated_data["last_name"],
             is_active=False,
+            phone=validated_data["phone"],
+            phone_country_code=validated_data["phone_country_code"],
         )
         user.set_password(validated_data["password"])
         user.save()

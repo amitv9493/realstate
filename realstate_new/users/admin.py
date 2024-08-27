@@ -28,7 +28,16 @@ class CustomUserAdmin(UserAdmin):
     ]
 
     custom_fieldsets = (
-        ("User Information", {"fields": ("mile_radius_preference",)}),
+        (
+            "User Information",
+            {
+                "fields": (
+                    "mile_radius_preference",
+                    "phone_country_code",
+                    "phone",
+                ),
+            },
+        ),
         (
             "Job Preferences",
             {
