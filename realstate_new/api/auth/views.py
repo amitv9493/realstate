@@ -3,7 +3,6 @@ import logging
 import random
 
 from django import forms
-from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login
@@ -13,18 +12,15 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.cache import cache
-from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect
 from django.shortcuts import render
-from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.utils.encoding import DjangoUnicodeDecodeError
 from django.utils.encoding import force_bytes
 from django.utils.encoding import smart_str
-from django.utils.html import strip_tags
 from django.utils.http import urlsafe_base64_decode
 from django.utils.http import urlsafe_base64_encode
 from django.views import View
@@ -37,6 +33,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from realstate_new.utils import send_email
 from realstate_new.utils.views import PublicApi
 
 from .renderers import UserRenderes
@@ -77,7 +74,6 @@ class RegistrationView(PublicApi):
             user = serializer.save()
 
             subject = "Registration Confirmation"
-            message = "Thank you for registering!"
             recipient_list = [user.email]
             current_site = get_current_site(request)
             token = default_token_generator.make_token(user)
@@ -87,22 +83,14 @@ class RegistrationView(PublicApi):
                 "uid": uid,
                 "token": token,
             }
-            from_email = settings.EMAIL_HOST_USER
-            html_message = render_to_string(
-                "emails/email-verification.html",
+
+            send_email.delay(
+                template_path="emails/email-verification.html",
+                recipient_list=recipient_list,
+                subject=subject,
                 context=context,
             )
-            plain_message = strip_tags(html_message)
-
-            message = EmailMultiAlternatives(
-                subject=subject,
-                body=plain_message,
-                from_email=from_email,
-                to=recipient_list,
-            )
             msg = "Registration Successful. Please check your email to verify your account."
-            message.attach_alternative(html_message, "text/html")
-            message.send()
             return Response(
                 {
                     "msg": msg,
@@ -379,6 +367,7 @@ class GoogleVerificationView(PublicApi):
 
             return Response(
                 {
+                    "status": True,
                     "token": token,
                     "msg": "Login Successful",
                     "userid": user.id,

@@ -70,6 +70,14 @@ class RegisterSerializer(serializers.ModelSerializer):
             "last_name": {"required": True, "allow_null": False},
         }
 
+    def validate_phone(self, value):
+        if value and value in set(
+            self.Meta.model.objects.values_list("phone", flat=True),
+        ):
+            error = "A user with this phone number already exists"
+            raise serializers.ValidationError(error)
+        return value
+
     def validate(self, attrs):
         if attrs["password"] != attrs["password2"]:
             raise serializers.ValidationError(
@@ -297,23 +305,16 @@ class GoogleAUthVerifiedData(serializers.Serializer):
     email = serializers.EmailField()
     family_name = serializers.CharField()
     given_name = serializers.CharField()
-    aud = serializers.CharField()
-
-    def validate_aud(self, value):
-        if value != settings.GOOGLE_CLIENT_ID:
-            msg = "aud is invalid. request is malformed."
-            raise serializers.ValidationError(msg)
 
     def create(self, validated_data):
         first_name = validated_data["family_name"]
         last_name = validated_data["given_name"]
         email = validated_data["email"]
         username = email.split("@")[0]
-        user, _created = User.objects.get_or_create(
+        user, created = get_user_model().objects.get_or_create(
+            username=username,
             email=email,
             first_name=first_name,
             last_name=last_name,
-            username=username,
         )
-        get_user_model().objects.get_or_create(user=user)
         return user

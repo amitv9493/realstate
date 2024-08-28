@@ -71,14 +71,8 @@ class User(AbstractUser):
         max_length=200,
         blank=True,
     )
-    phone = models.CharField(
-        max_length=20,
-        unique=True,
-        error_messages={"unique": _("A user with that phone number already exists.")},
-    )
-    phone_country_code = models.CharField(
-        max_length=20,
-    )
+    phone = models.CharField(max_length=20, default="")
+    phone_country_code = models.CharField(max_length=20, default="")
     fax = models.CharField(
         max_length=20,
         blank=True,
