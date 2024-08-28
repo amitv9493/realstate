@@ -100,11 +100,12 @@ class RegistrationView(PublicApi):
                 from_email=from_email,
                 to=recipient_list,
             )
-
+            msg = "Registration Successful. Please check your email to verify your account."
             message.attach_alternative(html_message, "text/html")
             message.send()
             return Response(
                 {
+                    "msg": msg,
                     "sttus": True,
                 },
                 status=status.HTTP_200_OK,
