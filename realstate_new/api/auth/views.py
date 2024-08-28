@@ -106,7 +106,7 @@ class RegistrationView(PublicApi):
             return Response(
                 {
                     "msg": msg,
-                    "sttus": True,
+                    "status": True,
                 },
                 status=status.HTTP_200_OK,
             )
