@@ -11,20 +11,23 @@ class ArelloService:
     endpoint = config.get("arello", "endpoint")
     username = config.get("arello", "username")
     password = config.get("arello", "password")
+    search_mode = config.get("arello", "search_mode")
 
     @log_api
-    def get_license_info(self, user):
+    def get_license_info(self, vals):
+        data = {
+            "username": self.username,
+            "password": self.password,
+            "jurisdiction": vals.get("license_jurisdiction"),
+            "licenseNumber": vals.get("license_number"),
+            "lastName": vals.get("last_name"),
+            "firstName": vals.get("first_name"),
+            "searchMode": self.search_mode,
+        }
+        data = {k: v for k, v in data.items() if v}
         return requests.post(
             self.endpoint,
-            data={
-                "username": self.username,
-                "password": self.password,
-                "jurisdiction": user.license_jurisdiction,
-                "licenseNumber": user.license_number,
-                "lastName": user.last_name,
-                "firstName": user.first_name,
-                "searchMode": "live",
-            },
             headers={"Content-Type": "application/x-www-form-urlencoded"},
             timeout=20,
+            data=data,
         )
