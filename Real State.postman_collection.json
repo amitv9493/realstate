@@ -1,0 +1,902 @@
+{
+	"info": {
+		"_postman_id": "87690278-811d-4a68-8096-d705636db904",
+		"name": "Real State",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25503165",
+		"_collection_link": "https://restless-flare-87088.postman.co/workspace/Team-Workspace~f0a36961-7ae8-40b7-8dbe-b7ad9858c771/collection/25503165-87690278-811d-4a68-8096-d705636db904?action=share&source=collection_link&creator=25503165"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Google",
+					"item": [
+						{
+							"name": "New Request",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "email",
+											"value": "amitv.9493@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "family_name",
+											"value": "patel",
+											"type": "text"
+										},
+										{
+											"key": "given_name",
+											"value": "amit",
+											"type": "text"
+										},
+										{
+											"key": "aud",
+											"value": "777985082123-96jf0j19a69tgbm5gcpso61q19rl31d2.apps.googleusercontent.com",
+											"type": "text",
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{localurl}}/api/auth/google/",
+									"host": [
+										"{{localurl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"google",
+										""
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "New Request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "email",
+													"value": "amitv.9493@gmail.com",
+													"type": "text"
+												},
+												{
+													"key": "family_name",
+													"value": "patel",
+													"type": "text"
+												},
+												{
+													"key": "given_name",
+													"value": "amit",
+													"type": "text"
+												},
+												{
+													"key": "aud",
+													"value": "777985082123-96jf0j19a69tgbm5gcpso61q19rl31d2.apps.googleusercontent.com",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{liveurl}}/api/auth/google/",
+											"host": [
+												"{{liveurl}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"google",
+												""
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "nginx/1.25.4"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 17 May 2024 07:25:23 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "571"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Vary",
+											"value": "Accept, origin, Cookie"
+										},
+										{
+											"key": "Allow",
+											"value": "GET, HEAD, OPTIONS"
+										},
+										{
+											"key": "X-Frame-Options",
+											"value": "DENY"
+										},
+										{
+											"key": "X-Content-Type-Options",
+											"value": "nosniff"
+										},
+										{
+											"key": "Referrer-Policy",
+											"value": "same-origin"
+										},
+										{
+											"key": "Cross-Origin-Opener-Policy",
+											"value": "same-origin"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"token\": {\n        \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcxNjEwMzUyMywiaWF0IjoxNzE1OTMwNzIzLCJqdGkiOiJjZWY2MzY5MDQxOGI0MzFiOThkYjNkNmU4OWRmNjIxNSIsInVzZXJfaWQiOjk5fQ.3i1nDLgTSXuLFhFa3w17Dls7aLXquBkr6BLeqzCmUuc\",\n        \"access\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE2MDE3MTIzLCJpYXQiOjE3MTU5MzA3MjMsImp0aSI6ImVjYzE4NWJhYmQ4MDQyZDE5NWU1MzMyYTA5YThiMjBkIiwidXNlcl9pZCI6OTl9.JTvuxoJMDY9zm2Xrwv_z_Ruxe1wabfENlFolFzCBwCg\"\n    },\n    \"msg\": \"Login Successful\",\n    \"userid\": 99,\n    \"user_status\": \"None\",\n    \"user_role\": null\n}"
+								}
+							]
+						},
+						{
+							"name": "state-token",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localurl}}/api/auth/csrf-token",
+									"host": [
+										"{{localurl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"csrf-token"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Extract the access token from the response body\r",
+									"var responseData = pm.response.json();\r",
+									"var accessToken = responseData.token.access;\r",
+									"var refreshToken = responseData.token.refresh;\r",
+									"\r",
+									"// Set the access token to the environment variable\r",
+									"pm.environment.set(\"access_token\", accessToken);\r",
+									"pm.environment.set('refresh_token', refreshToken);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\":\"admin\",\r\n  \"password\":\"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}/api/auth/login",
+							"host": [
+								"{{localurl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\":\"admin\",\r\n  \"password\":\"admin\"\r\n}\r\n// username and password required",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "studystreak.in/api/login/",
+									"host": [
+										"studystreak",
+										"in"
+									],
+									"path": [
+										"api",
+										"login",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.25.4"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 19 Feb 2024 04:22:14 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "570"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, origin, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "POST, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"token\": {\n        \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcwODQwMjkzNCwiaWF0IjoxNzA4MzE2NTM0LCJqdGkiOiI1ODA4NjRhYmI2M2Y0NDAwOWRiNzhmYjNjM2Q2MWRiZiIsInVzZXJfaWQiOjF9.xZhjGw5kLuzIxZB-YaMiT60egmgwdkZTcFru3nmROp0\",\n        \"access\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzA4MzE2ODM0LCJpYXQiOjE3MDgzMTY1MzQsImp0aSI6IjRlNGIyNzY0Zjc2ZTQxMWY4ZTAxMmM2NWI0MTA2ZjY3IiwidXNlcl9pZCI6MX0.h4rQOSXzO3nGju6uHyniilSYMVVI4PBYzAODmYdrdXc\"\n    },\n    \"msg\": \"Login Successful\",\n    \"userid\": 1,\n    \"user_status\": \"None\",\n    \"user_role\": \"admin\"\n}"
+						}
+					]
+				},
+				{
+					"name": "registration",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"amitv94932\",\r\n    \"password\": \"Amit@9493\",\r\n    \"password2\": \"Amit@9493\",\r\n    \"email\": \"amitv94932@gmail.com\",\r\n    \"first_name\": \"Amit\",\r\n    \"last_name\": \"Verma\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}/api/auth/registration",
+							"host": [
+								"{{localurl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"registration"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "registration",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \r\n        \"admin1\"\r\n    ,\r\n    \"password\": \r\n        \"admin1@gmail.com\"\r\n    ,\r\n    \"password2\": \r\n        \"admin1@gmail.com\"\r\n    ,\r\n    \"email\": \r\n        \"machhimehul61@gmail.com\"\r\n    ,\r\n    \"first_name\": \r\n        \"mehul\"\r\n    ,\r\n    \"last_name\": \r\n        \"machhi\"\r\n    \r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "studystreak.in/api/registration/",
+									"host": [
+										"studystreak",
+										"in"
+									],
+									"path": [
+										"api",
+										"registration",
+										""
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.25.4"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 19 Feb 2024 04:26:53 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "75"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, origin, Cookie"
+								},
+								{
+									"key": "Allow",
+									"value": "POST, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"msg\": \"Registration Successfull, Please Check Your Mail For Verification\"\n}"
+						}
+					]
+				},
+				{
+					"name": "changepassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"current_password\": \"amitv9493\",\n    \"password\": \"Amit@9493\",\n    \"password2\": \"Amit@9493\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}/api/auth/changepassword",
+							"host": [
+								"{{localurl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"changepassword"
+							]
+						},
+						"description": "add parameter:\n\ncurrent_password, password, password2"
+					},
+					"response": [
+						{
+							"name": "changepassword",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"current_password\": \"amitv9493\",\n    \"password\": \"Amit@9493\",\n    \"password2\": \"Amit@9493\"\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localurl}}/api/auth/changepassword",
+									"host": [
+										"{{localurl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"changepassword"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 15 Jul 2024 07:52:02 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "WSGIServer/0.2 CPython/3.10.12"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept, origin"
+								},
+								{
+									"key": "Allow",
+									"value": "POST, OPTIONS"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Length",
+									"value": "26"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"msg\": \"Password changed\"\n}"
+						}
+					]
+				},
+				{
+					"name": "resetpassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email_id\":\"amitv9493@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}/api/auth/resetpassword",
+							"host": [
+								"{{localurl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"resetpassword"
+							]
+						},
+						"description": "add parameter:  \nemail_id"
+					},
+					"response": []
+				},
+				{
+					"name": "refresh",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "refresh",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localurl}}/api/auth/token/refresh",
+							"host": [
+								"{{localurl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"token",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "confirm",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"first_name\":\"Amit1111111111111111111111\",\r\n    \"last_name\":\"Patel\",\r\n    \"email\":\"amitv9493@gmail.com\",\r\n    \"username\":\"amitv9493\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}/api/auth/confirm/:id/:token",
+							"host": [
+								"{{localurl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"confirm",
+								":id",
+								":token"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "MTU"
+								},
+								{
+									"key": "token",
+									"value": "ca746p-d94ecf546b1f8afbd0e800a04ba185a6"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{access_token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Arello",
+			"item": [
+				{
+					"name": "get license info",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "lvws_test",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "lvws_test",
+									"type": "text"
+								},
+								{
+									"key": "jurisdiction",
+									"value": "AL",
+									"type": "text"
+								},
+								{
+									"key": "licenseNumber",
+									"value": "000012345",
+									"type": "text"
+								},
+								{
+									"key": "lastName",
+									"value": "DOE",
+									"type": "text"
+								},
+								{
+									"key": "firstName",
+									"value": "JOHN",
+									"type": "text"
+								},
+								{
+									"key": "searchMode",
+									"value": "test",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localurl}}/api/arello/licenseinfo",
+							"host": [
+								"{{localurl}}"
+							],
+							"path": [
+								"api",
+								"arello",
+								"licenseinfo"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "update userinfo",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"license_number\":\"0000123434343345\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}/api/user/update",
+							"host": [
+								"{{localurl}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"update"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "payment",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Task",
+			"item": [
+				{
+					"name": "Showing Task",
+					"item": [
+						{
+							"name": "get",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{localurl}}/api/task/showingtask/",
+									"host": [
+										"{{localurl}}"
+									],
+									"path": [
+										"api",
+										"task",
+										"showingtask",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "post",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{localurl}}/api/task/showingtask/",
+									"host": [
+										"{{localurl}}"
+									],
+									"path": [
+										"api",
+										"task",
+										"showingtask",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "localurl",
+			"value": "localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "liveurl",
+			"value": "https://engagepluse.com",
+			"type": "string"
+		}
+	]
+}

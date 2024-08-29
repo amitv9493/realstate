@@ -1,4 +1,5 @@
 import logging
+import threading
 from functools import wraps
 from time import perf_counter
 
@@ -15,13 +16,17 @@ def log_api(func):
         end_time = perf_counter() - start_time
         msg = f"calling {response.url} in {end_time:.2f} seconds"
         logger.info(msg)
-        ThirdPartyCall.objects.create(
-            status_code=response.status_code,
-            request_body=response.request.body,
-            response_body=response.text,
-            endpoint=response.url,
-            time_taken=end_time,
+        t = threading.Thread(
+            target=ThirdPartyCall.objects.create,
+            kwargs={
+                "status_code": response.status_code,
+                "request_body": response.request.body,
+                "response_body": response.text,
+                "endpoint": response.url,
+                "time_taken": end_time,
+            },
         )
+        t.start()
         return response
 
     return wrapper

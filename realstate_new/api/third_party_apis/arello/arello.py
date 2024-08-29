@@ -23,7 +23,7 @@ class ArelloService:
                 "licenseNumber": user.license_number,
                 "lastName": user.last_name,
                 "firstName": user.first_name,
-                "searchMode": "test",
+                "searchMode": "live",
             },
             headers={"Content-Type": "application/x-www-form-urlencoded"},
             timeout=20,

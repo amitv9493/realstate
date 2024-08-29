@@ -198,4 +198,9 @@ class ProfessionalServiceTaskAdmin(BaseTaskAdmin):
 
 @admin.register(ThirdPartyCall)
 class ThirdPartyCallAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        "shortened_endpoint",
+        "status_code",
+        "date_created",
+    )
+    ordering = ("-date_created",)

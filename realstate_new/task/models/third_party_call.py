@@ -15,6 +15,10 @@ class ThirdPartyCall(models.Model):
         ordering = ("-date_created",)
 
     def __str__(self):
+        return self.shortened_endpoint
+
+    @property
+    def shortened_endpoint(self):
         match = re.search(r".*?\.com", self.endpoint)
         shortened_endpoint = match.group(0) if match else self.endpoint
 
