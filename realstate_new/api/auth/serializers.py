@@ -92,8 +92,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             first_name=validated_data["first_name"],
             last_name=validated_data["last_name"],
             is_active=False,
-            phone=validated_data["phone"],
-            phone_country_code=validated_data["phone_country_code"],
+            phone=validated_data.get("phone", ""),
+            phone_country_code=validated_data.get("phone_country_code", ""),
         )
         user.set_password(validated_data["password"])
         user.save()

@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from utils import MissingFieldError
+
+from realstate_new.utils import MissingFieldError
 
 
 class ArelloSerializer(serializers.Serializer):
