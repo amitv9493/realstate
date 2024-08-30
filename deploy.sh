@@ -1,3 +1,3 @@
 git pull
-docker compose build django
-docker compose restart django
+docker compose build
+docker compose restart
