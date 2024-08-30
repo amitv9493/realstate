@@ -15,4 +15,4 @@ class UserView(APIView):
         )
         if serializer.is_valid(raise_exception=True):  # noqa: RET503
             serializer.save()
-            return Response("updated", 200)
+            return Response({"msg": "Updated", "status": True}, 200)
