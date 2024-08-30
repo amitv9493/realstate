@@ -4,7 +4,7 @@ from realstate_new.utils import MissingFieldError
 
 
 class ArelloSerializer(serializers.Serializer):
-    license_jurisdiction = serializers.CharField(required=False)
+    license_jurisdiction = serializers.CharField(required=True)
     license_number = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
     first_name = serializers.CharField(required=False)
