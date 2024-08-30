@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
 
-@shared_task
+@shared_task()
 def send_email(
     recipient_list: list[str],
     subject: str,
