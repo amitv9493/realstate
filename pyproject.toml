@@ -6,7 +6,6 @@ python_files = [
     "tests.py",
     "test_*.py",
 ]
-
 # ==== Coverage ====
 [tool.coverage.run]
 include = ["realstate_new/**"]

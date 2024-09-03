@@ -14,7 +14,7 @@ class Property(TrackingModel):
         choices=PropertyType.choices,
     )
     listing_date = models.DateField()
-    Status = models.CharField(
+    status = models.CharField(
         max_length=50,
         choices=PropertyStatus,
         default=PropertyStatus.AVAILABLE,
@@ -30,7 +30,7 @@ class Property(TrackingModel):
     features = models.ManyToManyField(PropertyFeature)
 
     def __str__(self):
-        return f"{self.id} = {self.property_type} - {self.Status}"
+        return f"{self.id} = {self.property_type} - {self.status}"
 
     # will fetch it from the user created this property record
     # Contact Information: Contact details for the listing agent (phone number, email).
