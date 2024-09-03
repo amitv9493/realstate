@@ -5,3 +5,4 @@ POSTGRES_PORT=5432
 POSTGRES_DB=realstate_new
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
+DATABASE_URL=postgres://pstgres:postgres@127.0.0.1:5432/realstate_new

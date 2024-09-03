@@ -9,8 +9,10 @@ DJANGO_READ_DOT_ENV_FILE=True
 REDIS_URL=redis://redis:6379/0
 
 # Celery
+CELERY_FLOWER_PASSWORD=admin
+CELERY_BROKER_URL=redis://localhost:6379/0
 # ------------------------------------------------------------------------------
 
 # Flower
 CELERY_FLOWER_USER=admin
-CELERY_FLOWER_PASSWORD=admin
+USE_DOCKER=True

@@ -1,5 +1,6 @@
 # ruff: noqa: E501
 from .base import *  # noqa: F403
+from .base import BASE_DIR
 from .base import INSTALLED_APPS
 from .base import env
 
@@ -25,12 +26,6 @@ CACHES = {
     },
 }
 
-# EMAIL
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-host
-EMAIL_HOST = env("EMAIL_HOST", default="mailpit")
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-port
-EMAIL_PORT = 1025
 
 # WhiteNoise
 # ------------------------------------------------------------------------------
@@ -57,3 +52,10 @@ CELERY_TASK_EAGER_PROPAGATES = True
 # Your stuff...
 # ------------------------------------------------------------------------------
 TIME_ZONE = "Asia/Kolkata"
+
+# EMAIL
+# ------------------------------------------------------------------------------
+EMAIL_HOST = env("EMAIL_HOST", default="mailpit")
+EMAIL_PORT = 1025
+EMAIL_FILE_PATH = BASE_DIR / "emails"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
