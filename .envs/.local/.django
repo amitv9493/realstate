@@ -16,3 +16,4 @@ CELERY_BROKER_URL=redis://localhost:6379/0
 # Flower
 CELERY_FLOWER_USER=admin
 USE_DOCKER=True
+DATABASE_URL=postgres://pstgres:postgres@127.0.0.1:5432/realstate_new

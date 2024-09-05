@@ -20,8 +20,8 @@ def log_api(func):
             target=ThirdPartyCall.objects.create,
             kwargs={
                 "status_code": response.status_code,
-                "request_body": response.request.body,
-                "response_body": response.text,
+                "request_body": response.request.body or "",
+                "response_body": response.text or "",
                 "endpoint": response.url,
                 "time_taken": end_time,
             },

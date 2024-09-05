@@ -17,3 +17,9 @@ class UserSerializer(DynamicModelSerializer):
             "is_active",
             "date_joined",
         ]
+
+
+class UserMeSerializer(DynamicModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = "__all__"

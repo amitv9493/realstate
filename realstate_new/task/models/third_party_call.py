@@ -5,8 +5,8 @@ from django.db import models
 
 class ThirdPartyCall(models.Model):
     status_code = models.PositiveIntegerField()
-    request_body = models.TextField()
-    response_body = models.TextField()
+    request_body = models.TextField(default="")
+    response_body = models.TextField(default="")
     endpoint = models.TextField()
     time_taken = models.CharField(max_length=50)
     date_created = models.DateTimeField(auto_now_add=True)

@@ -15,7 +15,7 @@ class ZipCodeDetailView(APIView):
 class AgentAssignedAddressView(APIView):
     serializer_class = None
 
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         license_number = request.user.license_number
         license_jurisdiction = request.user.license_jurisdiction
 

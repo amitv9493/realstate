@@ -1,4 +1,5 @@
 import requests
+from api.third_party_apis import log_api
 from django.conf import settings
 
 config = settings.CONFIG
@@ -12,6 +13,7 @@ class SlipStreamApi:
     def headers(self):
         return
 
+    @log_api
     def get_zipcode_details(self, zipcode: list):
         url = f"{self.url}/ws/areas/zipcodes/get"
         zipcode_param = "".join(str(i) + "|" for i in zipcode)[:-1]
@@ -24,6 +26,7 @@ class SlipStreamApi:
             timeout=20,
         )
 
+    @log_api
     def get_agent_assigned_properties(self, license_number, market):
         url = f"{self.url}/ws/listings/search"
         return requests.get(

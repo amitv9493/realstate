@@ -1,5 +1,13 @@
+import logging
+from typing import Any
+from warnings import warn
+
 from rest_framework.serializers import ModelSerializer
 from rest_framework.serializers import Serializer
+
+from realstate_new.utils import TrackingModel
+
+_logger = logging.getLogger(__name__)
 
 
 class FieldExceptionError(Exception):
@@ -39,6 +47,14 @@ class DynamicFieldsMixin:
 class DynamicModelSerializer(DynamicFieldsMixin, ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if issubclass(self.Meta.model, TrackingModel):
+            if not isinstance(self, TrackingSerializer):
+                warn(
+                    f"Serializer {self.__class__.__name__} is using a model "
+                    f"that inherits from TrackingModel. Consider using "
+                    f"TrackingSerializer instead of {self.__class__.__name__}.",
+                    stacklevel=1,
+                )
         # use only to remove some fields from model Serializer
         exclude_fields = getattr(self.Meta, "exclude_fields", None)
         if exclude_fields:
@@ -47,3 +63,9 @@ class DynamicModelSerializer(DynamicFieldsMixin, ModelSerializer):
 
 
 class DynamicSerializer(DynamicFieldsMixin, Serializer): ...
+
+
+class TrackingSerializer(DynamicModelSerializer):
+    def create(self, validated_data: Any) -> Any:
+        validated_data["created_by"] = self.context.get("request").user
+        return super().create(validated_data)
