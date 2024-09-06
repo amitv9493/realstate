@@ -1,7 +1,7 @@
 from django.db import models
 
 from .basetask import BaseTask
-from .types import RunnerTaskType
+from .choices import RunnerTaskType
 
 
 class RunnerTask(BaseTask):

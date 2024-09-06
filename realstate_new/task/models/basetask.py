@@ -3,8 +3,8 @@ from django.db import models
 
 from realstate_new.utils.base_models import TrackingModel
 
-from .types import BrokerageType
-from .types import JobType
+from .choices import BrokerageType
+from .choices import JobType
 
 
 class BaseTask(TrackingModel):

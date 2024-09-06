@@ -1,7 +1,7 @@
 from django.db import models
 
 from .basetask import BaseTask
-from .types import ProfessionalServiceType
+from .choices import ProfessionalServiceType
 
 
 class ProfessionalServiceTask(BaseTask):

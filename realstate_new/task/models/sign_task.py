@@ -1,8 +1,8 @@
 from django.db import models
 
 from .basetask import BaseTask
-from .types import LockBoxType
-from .types import SignTaskType
+from .choices import LockBoxType
+from .choices import SignTaskType
 
 
 class SignTask(BaseTask):

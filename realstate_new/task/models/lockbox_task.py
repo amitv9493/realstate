@@ -1,8 +1,8 @@
 from django.db import models
 
 from .basetask import BaseTask
-from .types import LockBoxType
-from .types import TaskTypeChoices
+from .choices import LockBoxType
+from .choices import TaskTypeChoices
 
 
 class LockBoxTask(BaseTask):

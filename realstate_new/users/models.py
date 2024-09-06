@@ -27,10 +27,21 @@ DAYS_OF_WEEK = (
 )
 
 
-class User(AbstractUser):
-    job_preferences = MultiSelectField(choices=JOB_TYPES, blank=True, default="SHOWING")
+class NotificationPreferenceChoice(models.TextChoices):
+    EMAIL = "EMAIL", "EMAIL"
+    PHONE = "PHONE", "PHONE"
+    WHATSAPP = "WHATSAPP", "WHATSAPP"
+    PUSH = "PUSH", "PUSH"
 
-    # Time Preferences
+
+class User(AbstractUser):
+    job_preferences = MultiSelectField(choices=JOB_TYPES, default="SHOWING")
+
+    # Preferences
+    notification_preference = MultiSelectField(
+        default="EMAIL",
+        choices=NotificationPreferenceChoice.choices,
+    )
     time_preference_start = models.TimeField(blank=True, default=now)
     time_preference_end = models.TimeField(blank=True, default=now)
 
