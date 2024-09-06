@@ -39,6 +39,7 @@ class UserMeView(APIView):
         "phone_country_code",
     ]
     preferences = [
+        "job_preferences",
         "time_preference_start",
         "time_preference_end",
         "days_of_week_preferences",

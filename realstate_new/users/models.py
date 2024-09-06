@@ -7,32 +7,33 @@ from multiselectfield import MultiSelectField
 
 from realstate_new.payment.models import Wallet
 
+JOB_TYPES = (
+    ("SHOWING", "Showing"),
+    ("OPEN_HOUSE", "Open House"),
+    ("LOCKBOX", "Lockbox Install/Remove"),
+    ("SIGN", "Sign Install/Remove"),
+    ("RUNNER", "Runner Task"),
+    ("PROFESSIONAL", "Professional Services"),
+)
+
+DAYS_OF_WEEK = (
+    ("MON", "Monday"),
+    ("TUE", "Tuesday"),
+    ("WED", "Wednesday"),
+    ("THU", "Thursday"),
+    ("FRI", "Friday"),
+    ("SAT", "Saturday"),
+    ("SUN", "Sunday"),
+)
+
 
 class User(AbstractUser):
-    JOB_TYPES = (
-        ("SHOWING", "Showing"),
-        ("OPEN_HOUSE", "Open House"),
-        ("LOCKBOX", "Lockbox Install/Remove"),
-        ("SIGN", "Sign Install/Remove"),
-        ("RUNNER", "Runner Task"),
-        ("PROFESSIONAL", "Professional Services"),
-    )
     job_preferences = MultiSelectField(choices=JOB_TYPES, blank=True, default="SHOWING")
 
     # Time Preferences
     time_preference_start = models.TimeField(blank=True, default=now)
     time_preference_end = models.TimeField(blank=True, default=now)
 
-    # Days of Week Preferences
-    DAYS_OF_WEEK = (
-        ("MON", "Monday"),
-        ("TUE", "Tuesday"),
-        ("WED", "Wednesday"),
-        ("THU", "Thursday"),
-        ("FRI", "Friday"),
-        ("SAT", "Saturday"),
-        ("SUN", "Sunday"),
-    )
     days_of_week_preferences = MultiSelectField(
         choices=DAYS_OF_WEEK,
         blank=True,
