@@ -27,21 +27,15 @@ DAYS_OF_WEEK = (
 )
 
 
-class NotificationPreferenceChoice(models.TextChoices):
-    EMAIL = "EMAIL", "EMAIL"
-    PHONE = "PHONE", "PHONE"
-    WHATSAPP = "WHATSAPP", "WHATSAPP"
-    PUSH = "PUSH", "PUSH"
-
-
 class User(AbstractUser):
     job_preferences = MultiSelectField(choices=JOB_TYPES, default="SHOWING")
 
     # Preferences
-    notification_preferences = MultiSelectField(
-        default="EMAIL",
-        choices=NotificationPreferenceChoice.choices,
-    )
+    email_notification = models.BooleanField(default=True)
+    whatsapp_notification = models.BooleanField(default=True)
+    push_notification = models.BooleanField(default=True)
+    phone_notification = models.BooleanField(default=True)
+
     time_preference_start = models.TimeField(blank=True, default=now)
     time_preference_end = models.TimeField(blank=True, default=now)
 

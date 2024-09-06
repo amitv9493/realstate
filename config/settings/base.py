@@ -324,12 +324,12 @@ SOCIALACCOUNT_FORMS = {"signup": "realstate_new.users.forms.UserSocialSignupForm
 # -------------------------------------------------------------------------------
 # django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "realstate_new.utils.custom_exception_handler.custom_exception_handler",
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_SCHEMA_CLASS": "drf_standardized_errors.openapi.AutoSchema",
-    "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
     "JSON_UNDERSCOREIZE": {
         "no_underscore_before_number": True,
     },
@@ -357,10 +357,6 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Real State API",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": True,
-    "POSTPROCESSING_HOOKS": [
-        # "drf_spectacular.contrib.djangorestframework_camel_case.camelize_serializer_fields",
-        # "drf_spectacular.hooks.postprocess_schema_enums",
-    ],
     "ENUM_NAME_OVERRIDES": {
         "ValidationErrorEnum": "drf_standardized_errors.openapi_serializers.ValidationErrorEnum.choices",
         "ClientErrorEnum": "drf_standardized_errors.openapi_serializers.ClientErrorEnum.choices",
@@ -389,7 +385,7 @@ APPEND_SLASH = False
 PASSWORD_RESET_TIMEOUT = timedelta(days=5).total_seconds()  # seconds
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "ACCESS_TOKEN_LIFETIME": timedelta(seconds=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=14),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
