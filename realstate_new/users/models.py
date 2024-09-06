@@ -38,7 +38,7 @@ class User(AbstractUser):
     job_preferences = MultiSelectField(choices=JOB_TYPES, default="SHOWING")
 
     # Preferences
-    notification_preference = MultiSelectField(
+    notification_preferences = MultiSelectField(
         default="EMAIL",
         choices=NotificationPreferenceChoice.choices,
     )

@@ -3,12 +3,16 @@ from rest_framework import fields
 
 from realstate_new.users.models import DAYS_OF_WEEK
 from realstate_new.users.models import JOB_TYPES
+from realstate_new.users.models import NotificationPreferenceChoice
 from realstate_new.utils.serializers import DynamicModelSerializer
 
 
 class UserSerializer(DynamicModelSerializer):
     job_preferences = fields.MultipleChoiceField(choices=JOB_TYPES)
     days_of_week_preferences = fields.MultipleChoiceField(choices=DAYS_OF_WEEK)
+    notification_preference = fields.MultipleChoiceField(
+        choices=NotificationPreferenceChoice.choices,
+    )
 
     class Meta:
         model = get_user_model()
@@ -25,7 +29,7 @@ class UserSerializer(DynamicModelSerializer):
         ]
 
 
-class UserMeSerializer(DynamicModelSerializer):
+class UserMeSerializer(UserSerializer):
     class Meta:
         model = get_user_model()
         fields = "__all__"

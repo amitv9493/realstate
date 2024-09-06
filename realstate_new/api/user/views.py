@@ -39,6 +39,8 @@ class UserMeView(APIView):
         "phone_country_code",
     ]
     preferences = [
+        "notification_preference",
+        "time_preferences",
         "job_preferences",
         "time_preference_start",
         "time_preference_end",
