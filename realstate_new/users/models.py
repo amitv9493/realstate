@@ -140,8 +140,10 @@ class ProfessionalDetail(TrackingModel):
     )
     job_title = models.CharField(max_length=50)
     company_name = models.CharField(max_length=50)
-    duration = models.PositiveIntegerField()
+    start_date = models.DateField()
+    end_date = models.DateField()
     description = models.TextField()
+    skills = models.CharField(max_length=255)
 
 
 class EducationDetail(TrackingModel):
@@ -153,3 +155,5 @@ class EducationDetail(TrackingModel):
     degree = models.CharField(max_length=50)
     institution_name = models.CharField(max_length=50)
     year_of_graduation = models.PositiveIntegerField()
+    start_date = models.DateField()
+    end_date = models.DateField()

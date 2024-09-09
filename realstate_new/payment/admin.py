@@ -10,12 +10,8 @@ class PayPalPayementHistoryAdmin(admin.ModelAdmin):
         "id",
         "wallet",
         "date_created",
-        "transmission_id",
-        "transmission_time",
-        "event_body",
-        "valid",
     )
-    list_filter = ("date_created", "transmission_time", "valid")
+    list_filter = ("date_created",)
 
 
 @admin.register(Wallet)
