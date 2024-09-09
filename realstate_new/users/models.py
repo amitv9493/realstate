@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Avg
@@ -6,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
 
 from realstate_new.payment.models import Wallet
+from realstate_new.utils import TrackingModel
 
 JOB_TYPES = (
     ("SHOWING", "Showing"),
@@ -128,3 +130,26 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
         if is_new:
             Wallet.objects.create(user=self, balance=00.00)
+
+
+class ProfessionalDetail(TrackingModel):
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="professional_details",
+    )
+    job_title = models.CharField(max_length=50)
+    company_name = models.CharField(max_length=50)
+    duration = models.PositiveIntegerField()
+    description = models.TextField()
+
+
+class EducationDetail(TrackingModel):
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="education_details",
+    )
+    degree = models.CharField(max_length=50)
+    institution_name = models.CharField(max_length=50)
+    year_of_graduation = models.PositiveIntegerField()

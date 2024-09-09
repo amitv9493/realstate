@@ -16,9 +16,6 @@ class ShowingTaskViewSet(ModelViewSet):
         serializer.validated_data["created_by"] = self.request.user
         return super().perform_create(serializer)
 
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-
 
 def get_user_preferences(user: User):
     return user.days_of_week_preferences

@@ -1,7 +1,12 @@
+from django.db.models.query import QuerySet
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
+from realstate_new.users.models import ProfessionalDetail
+
+from .serializers import ProfessionalDetailSerializer
 from .serializers import UserMeSerializer
 from .serializers import UserSerializer
 
@@ -90,3 +95,17 @@ class UserMeView(APIView):
             msg = "please provide details query params options are 'basic' 'license' 'preferences'"
             raise ValidationError(msg)
         return Response(data, 200)
+
+
+class ProfessionalDetailViewSet(ModelViewSet):
+    serializer_class = ProfessionalDetailSerializer
+    queryset = ProfessionalDetail.objects.all()
+
+    def get_queryset(self) -> QuerySet:
+        qs = super().get_queryset()
+        return qs.filter(user=self.request.user).order_by("-updated_at")
+
+    def perform_create(self, serializer) -> None:
+        serializer.validated_data["user"] = self.request.user
+        serializer.validated_data["created_by"] = self.request.user
+        return super().perform_create(serializer)

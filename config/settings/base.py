@@ -381,7 +381,7 @@ paypalrestsdk.configure(
     },
 )
 
-APPEND_SLASH = False
+APPEND_SLASH = True
 PASSWORD_RESET_TIMEOUT = timedelta(days=5).total_seconds()  # seconds
 
 SIMPLE_JWT = {

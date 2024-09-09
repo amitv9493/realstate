@@ -3,6 +3,7 @@ from rest_framework import fields
 
 from realstate_new.users.models import DAYS_OF_WEEK
 from realstate_new.users.models import JOB_TYPES
+from realstate_new.users.models import ProfessionalDetail
 from realstate_new.utils.serializers import DynamicModelSerializer
 
 
@@ -29,3 +30,11 @@ class UserMeSerializer(UserSerializer):
     class Meta:
         model = get_user_model()
         fields = "__all__"
+
+
+class ProfessionalDetailSerializer(DynamicModelSerializer):
+    class Meta:
+        fields = "__all__"
+        model = ProfessionalDetail
+        exclude_fields = ["user"]
+        extra_kwargs = {"created_by": {"read_only": True}}
