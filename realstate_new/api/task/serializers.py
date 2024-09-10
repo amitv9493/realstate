@@ -20,9 +20,6 @@ class ShowingTaskSerializer(TaskSerializer):
     class Meta:
         model = ShowingTask
         fields = "__all__"
-        extra_kwargs = {
-            "created_by": {"read_only": True},
-        }
 
 
 class LockBoxBSSerializer(TaskSerializer):

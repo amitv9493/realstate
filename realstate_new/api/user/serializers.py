@@ -5,6 +5,7 @@ from realstate_new.users.models import DAYS_OF_WEEK
 from realstate_new.users.models import JOB_TYPES
 from realstate_new.users.models import ProfessionalDetail
 from realstate_new.utils.serializers import DynamicModelSerializer
+from realstate_new.utils.serializers import TrackingSerializer
 
 
 class UserSerializer(DynamicModelSerializer):
@@ -32,7 +33,7 @@ class UserMeSerializer(UserSerializer):
         fields = "__all__"
 
 
-class ProfessionalDetailSerializer(DynamicModelSerializer):
+class ProfessionalDetailSerializer(TrackingSerializer):
     class Meta:
         fields = "__all__"
         model = ProfessionalDetail

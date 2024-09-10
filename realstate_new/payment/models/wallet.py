@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.db import transaction
 
-from realstate_new.payment.errors import InsufficientAmountErrorError
+from realstate_new.payment.errors import InsufficientAmountError
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class Wallet(models.Model):
 
     def _has_enough_amount(self, amount):
         if not self.balance >= amount:
-            raise InsufficientAmountErrorError
+            raise InsufficientAmountError
 
     def deduct_amount(self, amount):
         with transaction.atomic():
