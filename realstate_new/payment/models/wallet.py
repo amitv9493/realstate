@@ -36,4 +36,4 @@ class Wallet(models.Model):
             self._has_enough_amount(amount)
             self.balance -= amount
             self.save(update_fields=["balance"])
-            self.transaction.create(amount=amount, transaction_type="withdrawal")
+            self.transaction.create(amount=amount, transcation_type="WITHDRAW")
