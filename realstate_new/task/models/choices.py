@@ -47,14 +47,14 @@ class BrokerageType(models.TextChoices):
 
 
 class ProfessionalServiceType(models.TextChoices):
-    photography = "photography", "Photography"
-    cleaning = "cleaning", "Cleaning"
-    repair = "repair", "Repair"
-    inspection = "inspection", "Inspection"
-    other = "other", "other"
-    home_staging = "home_staging", "Home Staging"
+    photography = "PHOTOGRAPGY", "Photography"
+    cleaning = "CLEANING", "Cleaning"
+    repair = "REPAIR", "Repair"
+    inspection = "INSPECTION", "Inspection"
+    other = "OTHER", "other"
+    home_staging = "HOME STAGING", "Home Staging"
 
 
 class SignTaskType(models.TextChoices):
-    install = "install", "Install"
-    remove = "remove", "Remove"
+    install = "INSTALL", "Install"
+    remove = "REMOVE", "Remove"
