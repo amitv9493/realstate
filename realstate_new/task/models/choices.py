@@ -47,7 +47,7 @@ class BrokerageType(models.TextChoices):
 
 
 class ProfessionalServiceType(models.TextChoices):
-    photography = "PHOTOGRAPGY", "Photography"
+    photography = "PHOTOGRAPHY", "Photography"
     cleaning = "CLEANING", "Cleaning"
     repair = "REPAIR", "Repair"
     inspection = "INSPECTION", "Inspection"
