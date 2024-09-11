@@ -21,13 +21,13 @@ class TaskSerializer(TrackingSerializer):
 
 
 class ShowingTaskSerializer(TaskSerializer):
-    class Meta:
+    class Meta(TaskSerializer.Meta):
         model = ShowingTask
         fields = "__all__"
 
 
 class LockBoxSerializer(DynamicModelSerializer):
-    class Meta:
+    class Meta(TaskSerializer.Meta):
         model = LockBox
         fields = "__all__"
         exclude_fields = ["id", "lockbox_task"]
@@ -36,7 +36,7 @@ class LockBoxSerializer(DynamicModelSerializer):
 class LockBoxBSSerializer(TaskSerializer):
     lockbox = LockBoxSerializer()
 
-    class Meta:
+    class Meta(TaskSerializer.Meta):
         model = LockBoxTaskBS
         fields = "__all__"
 
@@ -49,30 +49,30 @@ class LockBoxBSSerializer(TaskSerializer):
 
 
 class LockBoxIRSerializer(TaskSerializer):
-    class Meta:
+    class Meta(TaskSerializer.Meta):
         model = LockBoxTaskIR
         fields = "__all__"
 
 
 class OpenHouseTaskSerializer(TaskSerializer):
-    class Meta:
+    class Meta(TaskSerializer.Meta):
         model = OpenHouseTask
         fields = "__all__"
 
 
 class ProfessionalTaskSerializer(TaskSerializer):
-    class Meta:
+    class Meta(TaskSerializer.Meta):
         model = ProfessionalServiceTask
         fields = "__all__"
 
 
 class RunnerTaskSerializer(TaskSerializer):
-    class Meta:
+    class Meta(TaskSerializer.Meta):
         model = RunnerTask
         fields = "__all__"
 
 
 class SignTaskSerializer(TaskSerializer):
-    class Meta:
+    class Meta(TaskSerializer.Meta):
         model = SignTask
         fields = "__all__"
