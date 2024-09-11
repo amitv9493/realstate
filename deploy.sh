@@ -8,7 +8,7 @@ handle_error() {
 
 git pull || handle_error "Failed to pull latest changes from the repository"
 
-docker compose build || handle_error "Failed to build Docker container"
+docker compose build django celeryworker celerybeat|| handle_error "Failed to build Docker container"
 
 docker compose up -d || handle_error "Failed to start containers"
 
