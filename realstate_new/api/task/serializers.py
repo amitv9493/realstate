@@ -1,5 +1,9 @@
+from typing import Any
+
+from utils.serializers import DynamicModelSerializer
 from utils.serializers import TrackingSerializer
 
+from realstate_new.task.models import LockBox
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
 from realstate_new.task.models import OpenHouseTask
@@ -22,10 +26,26 @@ class ShowingTaskSerializer(TaskSerializer):
         fields = "__all__"
 
 
+class LockBoxSerializer(DynamicModelSerializer):
+    class Meta:
+        model = LockBox
+        fields = "__all__"
+        exclude_fields = ["id", "lockbox_task"]
+
+
 class LockBoxBSSerializer(TaskSerializer):
+    lockbox = LockBoxSerializer()
+
     class Meta:
         model = LockBoxTaskBS
         fields = "__all__"
+
+    def create(self, validated_data: Any) -> Any:
+        lockbox_data = validated_data.pop("lockbox", None)
+        lockbox_task = super().create(validated_data)
+        if lockbox_data:
+            LockBox.objects.create(**lockbox_data, lockbox_task=lockbox_task)
+        return lockbox_task
 
 
 class LockBoxIRSerializer(TaskSerializer):

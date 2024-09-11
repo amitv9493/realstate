@@ -58,12 +58,12 @@ class LockBoxTaskBS(LockBoxTask):
 
 class LockBox(models.Model):
     name = models.CharField(max_length=50)
-    type = models.CharField(max_length=50)
+    lockbox_type = models.CharField(max_length=50)
     brand = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     price = models.PositiveIntegerField()
-    lockbox_task = models.ForeignKey(
-        LockBoxTaskBS,
+    lockbox_task = models.OneToOneField(
+        LockBoxTask,
         on_delete=models.CASCADE,
         related_name="lockbox",
         verbose_name="Lock Boxes",

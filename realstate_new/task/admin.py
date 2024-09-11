@@ -90,7 +90,7 @@ class OpenHouseTaskAdmin(BaseTaskAdmin):
 
 
 @admin.register(LockBoxTaskIR)
-class LockboxTaskAdmin(BaseTaskAdmin):
+class LockboxTaskIRAdmin(BaseTaskAdmin):
     fieldsets = (
         *BaseTaskAdmin.fieldsets,
         (
@@ -118,7 +118,7 @@ class LockBoxAdminInline(admin.StackedInline):
 
 
 @admin.register(LockBoxTaskBS)
-class LockboxTask2Admin(BaseTaskAdmin):
+class LockboxTaskBSAdmin(BaseTaskAdmin):
     fieldsets = (
         *BaseTaskAdmin.fieldsets,
         (
