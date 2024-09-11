@@ -333,6 +333,9 @@ REST_FRAMEWORK = {
     "JSON_UNDERSCOREIZE": {
         "no_underscore_before_number": True,
     },
+    "DEFAULT_RENDERER_CLASSES": [
+        "realstate_new.utils.renderer.Custom200Renderer",
+    ],
 }
 
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup

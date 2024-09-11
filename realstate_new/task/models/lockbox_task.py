@@ -34,7 +34,7 @@ class LockBoxTask(BaseTask):
 class LockBoxTaskIR(LockBoxTask):
     class LockBoxTaskIRManager(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().filter(task_type__in=["install", "remove"])
+            return super().get_queryset().filter(task_type__in=["INSTALL", "REMOVE"])
 
     class Meta:
         proxy = True
@@ -47,7 +47,7 @@ class LockBoxTaskIR(LockBoxTask):
 class LockBoxTaskBS(LockBoxTask):
     class LockBoxTaskBSManager(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().filter(task_type__in=["buy", "sell"])
+            return super().get_queryset().filter(task_type__in=["BUY", "SELL"])
 
     class Meta:
         proxy = True
