@@ -128,6 +128,14 @@ class LoginView(PublicApi):
                         "userid": user.id,
                         "user_status": user_group,
                         "user_role": user_role,
+                        "license_info": {
+                            "license_number": user.license_number,
+                            "license_issue_date": user.license_issue_date,
+                            "license_expiration_date": user.license_expiration_date,
+                            "license_status": user.license_status,
+                            "license_type": user.license_type,
+                            "license_jurisdiction": user.license_jurisdiction,
+                        },
                     },
                     status=status.HTTP_200_OK,
                 )
