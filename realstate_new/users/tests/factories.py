@@ -11,7 +11,7 @@ from realstate_new.users.models import User
 class UserFactory(DjangoModelFactory):
     username = Faker("user_name")
     email = Faker("email")
-    name = Faker("name")
+    first_name = Faker("first_name")
 
     @post_generation
     def password(self, create: bool, extracted: Sequence[Any], **kwargs):  # noqa: FBT001

@@ -5,9 +5,9 @@ from django.db import transaction
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from utils.exceptions import PaymentVerificationFailedError
 
 from realstate_new.payment.models import TranscationTypeChoice
+from realstate_new.utils.exceptions import PaymentVerificationFailedError
 
 from .serializers import ConfirmPaymentSerializer
 from .serializers import PaymentSerializer

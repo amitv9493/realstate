@@ -1,7 +1,8 @@
 import paypalrestsdk
 import paypalrestsdk.exceptions
 from rest_framework import serializers
-from utils.serializers import DynamicSerializer
+
+from realstate_new.utils.serializers import DynamicSerializer
 
 
 class PaymentSerializer(DynamicSerializer):

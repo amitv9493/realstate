@@ -1,6 +1,7 @@
 import requests
-from api.third_party_apis import log_api
 from django.conf import settings
+
+from realstate_new.api.third_party_apis import log_api
 
 config = settings.CONFIG
 

@@ -396,14 +396,3 @@ SIMPLE_JWT = {
 PAYPAL_CLIENT_ID = CONFIG.get("paypal", "client_id")
 PAYPAL_CLIENT_SECRET = CONFIG.get("paypal", "client_secret")
 PAYPAL_WEBHOOK_ID = CONFIG.get("paypal", "webhook_id")
-
-CACHES = (
-    {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://redis:6379/1",
-            "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
-            "KEY_PREFIX": "prod",
-        },
-    },
-)

@@ -1,8 +1,5 @@
 from typing import Any
 
-from utils.serializers import DynamicModelSerializer
-from utils.serializers import TrackingSerializer
-
 from realstate_new.task.models import LockBox
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
@@ -11,6 +8,8 @@ from realstate_new.task.models import ProfessionalServiceTask
 from realstate_new.task.models import RunnerTask
 from realstate_new.task.models import ShowingTask
 from realstate_new.task.models import SignTask
+from realstate_new.utils.serializers import DynamicModelSerializer
+from realstate_new.utils.serializers import TrackingSerializer
 
 
 class TaskSerializer(TrackingSerializer):
