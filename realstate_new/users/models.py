@@ -156,7 +156,6 @@ class User(AbstractUser):
             "whatsapp_notification": self.whatsapp_notification,
             "push_notification": self.push_notification,
             "phone_notification": self.phone_notification,
-            "time_preferences": self.time_preferences,
             "job_preferences": self.job_preferences,
             "time_preference_start": self.time_preference_start,
             "time_preference_end": self.time_preference_end,
