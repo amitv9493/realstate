@@ -86,3 +86,6 @@ The following details how to deploy this application.
 ### Docker
 
 See detailed [cookiecutter-django Docker documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html).
+
+### Run in Postman
+[<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://app.getpostman.com/run-collection/25503165-87690278-811d-4a68-8096-d705636db904?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D25503165-87690278-811d-4a68-8096-d705636db904%26entityType%3Dcollection%26workspaceId%3D75cfc06e-2da5-42e7-9516-78b17c7f2caf)

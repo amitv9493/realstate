@@ -129,7 +129,7 @@ class LoginView(PublicApi):
                         "userid": user.id,
                         "user_status": user_group,
                         "user_role": user_role,
-                        "license_info": user.get_license_info(),
+                        "license_info": user.get_required_license_info(),
                     },
                     status=status.HTTP_200_OK,
                 )

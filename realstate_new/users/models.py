@@ -75,10 +75,11 @@ class User(AbstractUser):
         max_length=20,
         blank=True,
     )
-    office_name = models.CharField(
+    brokerage_name = models.CharField(
         max_length=200,
         blank=True,
-    )
+    )  # also known as office_name
+
     phone = models.CharField(max_length=20, default="")
     phone_country_code = models.CharField(max_length=20, default="")
     fax = models.CharField(
@@ -131,13 +132,66 @@ class User(AbstractUser):
         if is_new:
             Wallet.objects.create(user=self, balance=00.00)
 
-    def get_license_info(self):
+    def get_basic_info(self):
         return {
+            "last_login": self.last_login,
+            "username": self.username,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "email": self.email,
+            "is_active": self.is_active,
+            "date_joined": self.date_joined,
+            "job_preferences": self.job_preferences,
+            "time_preference_start": self.time_preference_start,
+            "time_preference_end": self.time_preference_end,
+            "days_of_week_preferences": self.days_of_week_preferences,
+            "mile_radius_preference": self.mile_radius_preference,
+            "phone": self.phone,
+            "phone_country_code": self.phone_country_code,
+        }
+
+    def get_preferences(self):
+        return {
+            "email_notification": self.email_notification,
+            "whatsapp_notification": self.whatsapp_notification,
+            "push_notification": self.push_notification,
+            "phone_notification": self.phone_notification,
+            "time_preferences": self.time_preferences,
+            "job_preferences": self.job_preferences,
+            "time_preference_start": self.time_preference_start,
+            "time_preference_end": self.time_preference_end,
+            "days_of_week_preferences": self.days_of_week_preferences,
+            "mile_radius_preference": self.mile_radius_preference,
+        }
+
+    def get_all_license_info(self):
+        return {
+            "license_number": self.license_number,
             "license_issue_date": self.license_issue_date,
             "license_expiration_date": self.license_expiration_date,
             "license_status": self.license_status,
             "license_type": self.license_type,
             "license_jurisdiction": self.license_jurisdiction,
+            "brokerage_name": self.brokerage_name,
+            "suffix": self.suffix,
+            "address_line1": self.address_line1,
+            "address_line2": self.address_line2,
+            "city": self.city,
+            "state_province": self.state_province,
+            "postal_code": self.postal_code,
+            "country": self.country,
+        }
+
+    def get_required_license_info(self):
+        return {
+            "license_number": self.license_number,
+            "license_issue_date": self.license_issue_date,
+            "license_expiration_date": self.license_expiration_date,
+            "license_status": self.license_status,
+            "license_type": self.license_type,
+            "license_jurisdiction": self.license_jurisdiction,
+            "suffix": self.suffix,
+            "brokerage_name": self.brokerage_name,
         }
 
 
