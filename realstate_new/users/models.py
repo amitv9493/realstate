@@ -131,6 +131,15 @@ class User(AbstractUser):
         if is_new:
             Wallet.objects.create(user=self, balance=00.00)
 
+    def get_license_info(self):
+        return {
+            "license_issue_date": self.license_issue_date,
+            "license_expiration_date": self.license_expiration_date,
+            "license_status": self.license_status,
+            "license_type": self.license_type,
+            "license_jurisdiction": self.license_jurisdiction,
+        }
+
 
 class ProfessionalDetail(TrackingModel):
     user = models.ForeignKey(

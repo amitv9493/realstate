@@ -33,6 +33,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from realstate_new.users.models import User as UserType
 from realstate_new.utils import send_email
 from realstate_new.utils.views import PublicApi
 
@@ -48,7 +49,7 @@ from .serializers import UserProfileSerializer
 from .utils import get_user_role
 
 logger = logging.getLogger(__name__)
-User = get_user_model()
+User: UserType = get_user_model()
 
 
 def get_csrf_token(request):
@@ -111,7 +112,7 @@ class LoginView(PublicApi):
         if serializer.is_valid(raise_exception=True):
             username = serializer.data.get("username")
             password = serializer.data.get("password")
-            user = authenticate(username=username, password=password)
+            user: UserType | None = authenticate(username=username, password=password)
             if user is not None:
                 try:
                     user_group = (Group.objects.get(user=user.id)).name
@@ -128,14 +129,7 @@ class LoginView(PublicApi):
                         "userid": user.id,
                         "user_status": user_group,
                         "user_role": user_role,
-                        "license_info": {
-                            "license_number": user.license_number,
-                            "license_issue_date": user.license_issue_date,
-                            "license_expiration_date": user.license_expiration_date,
-                            "license_status": user.license_status,
-                            "license_type": user.license_type,
-                            "license_jurisdiction": user.license_jurisdiction,
-                        },
+                        "license_info": user.get_license_info(),
                     },
                     status=status.HTTP_200_OK,
                 )
@@ -365,7 +359,7 @@ class GoogleVerificationView(PublicApi):
         serializer = GoogleAUthVerifiedData(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
-            user = serializer.save()
+            user: UserType = serializer.save()
             token = get_tokens_for_user(user)
             user_role = get_user_role(user)
             try:
@@ -381,6 +375,7 @@ class GoogleVerificationView(PublicApi):
                     "userid": user.id,
                     "user_status": user_group,
                     "user_role": user_role,
+                    "license_info": user.get_license_info(),
                 },
                 status=200,
             )
