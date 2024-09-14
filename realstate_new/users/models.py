@@ -133,6 +133,7 @@ class User(AbstractUser):
             Wallet.objects.create(user=self, balance=00.00)
 
     def get_basic_info(self):
+        "Returns users basic info"
         return {
             "last_login": self.last_login,
             "username": self.username,
@@ -141,16 +142,12 @@ class User(AbstractUser):
             "email": self.email,
             "is_active": self.is_active,
             "date_joined": self.date_joined,
-            "job_preferences": self.job_preferences,
-            "time_preference_start": self.time_preference_start,
-            "time_preference_end": self.time_preference_end,
-            "days_of_week_preferences": self.days_of_week_preferences,
-            "mile_radius_preference": self.mile_radius_preference,
             "phone": self.phone,
             "phone_country_code": self.phone_country_code,
         }
 
     def get_preferences(self):
+        "Returns all uesr preferences related to a job."
         return {
             "email_notification": self.email_notification,
             "whatsapp_notification": self.whatsapp_notification,
@@ -164,6 +161,7 @@ class User(AbstractUser):
         }
 
     def get_all_license_info(self):
+        """Returns all license related info"""
         return {
             "license_number": self.license_number,
             "license_issue_date": self.license_issue_date,
@@ -182,6 +180,7 @@ class User(AbstractUser):
         }
 
     def get_required_license_info(self):
+        "Returns only necessary license info."
         return {
             "license_number": self.license_number,
             "license_issue_date": self.license_issue_date,
