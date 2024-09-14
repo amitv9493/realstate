@@ -6,6 +6,8 @@ volumes:
 
   production_redis_data: {}
 
+
+
 services:
   django: &django
     build:
@@ -22,12 +24,8 @@ services:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
     environment:
-      - DJANGO_SETTINGS_MODULE=config.settings.production
-    command: >
-      /bin/sh -c "
-        python manage.py compilemessages &&
-        /start
-      "
+          - DJANGO_SETTINGS_MODULE=config.settings.production
+    command: /start
 
   postgres:
     build:
@@ -50,15 +48,16 @@ services:
     volumes:
       - production_traefik:/etc/traefik/acme
     ports:
-      - "0.0.0.0:80:80"
-      - "0.0.0.0:443:443"
-      - "0.0.0.0:5555:5555"
+      - '0.0.0.0:80:80'
+      - '0.0.0.0:443:443'
+      - '0.0.0.0:5555:5555'
 
   redis:
     image: docker.io/redis:6
 
     volumes:
       - production_redis_data:/data
+
 
   celeryworker:
     <<: *django
