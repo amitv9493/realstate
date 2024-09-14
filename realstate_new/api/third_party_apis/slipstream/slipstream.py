@@ -1,14 +1,12 @@
 import requests
-from django.conf import settings
 
+from config.settings.base import env
 from realstate_new.api.third_party_apis import log_api
-
-config = settings.CONFIG
 
 
 class SlipStreamApi:
-    url = config.get("slipstream", "url")
-    public_key = config.get("slipstream", "public_key")
+    url = env("SLIPSTREAM_URL")
+    public_key = env("SLIPSTREAM_PUBLIC_KEY")
 
     @property
     def headers(self):

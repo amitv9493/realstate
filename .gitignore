@@ -69,6 +69,8 @@ celerybeat-schedule
 # Environments
 .venv
 venv/
+
+
 ENV/
 
 # Rope project settings
@@ -278,5 +280,5 @@ realstate_new/media/
 .pytest_cache/
 .ipython/
 .env
+# .envs/.local/
 .envs/*
-!.envs/.local/

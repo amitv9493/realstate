@@ -1,17 +1,13 @@
 # ruff: noqa: ERA001, E501
 """Base settings to build other settings files upon."""
 
-import configparser
 from datetime import timedelta
 from pathlib import Path
 
 import environ
 import paypalrestsdk
 
-CONFIG = configparser.ConfigParser()
-
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
-CONFIG.read(BASE_DIR / "config" / "project.conf")
 # realstate_new/
 APPS_DIR = BASE_DIR / "realstate_new"
 env = environ.Env()
@@ -379,8 +375,8 @@ SPECTACULAR_SETTINGS = {
 paypalrestsdk.configure(
     {
         "mode": "sandbox",  # sandbox or live
-        "client_id": CONFIG.get("paypal", "client_id"),
-        "client_secret": CONFIG.get("paypal", "client_secret"),
+        "client_id": env("PAYPAL_CLIENT_ID"),
+        "client_secret": env("PAYPAL_CLIENT_SECRET"),
     },
 )
 
@@ -393,6 +389,3 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
 }
-PAYPAL_CLIENT_ID = CONFIG.get("paypal", "client_id")
-PAYPAL_CLIENT_SECRET = CONFIG.get("paypal", "client_secret")
-PAYPAL_WEBHOOK_ID = CONFIG.get("paypal", "webhook_id")

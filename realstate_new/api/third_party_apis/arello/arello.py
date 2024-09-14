@@ -1,17 +1,16 @@
 # ruff: noqa: TID252
 import requests
-from django.conf import settings
+
+from config.settings.base import env
 
 from ..logger import log_api
 
-config = settings.CONFIG
-
 
 class ArelloService:
-    endpoint = config.get("arello", "endpoint")
-    username = config.get("arello", "username")
-    password = config.get("arello", "password")
-    search_mode = config.get("arello", "search_mode")
+    endpoint = env("ARELLO_ENDPOINT")
+    username = env("ARELLO_USERNAME")
+    password = env("ARELLO_PASSWORD")
+    search_mode = env("ARELLO_SEARCH_MODE")
 
     @log_api
     def get_license_info(self, vals):

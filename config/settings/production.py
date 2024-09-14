@@ -1,7 +1,6 @@
 # ruff: noqa: E501
 from .base import *  # noqa: F403
 from .base import BASE_DIR
-from .base import CONFIG
 from .base import DATABASES
 from .base import INSTALLED_APPS
 from .base import SPECTACULAR_SETTINGS
@@ -161,8 +160,8 @@ SPECTACULAR_SETTINGS["SERVERS"] = [
 
 EMAIL_FILE_PATH = BASE_DIR / "emails"
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = CONFIG.get("smtp", "host")
+EMAIL_HOST = env("SMTP_HOST")
 EMAIL_PORT = 587
-EMAIL_HOST_USER = CONFIG.get("smtp", "host_user")
-EMAIL_HOST_PASSWORD = CONFIG.get("smtp", "password")
+EMAIL_HOST_USER = env("SMTP_HOST_USER")
+EMAIL_HOST_PASSWORD = env("SMTP_PASSWORD")
 EMAIL_USE_TLS = True
