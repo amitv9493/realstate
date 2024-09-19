@@ -6,7 +6,8 @@ from realstate_new.api.third_party_apis import log_api
 
 class SlipStreamApi:
     url = env("SLIPSTREAM_URL")
-    public_key = env("SLIPSTREAM_PUBLIC_KEY")
+    public_key = env("SLIPSTREAM_PRIVATE_KEY")
+    market = env("MARKET")
 
     @property
     def headers(self):
@@ -26,14 +27,17 @@ class SlipStreamApi:
         )
 
     @log_api
-    def get_agent_assigned_properties(self, license_number, market):
-        url = f"{self.url}/ws/listings/search"
+    def get_agent_assigned_properties(self, mls_id):
+        url = f"{self.url}/ws/listings/get"
         return requests.get(
             url,
             params={
-                "agent.licenseNumber": license_number,
                 "authorization": self.public_key,
-                "market": market,
+                "market": self.market,
+                "details": True,
+                "extended": True,
+                "images": True,
+                "id": mls_id,
             },
             timeout=20,
         )

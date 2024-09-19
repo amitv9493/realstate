@@ -6,6 +6,7 @@ class PropertyType(models.TextChoices):
     CONDO = "CONDO", "Condo"
     APT = "APT", "Apartment"
     COMM = "COMM", "Commercial"
+    OTHER = "OTHER", "Other"
 
 
 class PropertyStatus(models.TextChoices):

@@ -1,5 +1,9 @@
+from rest_framework import serializers
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from realstate_new.master.models import Property
 
 from .slipstream import SlipStreamApi
 
@@ -13,21 +17,21 @@ class ZipCodeDetailView(APIView):
 
 
 class AgentAssignedAddressView(APIView):
-    serializer_class = None
+    class MLSIDSerializer(serializers.Serializer):
+        mls_id = serializers.IntegerField()
+
+    serializer_class = MLSIDSerializer
 
     def get(self, request, *args, **kwargs):
-        license_number = request.user.license_number
-        license_jurisdiction = request.user.license_jurisdiction
+        serializer = self.serializer_class(data=request.data)
 
-        if not license_number or not license_jurisdiction:
-            return Response(
-                {"error": "license number and license jurisdiction is not saved"},
-                400,
+        if serializer.is_valid(raise_exception=True):  # noqa: RET503
+            response = SlipStreamApi().get_agent_assigned_properties(
+                mls_id=serializer.validated_data.get("mls_id", None),
             )
 
-        # using dummy query param as of now
-        response = SlipStreamApi().get_agent_assigned_properties(
-            license_number,
-            license_jurisdiction,
-        )
-        return Response(response.json(), response.status_code)
+            if response.status_code == status.HTTP_200_OK:
+                Property.objects.create(
+                    api_response=response.json(),
+                )
+            return Response({"status": True}, response.status_code)
