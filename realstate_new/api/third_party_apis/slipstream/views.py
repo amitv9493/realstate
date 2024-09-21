@@ -3,8 +3,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from realstate_new.master.models import Property
-
 from .slipstream import SlipStreamApi
 
 
@@ -17,21 +15,14 @@ class ZipCodeDetailView(APIView):
 
 
 class AgentAssignedAddressView(APIView):
-    class MLSIDSerializer(serializers.Serializer):
-        mls_id = serializers.IntegerField()
+    serializer_class = None
 
-    serializer_class = MLSIDSerializer
+    def get(self, request, mls_id, *args, **kwargs):
+        response = SlipStreamApi().get_agent_assigned_properties(
+            mls_id=mls_id,
+        )
 
-    def get(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-
-        if serializer.is_valid(raise_exception=True):  # noqa: RET503
-            response = SlipStreamApi().get_agent_assigned_properties(
-                mls_id=serializer.validated_data.get("mls_id", None),
-            )
-
-            if response.status_code == status.HTTP_200_OK:
-                Property.objects.create(
-                    api_response=response.json(),
-                )
-            return Response({"status": True}, response.status_code)
+        if response.status_code == status.HTTP_200_OK:
+            cleaned_response = response.json()["result"]["listings"]
+            return Response(cleaned_response, response.status_code)
+        raise serializers.ValidationError(msg=response.json(), code="client_error")

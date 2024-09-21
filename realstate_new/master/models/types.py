@@ -10,6 +10,7 @@ class PropertyType(models.TextChoices):
 
 
 class PropertyStatus(models.TextChoices):
-    AVAILABLE = "Available", "Available"
-    UC = "Under Contract", "Under Contract"
-    SOLD = "Sold", "Sold"
+    AVAILABLE = "AVAIABLRE", "Available"
+    UC = "UNDER CONTRACT", "Under Contract"
+    SOLD = "SOLD", "Sold"
+    OTHER = "OTHER", "Other"

@@ -48,7 +48,7 @@ class DynamicModelSerializer(DynamicFieldsMixin, ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if issubclass(self.Meta.model, TrackingModel):
-            if not isinstance(self, TrackingSerializer):
+            if not isinstance(self, TrackingModelSerializer):
                 warn(
                     f"Serializer {self.__class__.__name__} is using a model "
                     f"that inherits from TrackingModel. Consider using "
@@ -62,10 +62,19 @@ class DynamicModelSerializer(DynamicFieldsMixin, ModelSerializer):
                 self.fields.pop(field)
 
 
-class DynamicSerializer(DynamicFieldsMixin, Serializer): ...
+class DynamicSerializer(DynamicFieldsMixin, Serializer):
+    pass
 
 
-class TrackingSerializer(DynamicModelSerializer):
-    def create(self, validated_data: Any) -> Any:
+class TrackingSerializer(DynamicSerializer):
+    def set_created_by(self, validated_data):
         validated_data["created_by"] = self.context.get("request").user
+
+
+class TrackingModelSerializer(DynamicModelSerializer):
+    def create(self, validated_data: Any) -> Any:
+        self.set_created_by(validated_data)
         return super().create(validated_data)
+
+    def set_created_by(self, validated_data):
+        validated_data["created_by"] = self.context.get("request").user

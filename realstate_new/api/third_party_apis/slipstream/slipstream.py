@@ -28,16 +28,14 @@ class SlipStreamApi:
 
     @log_api
     def get_agent_assigned_properties(self, mls_id):
-        url = f"{self.url}/ws/listings/get"
+        url = f"{self.url}/ws/listings/search"
         return requests.get(
             url,
             params={
                 "authorization": self.public_key,
-                "market": self.market,
                 "details": True,
-                "extended": True,
-                "images": True,
                 "id": mls_id,
+                "market": self.market,
             },
             timeout=20,
         )

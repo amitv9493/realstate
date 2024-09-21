@@ -29,3 +29,4 @@ paypalrestsdk==1.13.3
 djangorestframework-simplejwt==5.3.1
 drf-standardized-errors==0.14.0
 django-jazzmin==3.0.0
+djangorestframework-camel-case==1.4.2

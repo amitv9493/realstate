@@ -5,5 +5,5 @@ from .views import ZipCodeDetailView
 
 urlpatterns = [
     path("zipcode-detail", ZipCodeDetailView.as_view()),
-    path("agent-assigned-address", AgentAssignedAddressView.as_view()),
+    path("searchproperty/<int:mls_id>", AgentAssignedAddressView.as_view()),
 ]
