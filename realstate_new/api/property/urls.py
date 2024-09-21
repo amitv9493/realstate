@@ -8,5 +8,9 @@ router = DefaultRouter()
 router.register("", PropertyViewSet, basename="property")
 
 urlpatterns = [
-    path("create/", PropertyCreateView.as_view()),
+    path(
+        "create/",
+        PropertyCreateView.as_view(),
+    ),
+    *router.urls,
 ]
