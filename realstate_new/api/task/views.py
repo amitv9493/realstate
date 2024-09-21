@@ -1,3 +1,5 @@
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
 from realstate_new.task.models import LockBoxTaskBS
@@ -5,10 +7,13 @@ from realstate_new.task.models import LockBoxTaskIR
 from realstate_new.task.models import OpenHouseTask
 from realstate_new.task.models import ShowingTask
 from realstate_new.task.models.professional_task import ProfessionalServiceTask
+from realstate_new.task.models.runner_task import RunnerTask
+from realstate_new.task.models.sign_task import SignTask
 from realstate_new.users.models import User
 
 from .serializers import LockBoxBSSerializer
 from .serializers import LockBoxIRSerializer
+from .serializers import OngoingTaskSerializer
 from .serializers import OpenHouseTaskSerializer
 from .serializers import ProfessionalTaskSerializer
 from .serializers import RunnerTaskSerializer
@@ -60,3 +65,47 @@ class RunnerTaskViewSet(TaskViewSet):
 class SignTaskViewSet(TaskViewSet):
     serializer_class = SignTaskSerializer
     queryset = ProfessionalServiceTask.objects.all()
+
+
+class OngoingTaskView(APIView):
+    def get(self, request, *args, **kwargs):
+        showing_tasks = ShowingTask.objects.filter(
+            is_completed=False,
+            created_by=request.user,
+        )
+        sign_tasks = SignTask.objects.filter(
+            is_completed=False,
+            created_by=request.user,
+        )
+        runner_tasks = RunnerTask.objects.filter(
+            is_completed=False,
+            created_by=request.user,
+        )
+        professional_tasks = ProfessionalServiceTask.objects.filter(
+            is_completed=False,
+            created_by=request.user,
+        )
+        openhouse_tasks = OpenHouseTask.objects.filter(
+            is_completed=False,
+            created_by=request.user,
+        )
+        lockbox_tasks_bs = LockBoxTaskBS.objects.filter(
+            is_completed=False,
+            created_by=request.user,
+        )
+        lockbox_tasks_ir = LockBoxTaskIR.objects.filter(
+            is_completed=False,
+            created_by=request.user,
+        )
+
+        data = {
+            "showing_tasks": showing_tasks,
+            "sign_tasks": sign_tasks,
+            "runner_tasks": runner_tasks,
+            "professional_tasks": professional_tasks,
+            "openhouse_tasks": openhouse_tasks,
+            "lockbox_tasks_bs": lockbox_tasks_bs,
+            "lockbox_tasks_ir": lockbox_tasks_ir,
+        }
+        data = OngoingTaskSerializer(data).data
+        return Response(data, 200)

@@ -1,5 +1,7 @@
 from typing import Any
 
+from rest_framework import serializers
+
 from realstate_new.task.models import LockBox
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
@@ -8,11 +10,10 @@ from realstate_new.task.models import ProfessionalServiceTask
 from realstate_new.task.models import RunnerTask
 from realstate_new.task.models import ShowingTask
 from realstate_new.task.models import SignTask
-from realstate_new.utils.serializers import DynamicModelSerializer
-from realstate_new.utils.serializers import TrackingSerializer
+from realstate_new.utils.serializers import TrackingModelSerializer
 
 
-class TaskSerializer(TrackingSerializer):
+class TaskSerializer(TrackingModelSerializer):
     class Meta:
         extra_kwargs = {
             "created_by": {"read_only": True},
@@ -25,7 +26,7 @@ class ShowingTaskSerializer(TaskSerializer):
         fields = "__all__"
 
 
-class LockBoxSerializer(DynamicModelSerializer):
+class LockBoxSerializer(TaskSerializer):
     class Meta(TaskSerializer.Meta):
         model = LockBox
         fields = "__all__"
@@ -75,3 +76,27 @@ class SignTaskSerializer(TaskSerializer):
     class Meta(TaskSerializer.Meta):
         model = SignTask
         fields = "__all__"
+
+
+ONGOING_FIELDS = (
+    "id",
+    "title",
+    "created-at",
+    "task_time",
+    "payment_amount",
+    "job_deadline",
+    "apply_deadline",
+    "created_by",
+    "assigned_to",
+    "property",
+)
+
+
+class OngoingTaskSerializer(serializers.Serializer):
+    showing_tasks = ShowingTaskSerializer(many=True, fields=ONGOING_FIELDS)
+    sign_tasks = SignTaskSerializer(many=True, fields=ONGOING_FIELDS)
+    runner_tasks = RunnerTaskSerializer(many=True, fields=ONGOING_FIELDS)
+    professional_tasks = ProfessionalTaskSerializer(many=True, fields=ONGOING_FIELDS)
+    openhouse_tasks = OpenHouseTaskSerializer(many=True, fields=ONGOING_FIELDS)
+    lockbox_tasks_bs = LockBoxBSSerializer(many=True, fields=ONGOING_FIELDS)
+    lockbox_tasks_ir = LockBoxIRSerializer(many=True, fields=ONGOING_FIELDS)

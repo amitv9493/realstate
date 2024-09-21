@@ -8,6 +8,7 @@ from .choices import JobType
 
 
 class BaseTask(TrackingModel):
+    title = models.CharField(max_length=50, default="")
     property = models.ForeignKey(
         "master.Property",
         on_delete=models.SET_NULL,

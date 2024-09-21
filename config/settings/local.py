@@ -2,6 +2,7 @@
 from .base import *  # noqa: F403
 from .base import BASE_DIR
 from .base import INSTALLED_APPS
+from .base import MIDDLEWARE
 from .base import env
 
 # GENERAL
@@ -30,7 +31,7 @@ CACHES = {
 # WhiteNoise
 # ------------------------------------------------------------------------------
 # http://whitenoise.evans.io/en/latest/django.html#using-whitenoise-in-development
-INSTALLED_APPS = ["whitenoise.runserver_nostatic", *INSTALLED_APPS]
+INSTALLED_APPS = ["silk", "whitenoise.runserver_nostatic", *INSTALLED_APPS]
 
 
 INTERNAL_IPS = ["127.0.0.1", "10.0.2.2"]
@@ -59,3 +60,5 @@ EMAIL_HOST = "mailpit"  # env("EMAIL_HOST", default="mailpit")
 EMAIL_PORT = 1025
 EMAIL_FILE_PATH = BASE_DIR / "emails"
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+MIDDLEWARE = ["silk.middleware.SilkyMiddleware", *MIDDLEWARE]

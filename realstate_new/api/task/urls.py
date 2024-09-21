@@ -1,7 +1,9 @@
+from django.urls import path
 from rest_framework import routers
 
 from .views import LockBoxTaskBSViewSet
 from .views import LockBoxTaskIRViewSet
+from .views import OngoingTaskView
 from .views import OpenHouseTaskViewSet
 from .views import ProfessionalTaskViewSet
 from .views import RunnerTaskViewSet
@@ -18,4 +20,4 @@ router.register("runnertask", RunnerTaskViewSet, "runner-task")
 router.register("signtask", SignTaskViewSet, "sign-task")
 
 
-urlpatterns = [*router.urls]
+urlpatterns = [path("ongoingtasks/", OngoingTaskView.as_view()), *router.urls]

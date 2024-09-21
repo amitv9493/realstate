@@ -14,7 +14,7 @@ urlpatterns = [
 if settings.DEBUG:
     # Static file serving when using Gunicorn + Uvicorn for local web socket development
     urlpatterns += staticfiles_urlpatterns()
-
+    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
 # API URLS
 urlpatterns += [
     # API base url
