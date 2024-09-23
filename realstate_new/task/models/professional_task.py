@@ -13,3 +13,7 @@ class ProfessionalServiceTask(BaseTask):
     service_provider_phone = models.CharField(max_length=20)
     service_provider_email = models.EmailField()
     service_instructions = models.TextField()
+
+    @property
+    def type_of_task(self):
+        return "Professional"

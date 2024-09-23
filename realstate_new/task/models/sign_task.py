@@ -17,3 +17,7 @@ class SignTask(BaseTask):
         choices=LockBoxType.choices,
         blank=True,
     )
+
+    @property
+    def type_of_task(self):
+        return "Sign"

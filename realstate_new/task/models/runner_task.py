@@ -21,3 +21,7 @@ class RunnerTask(BaseTask):
     vendor_phone = models.CharField(max_length=50)
     vendor_company_name = models.CharField(max_length=50)
     vebdor_notes = models.TextField()
+
+    @property
+    def type_of_task(self):
+        return "Runner"

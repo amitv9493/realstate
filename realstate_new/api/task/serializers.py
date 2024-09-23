@@ -12,8 +12,24 @@ from realstate_new.task.models import ShowingTask
 from realstate_new.task.models import SignTask
 from realstate_new.utils.serializers import TrackingModelSerializer
 
+ONGOING_FIELDS = (
+    "id",
+    "title",
+    "created-at",
+    "task_time",
+    "payment_amount",
+    "job_deadline",
+    "apply_deadline",
+    "created_by",
+    "assigned_to",
+    "property",
+    "type_of_task",
+)
+
 
 class TaskSerializer(TrackingModelSerializer):
+    type_of_task = serializers.CharField()
+
     class Meta:
         extra_kwargs = {
             "created_by": {"read_only": True},
@@ -76,20 +92,6 @@ class SignTaskSerializer(TaskSerializer):
     class Meta(TaskSerializer.Meta):
         model = SignTask
         fields = "__all__"
-
-
-ONGOING_FIELDS = (
-    "id",
-    "title",
-    "created-at",
-    "task_time",
-    "payment_amount",
-    "job_deadline",
-    "apply_deadline",
-    "created_by",
-    "assigned_to",
-    "property",
-)
 
 
 class OngoingTaskSerializer(serializers.Serializer):
