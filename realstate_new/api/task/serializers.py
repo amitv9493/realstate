@@ -28,7 +28,7 @@ ONGOING_FIELDS = (
 
 
 class TaskSerializer(TrackingModelSerializer):
-    type_of_task = serializers.CharField()
+    type_of_task = serializers.CharField(read_only=True)
 
     class Meta:
         extra_kwargs = {
