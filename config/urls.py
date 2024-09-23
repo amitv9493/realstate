@@ -9,12 +9,12 @@ from drf_spectacular.views import SpectacularSwaggerView
 
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
+    path("silk/", include("silk.urls", namespace="silk")),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
 if settings.DEBUG:
     # Static file serving when using Gunicorn + Uvicorn for local web socket development
     urlpatterns += staticfiles_urlpatterns()
-    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
 # API URLS
 urlpatterns += [
     # API base url
