@@ -79,6 +79,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "drf_spectacular",
     "drf_standardized_errors",
+    "silk",
 ]
 
 LOCAL_APPS = [
@@ -148,6 +149,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     "djangorestframework_camel_case.middleware.CamelCaseMiddleWare",
+    "silk.middleware.SilkyMiddleware",
 ]
 
 # STATIC
