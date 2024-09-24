@@ -73,6 +73,8 @@ class SignTaskViewSet(TaskViewSet):
 
 
 class OngoingTaskView(APIView):
+    serializer_class = None
+
     @silk_profile(name="ongoing task")
     def get(self, request, *args, **kwargs):
         page_size = int(request.query_params.get("page_size", 10))
@@ -115,6 +117,8 @@ class OngoingTaskView(APIView):
 
 
 class CompletedTaskView(APIView):
+    serializer_class = None
+
     @silk_profile(name="ongoing task")
     def get(self, request, *args, **kwargs):
         page_size = int(request.query_params.get("page_size", 10))

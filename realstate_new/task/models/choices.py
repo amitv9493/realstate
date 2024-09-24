@@ -5,6 +5,7 @@ class LockBoxType(models.TextChoices):
     SUPRA = "SUPRA", "SUPRA"
     KEYPAD_ENTRY = "KEYPAD ENTRY", "KEYPAD ENTRY"
     CONTRACTOR = "CONTRACTOR", "CONTRACTOR"
+    OTHER = "OTHER", "OTHER"
 
 
 class TaskTypeChoices(models.TextChoices):

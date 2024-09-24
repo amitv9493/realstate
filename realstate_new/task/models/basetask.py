@@ -5,6 +5,7 @@ from realstate_new.utils.base_models import TrackingModel
 
 from .choices import BrokerageType
 from .choices import JobType
+from .choices import LockBoxType
 
 
 class BaseTask(TrackingModel):
@@ -15,11 +16,13 @@ class BaseTask(TrackingModel):
         null=True,
         blank=True,
     )
-    client_name = models.CharField(max_length=50)
-    client_phone = models.CharField(max_length=50)
-    client_email = models.EmailField()
+    client_name = models.CharField(max_length=50, default="", blank=True)
+    client_phone = models.CharField(max_length=50, default="", blank=True)
+    client_email = models.EmailField(blank=True)
+
     task_time = models.DateTimeField()
-    notes = models.TextField()
+    notes = models.TextField(blank=True, default="")
+
     payment_amount = models.PositiveIntegerField()
     is_completed = models.BooleanField(default=False)
     job_type = models.CharField(
@@ -27,8 +30,8 @@ class BaseTask(TrackingModel):
         choices=JobType.choices,
         default=JobType.apply,
     )
-    job_deadline = models.DateTimeField()
     apply_deadline = models.DateTimeField(null=True, blank=True)
+
     assigned_to = models.ForeignKey(
         get_user_model(),
         on_delete=models.SET_NULL,
@@ -42,7 +45,22 @@ class BaseTask(TrackingModel):
         default=BrokerageType.my_brokerage,
     )
 
-    show_client_phone_number = models.BooleanField(default=False)
+    show_client_info = models.BooleanField(default=False)
+
+    # extra info
+    vacant = models.BooleanField(default=False)
+    pets = models.BooleanField(default=False)
+    concierge = models.BooleanField(default=False)
+
+    alarm_code = models.CharField(max_length=50, default="", blank=True)
+    gate_code = models.CharField(max_length=50, default="", blank=True)
+
+    lockbox_type = models.CharField(
+        max_length=50,
+        choices=LockBoxType.choices,
+        default=LockBoxType.OTHER,
+        blank=True,
+    )
 
     def __str__(self):
         return f"{self.client_name}-{self.payment_amount}"

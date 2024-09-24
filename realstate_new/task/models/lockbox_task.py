@@ -30,6 +30,8 @@ class LockBoxTask(BaseTask):
     # in case of buy and sell
     price = models.PositiveIntegerField(blank=True)
 
+    include_sign = models.BooleanField(null=True, blank=True)
+
     @property
     def type_of_task(self):
         return "Lockbox"

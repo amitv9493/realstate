@@ -33,27 +33,42 @@ class BaseTaskAdmin(admin.ModelAdmin):
                 "fields": (
                     "property",
                     "task_time",
-                    "is_completed",
                     "job_type",
-                    "job_deadline",
                     "apply_deadline",
                     "brokerage",
-                    "show_client_phone_number",
                 ),
             },
         ),
         (
             _("Client Information"),
-            {"fields": ("client_name", "client_phone", "client_email")},
+            {
+                "fields": (
+                    "client_name",
+                    "client_phone",
+                    "client_email",
+                    "show_client_info",
+                ),
+            },
         ),
         (
             _("Payment Details"),
             {"fields": ("payment_amount",)},
         ),
-        (_("Assignment"), {"fields": ("assigned_to",)}),
+        (_("Assignment"), {"fields": ("assigned_to", "is_completed")}),
         (
             _("Additional Information"),
-            {"fields": ("notes",), "classes": ("collapse",)},
+            {
+                "fields": (
+                    "lockbox_type",
+                    "vacant",
+                    "pets",
+                    "concierge",
+                    "alarm_code",
+                    "gate_code",
+                    "notes",
+                ),
+                "classes": ("collapse",),
+            },
         ),
         (
             _("Metadata"),
@@ -74,7 +89,10 @@ class BaseTaskAdmin(admin.ModelAdmin):
 class ShowingTaskAdmin(BaseTaskAdmin):
     fieldsets = (
         *BaseTaskAdmin.fieldsets,
-        (_("Showing Details"), {"fields": ("access_information",)}),
+        (
+            _("Showing Details"),
+            {"fields": ("access_information",)},
+        ),
     )
 
 
@@ -95,7 +113,7 @@ class LockboxTaskIRAdmin(BaseTaskAdmin):
         *BaseTaskAdmin.fieldsets,
         (
             _("Lockbox Details"),
-            {"fields": ("task_type", "lockbox_code", "instructions")},
+            {"fields": ("task_type", "lockbox_code", "instructions", "include_sign")},
         ),
         (
             "INSTALL",
@@ -130,6 +148,7 @@ class LockboxTaskBSAdmin(BaseTaskAdmin):
                     "instructions",
                     "price",
                     "pickup_address",
+                    "include_sign",
                 ),
             },
         ),
@@ -142,7 +161,18 @@ class LockboxTaskBSAdmin(BaseTaskAdmin):
 class SignTaskAdmin(BaseTaskAdmin):
     fieldsets = (
         *BaseTaskAdmin.fieldsets,
-        (_("Sign Details"), {"fields": ("task_type", "sign_type", "instructions")}),
+        (
+            _("Sign Details"),
+            {
+                "fields": (
+                    "task_type",
+                    "sign_type",
+                    "instructions",
+                    "collection_address",
+                    "dropoff_address",
+                ),
+            },
+        ),
     )
 
 
@@ -156,9 +186,6 @@ class RunnerTaskAdmin(BaseTaskAdmin):
                 "fields": (
                     "task_type",
                     "instructions",
-                    "contact_name",
-                    "contact_phone",
-                    "contact_email",
                 ),
             },
         ),

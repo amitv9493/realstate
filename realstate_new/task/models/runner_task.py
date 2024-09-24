@@ -7,9 +7,6 @@ from .choices import RunnerTaskType
 class RunnerTask(BaseTask):
     task_type = models.CharField(max_length=50, choices=RunnerTaskType.choices)
     instructions = models.TextField()
-    contact_name = models.CharField(max_length=100)
-    contact_phone = models.CharField(max_length=20)
-    contact_email = models.EmailField()
     closing_location_address = models.TextField()
 
     # in case of paperwork type runner task
