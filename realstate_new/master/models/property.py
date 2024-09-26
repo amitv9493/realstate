@@ -33,7 +33,7 @@ class Property(TrackingModel):
         choices=PropertyStatus,
         default=PropertyStatus.AVAILABLE,
     )
-    lotsize_sqft = models.PositiveIntegerField()
+    lotsize_sqft = models.PositiveIntegerField(null=True, blank=True, default=0)
     lotsize_acres = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
 
     size = models.DecimalField(max_digits=8, decimal_places=2, default=0.0)

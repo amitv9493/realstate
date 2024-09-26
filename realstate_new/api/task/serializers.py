@@ -2,6 +2,8 @@ from typing import Any
 
 from rest_framework import serializers
 
+from realstate_new.api.property.serializers import PropertySerializer
+from realstate_new.master.models.property import Property
 from realstate_new.task.models import LockBox
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
@@ -29,11 +31,30 @@ ONGOING_FIELDS = (
 
 class TaskSerializer(TrackingModelSerializer):
     type_of_task = serializers.CharField(read_only=True)
+    property = PropertySerializer(
+        fields=["state", "zip", "street", "city", "latitude", "longitude"],
+    )
 
     class Meta:
         extra_kwargs = {
             "created_by": {"read_only": True},
         }
+
+    def create(self, validated_data: Any) -> Any:
+        property_address = validated_data.pop("property", None)
+        property_instance = Property.objects.create(
+            **property_address,
+        )
+        validated_data["property"] = property_instance
+        return super().create(validated_data)
+
+    def to_representation(self, instance: Any) -> dict[str, Any]:
+        res = super().to_representation(instance)
+        res["property"] = PropertySerializer(
+            instance=instance.property,
+            fields=["state", "zip", "street", "city", "latitude", "longitude"],
+        ).data
+        return res
 
 
 class ShowingTaskSerializer(TaskSerializer):

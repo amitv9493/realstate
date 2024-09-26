@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from realstate_new.utils.base_models import TrackingModel
 
@@ -21,6 +22,7 @@ class BaseTask(TrackingModel):
     client_email = models.EmailField(blank=True)
 
     task_time = models.DateTimeField()
+    asap = models.BooleanField(_("As Soon As Possible"), null=True, blank=True)
     notes = models.TextField(blank=True, default="")
 
     payment_amount = models.PositiveIntegerField()
