@@ -16,18 +16,14 @@ class TaskTypeChoices(models.TextChoices):
 
 
 class RunnerTaskType(models.TextChoices):
-    dd = "DOCUMENT DELIVERY", "Document Delivery"
-    key_drop_off = "KEY DROP OFF", "Key Drop Off"
-    key_pick_off = "KEY PICK OFF", "Key Pick Off"
-    property_check = "PROPERTY CHECK", "Property Check"
-    other = "OTHER", "Other"
-    meet_delivery_vendor = "MEET DELIVERY VENDOR", "Meet delivery or Vendor"
-    attend_closing = "ATTEND CLOSING", "Attend closing for agent"
-    take_photos = (
-        "TAKE PHOTOS",
-        "Take photos of Inside / Outside of house, separate from professional photos",
-    )
-    paperwork = "PAPERWORK", "Paperwork Courier / Paperwork in Office"
+    ATTEND_CLOSING = "ATTEND_CLOSING", "Attend closing for agent"
+    PAPERWORK = "PAPERWORK", "Paperwork Courier / Paperwork in Office"
+    DD = "DOCUMENT_DELIVERY", "Document Delivery"
+    NOTARY_SERVICE = "NOTARY_SERVICE", "Notary Services"
+    PROPERTY_INSPECTION = "PROPERTY_INSPECTION", "Property Inspections"
+    TRANSLATOR = "TRANSLATOR", "Translator for secondary Language"
+    HOME_ERRANDS = "HOME_ERRANDS", "Homes errands"
+    OTHER = "OTHER", "Other"
 
 
 class JobType(models.TextChoices):
