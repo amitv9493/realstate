@@ -59,7 +59,8 @@ class DynamicModelSerializer(DynamicFieldsMixin, ModelSerializer):
         exclude_fields = getattr(self.Meta, "exclude_fields", None)
         if exclude_fields:
             for field in exclude_fields:
-                self.fields.pop(field)
+                if field in self.fields:
+                    self.fields.pop(field)
 
 
 class DynamicSerializer(DynamicFieldsMixin, Serializer):

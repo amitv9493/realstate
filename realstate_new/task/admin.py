@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from .models import LockBox
 from .models import LockBoxTaskBS
 from .models import LockBoxTaskIR
 from .models import OpenHouseTask
@@ -112,27 +111,18 @@ class LockboxTaskIRAdmin(BaseTaskAdmin):
     fieldsets = (
         *BaseTaskAdmin.fieldsets,
         (
-            _("Lockbox Details"),
-            {"fields": ("task_type", "lockbox_code", "instructions", "include_sign")},
-        ),
-        (
-            "INSTALL",
+            _("Other Details"),
             {
                 "fields": (
-                    "lockbox_collection_address",
-                    "installation_address",
-                    "installation_location",
+                    "task_type",
+                    "lockbox_code",
+                    "instructions",
+                    "include_sign",
+                    "installation_or_remove_address",
                 ),
             },
         ),
-        ("REMOVE", {"fields": ("pickup_address", "dropoff_address")}),
     )
-
-
-class LockBoxAdminInline(admin.StackedInline):
-    model = LockBox
-    fk_name = "lockbox_task"
-    extra = 1
 
 
 @admin.register(LockBoxTaskBS)
@@ -146,15 +136,12 @@ class LockboxTaskBSAdmin(BaseTaskAdmin):
                     "task_type",
                     "lockbox_code",
                     "instructions",
-                    "price",
                     "pickup_address",
                     "include_sign",
                 ),
             },
         ),
     )
-
-    inlines = [LockBoxAdminInline]
 
 
 @admin.register(SignTask)

@@ -24,7 +24,11 @@ class PropertyAdmin(admin.ModelAdmin):
         "mls_number",
         "description",
     )
-    list_filter = ("created_at", "updated_at", "created_by", "listing_date")
+    list_filter = (
+        "created_at",
+        "updated_at",
+        "created_by",
+    )
     raw_id_fields = ("features",)
     date_hierarchy = "created_at"
 

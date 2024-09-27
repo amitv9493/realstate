@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 from realstate_new.utils.base_models import TrackingModel
 
@@ -27,7 +26,6 @@ class Property(TrackingModel):
         choices=PropertyType.choices,
         default=PropertyType.OTHER,
     )
-    listing_date = models.DateField(default=timezone.now)
     status = models.CharField(
         max_length=50,
         choices=PropertyStatus,

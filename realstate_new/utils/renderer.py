@@ -1,12 +1,26 @@
+from djangorestframework_camel_case.settings import api_settings
+from djangorestframework_camel_case.util import camelize
 from rest_framework import status
-from rest_framework.renderers import JSONRenderer
 
 
-class Custom200Renderer(JSONRenderer):
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        response = renderer_context["response"]
+class CamelCaseJSONRenderer(api_settings.RENDERER_CLASS):
+    json_underscoreize = api_settings.JSON_UNDERSCOREIZE
+
+    def render(
+        self,
+        data,
+        accepted_media_type=None,
+        renderer_context=None,
+        *args,
+        **kwargs,
+    ):
+        response = renderer_context.get("response") if renderer_context else None
 
         if status.is_success(response.status_code):
             response.status_code = status.HTTP_200_OK
 
-        return super().render(data, accepted_media_type, renderer_context)
+        return super().render(
+            camelize(data, **self.json_underscoreize),
+            *args,
+            **kwargs,
+        )

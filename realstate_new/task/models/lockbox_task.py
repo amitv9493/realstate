@@ -13,24 +13,34 @@ class LockBoxTask(BaseTask):
         max_length=50,
         choices=LockBoxType.choices,
     )
-    sign_option = models.BooleanField(default=False)
-    sign_address = models.TextField(blank=True)
 
-    # if task_type is REMOVE
-    pickup_address = models.TextField(blank=True)
-    dropoff_address = models.TextField(blank=True)
+    # if task_type is BUY SELL
+    pickup_address = models.OneToOneField(
+        "master.Property",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="+",
+    )
+    # if task_type is INSTALL/ REMOVE
+    installation_or_remove_address = models.OneToOneField(
+        "master.Property",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="+",
+    )
 
-    # if task_type is INSTALL
-    lockbox_collection_address = models.TextField(blank=True)
-    installation_address = models.TextField(blank=True)
-    installation_location = models.TextField(blank=True)
-
-    # if task_type is BUY
-
-    # in case of buy and sell
-    price = models.PositiveIntegerField(blank=True)
-
-    include_sign = models.BooleanField(null=True, blank=True)
+    include_sign = models.BooleanField(
+        "Include Sign",
+        null=True,
+        blank=True,
+    )
+    remove_sign = models.BooleanField(
+        "Include Sign",
+        null=True,
+        blank=True,
+    )
 
     @property
     def type_of_task(self):
