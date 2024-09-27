@@ -16,15 +16,12 @@ from realstate_new.utils.serializers import TrackingModelSerializer
 
 ONGOING_FIELDS = (
     "id",
-    "title",
-    "created-at",
+    "job_type",
     "task_time",
     "payment_amount",
-    "job_deadline",
-    "apply_deadline",
     "created_by",
     "assigned_to",
-    "property",
+    # "property",
     "type_of_task",
 )
 
@@ -211,8 +208,9 @@ class SignTaskSerializer(TaskSerializer):
                 instance=instance.install_address,
                 fields=self.get_property_fields(),
             ).data
-            del rep["remove_address"]
-            del rep["dropoff_address"]
+            rep.pop("remove_address", None)
+            rep.pop("dropoff_address", None)
+
         if instance.task_type == "REMOVE":
             rep["remove_address"] = PropertySerializer(
                 instance=instance.remove_address,
@@ -222,8 +220,8 @@ class SignTaskSerializer(TaskSerializer):
                 instance=instance.dropoff_address,
                 fields=self.get_property_fields(),
             ).data
-            del rep["install_address"]
-            del rep["pickup_address"]
+            rep.pop("install_address", None)
+            rep.pop("pickup_address", None)
         return rep
 
 

@@ -103,7 +103,7 @@ class OngoingTaskView(APIView):
 
         data = OngoingTaskSerializer(data).data
         flattened_response = chain.from_iterable(filter(bool, data.values()))
-        sorted_data = sorted(flattened_response, key=itemgetter("job_deadline"))
+        sorted_data = sorted(flattened_response, key=itemgetter("task_time"))
 
         data = OrderedDict(
             [
