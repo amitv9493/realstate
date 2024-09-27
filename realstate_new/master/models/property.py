@@ -10,10 +10,10 @@ from .types import PropertyType
 class Property(TrackingModel):
     # address
     delivery_line = models.CharField(max_length=255, default="")
-    city = models.CharField(max_length=50)
-    state = models.CharField(max_length=50)
+    city = models.CharField(max_length=255)
+    state = models.CharField(max_length=255)
     zip = models.CharField(max_length=50)
-    street = models.CharField(max_length=50)
+    street = models.CharField(max_length=255)
 
     # cordinates
     latitude = models.CharField(max_length=255)
