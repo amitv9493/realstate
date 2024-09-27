@@ -1,5 +1,7 @@
 from django.db import models
 
+from realstate_new.task import models as tasks
+
 
 class PropertyType(models.TextChoices):
     SFH = "SFH", "Single Family Home"
@@ -14,3 +16,14 @@ class PropertyStatus(models.TextChoices):
     UC = "UNDER CONTRACT", "Under Contract"
     SOLD = "SOLD", "Sold"
     OTHER = "OTHER", "Other"
+
+
+JOB_TYPE_MAPPINGS = {
+    "LockBoxBS": tasks.LockBoxTaskBS,
+    "LockBoxIR": tasks.LockBoxTaskIR,
+    "Showing": tasks.ShowingTask,
+    "OpenHouse": tasks.OpenHouseTask,
+    "Runner": tasks.RunnerTask,
+    "Sign": tasks.SignTask,
+    "Professional": tasks.ProfessionalServiceTask,
+}

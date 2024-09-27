@@ -14,6 +14,7 @@ urlpatterns = [
     path("user/", include("realstate_new.api.user.urls")),
     path("property/", include("realstate_new.api.property.urls")),
     path("payment/", include("realstate_new.api.payment.urls")),
+    path("application/", include("realstate_new.api.application.urls")),
     path("arello/", include("realstate_new.api.third_party_apis.arello.urls")),
     path("slipstream/", include("realstate_new.api.third_party_apis.slipstream.urls")),
     *router.urls,

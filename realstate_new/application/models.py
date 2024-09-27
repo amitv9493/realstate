@@ -6,16 +6,16 @@ from django.db import models
 
 class JobApplication(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey("content_type", "object_id")
+    task_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "task_id")
 
     status = models.CharField(
         max_length=20,
         choices=[
-            ("PENDING", "Pending"),
-            ("ACCEPTED", "Accepted"),
-            ("REJECTED", "Rejected"),
-            ("CLAIMED", "Claimed"),
+            ("PENDING", "PENDING"),
+            ("ACCEPTED", "ACCEPTED"),
+            ("REJECTED", "REJECTED"),
+            ("CLAIMED", "CLAIMED"),
         ],
         default="PENDING",
     )
@@ -28,11 +28,11 @@ class JobApplication(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=["content_type", "object_id"]),
+            models.Index(fields=["content_type", "task_id"]),
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=["object_id", "content_type", "applicant"],
+                fields=["task_id", "content_type", "applicant"],
                 name="unique-application",
                 violation_error_message="The record already exists.",
             ),
