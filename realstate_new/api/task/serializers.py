@@ -162,9 +162,69 @@ class RunnerTaskSerializer(TaskSerializer):
 
 
 class SignTaskSerializer(TaskSerializer):
+    install_address = PropertySerializer(
+        required=False,
+    )
+    pickup_address = PropertySerializer(
+        required=False,
+    )
+    remove_address = PropertySerializer(
+        required=False,
+    )
+    dropoff_address = PropertySerializer(
+        required=False,
+    )
+
     class Meta(TaskSerializer.Meta):
         model = SignTask
         fields = "__all__"
+        exclude_fields = ["property"]
+
+    def create(self, validated_data: Any) -> Any:
+        install_address = validated_data.pop("install_address", None)
+        pickup_address = validated_data.pop("pickup_address", None)
+        remove_address = validated_data.pop("remove_address", None)
+        dropoff_address = validated_data.pop("dropoff_address", None)
+
+        if validated_data["task_type"] == "INSTALL":
+            validated_data["install_address"] = Property.objects.create(
+                **install_address,
+            )
+            validated_data["pickup_address"] = Property.objects.create(**pickup_address)
+
+        elif validated_data["task_type"] == "REMOVE":
+            validated_data["remove_address"] = Property.objects.create(**remove_address)
+            validated_data["dropoff_address"] = Property.objects.create(
+                **dropoff_address,
+            )
+
+        return super().create(validated_data)
+
+    def to_representation(self, instance: Any) -> dict[str, Any]:
+        rep = super(TrackingModelSerializer, self).to_representation(instance)
+        if instance.task_type == "INSTALL":
+            rep["install_address"] = PropertySerializer(
+                instance=instance.install_address,
+                fields=self.get_property_fields(),
+            ).data
+            rep["pickup_address"] = PropertySerializer(
+                instance=instance.install_address,
+                fields=self.get_property_fields(),
+            ).data
+            del rep["remove_address"]
+            del rep["dropoff_address"]
+        if instance.task_type == "REMOVE":
+            rep["remove_address"] = PropertySerializer(
+                instance=instance.remove_address,
+                fields=self.get_property_fields(),
+            ).data
+            rep["dropoff_address"] = PropertySerializer(
+                instance=instance.dropoff_address,
+                fields=self.get_property_fields(),
+            ).data
+            del rep["install_address"]
+            del rep["pickup_address"]
+        return rep
 
 
 class OngoingTaskSerializer(serializers.Serializer):

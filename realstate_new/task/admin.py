@@ -1,13 +1,14 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
+from realstate_new.task.models.sign_task import SignTask
+
 from .models import LockBoxTaskBS
 from .models import LockBoxTaskIR
 from .models import OpenHouseTask
 from .models import ProfessionalServiceTask
 from .models import RunnerTask
 from .models import ShowingTask
-from .models import SignTask
 from .models import ThirdPartyCall
 
 
@@ -155,7 +156,6 @@ class SignTaskAdmin(BaseTaskAdmin):
                     "task_type",
                     "sign_type",
                     "instructions",
-                    "collection_address",
                     "dropoff_address",
                 ),
             },

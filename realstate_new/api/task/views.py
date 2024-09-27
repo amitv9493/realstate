@@ -69,7 +69,7 @@ class RunnerTaskViewSet(TaskViewSet):
 
 class SignTaskViewSet(TaskViewSet):
     serializer_class = SignTaskSerializer
-    queryset = ProfessionalServiceTask.objects.all()
+    queryset = SignTask.objects.all()
 
 
 class OngoingTaskView(APIView):
