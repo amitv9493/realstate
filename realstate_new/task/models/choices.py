@@ -3,7 +3,7 @@ from django.db import models
 
 class LockBoxType(models.TextChoices):
     SUPRA = "SUPRA", "SUPRA"
-    KEYPAD_ENTRY = "KEYPAD ENTRY", "KEYPAD ENTRY"
+    KEYPAD_ENTRY = "KEYPAD_ENTRY", "KEYPAD ENTRY"
     CONTRACTOR = "CONTRACTOR", "CONTRACTOR"
     OTHER = "OTHER", "OTHER"
 

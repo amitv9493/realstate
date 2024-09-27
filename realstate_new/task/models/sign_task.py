@@ -1,7 +1,6 @@
 from django.db import models
 
 from .basetask import BaseTask
-from .choices import LockBoxType
 from .choices import SignTaskType
 
 
@@ -38,12 +37,6 @@ class SignTask(BaseTask):
         null=True,
         blank=True,
         related_name="+",
-    )
-
-    lockbox_type = models.CharField(
-        max_length=50,
-        choices=LockBoxType.choices,
-        blank=True,
     )
 
     @property
