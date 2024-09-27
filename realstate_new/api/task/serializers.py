@@ -21,15 +21,24 @@ ONGOING_FIELDS = (
     "payment_amount",
     "created_by",
     "assigned_to",
-    # "property",
+    "property",
     "type_of_task",
 )
+
+PROPERTY_FIELDS = [
+    "state",
+    "zip",
+    "street",
+    "city",
+    "latitude",
+    "longitude",
+]
 
 
 class TaskSerializer(TrackingModelSerializer):
     type_of_task = serializers.CharField(read_only=True)
     property = PropertySerializer(
-        fields=["state", "zip", "street", "city", "latitude", "longitude"],
+        fields=PROPERTY_FIELDS,
         required=False,
     )
 
@@ -47,19 +56,9 @@ class TaskSerializer(TrackingModelSerializer):
             validated_data["property"] = property_instance
         return super().create(validated_data)
 
-    def to_representation(self, instance: Any) -> dict[str, Any]:
-        res = super().to_representation(instance)
-        if hasattr(instance, "property"):
-            data = PropertySerializer(
-                instance=instance.property,
-                fields=self.get_property_fields(),
-            ).data
-            res["property"] = data
-        return res
-
     @staticmethod
     def get_property_fields():
-        return ["state", "zip", "street", "city", "latitude", "longitude"]
+        return PROPERTY_FIELDS
 
 
 class ShowingTaskSerializer(TaskSerializer):
@@ -76,7 +75,7 @@ class LockBoxSerializer(TaskSerializer):
 
 
 class LockBoxBSSerializer(TaskSerializer):
-    pickup_address = PropertySerializer()
+    pickup_address = PropertySerializer(fields=PROPERTY_FIELDS)
 
     class Meta(TaskSerializer.Meta):
         model = LockBoxTaskBS
@@ -94,18 +93,13 @@ class LockBoxBSSerializer(TaskSerializer):
 
         return super().create(validated_data)
 
-    def to_representation(self, instance: Any) -> dict[str, Any]:
-        data = super(TrackingModelSerializer, self).to_representation(instance)
-        data["pickup_address"] = PropertySerializer(
-            instance=instance.pickup_address,
-            fields=self.get_property_fields(),
-        ).data
-        return data
-
 
 class LockBoxIRSerializer(TaskSerializer):
-    pickup_address = PropertySerializer(required=False)
-    installation_or_remove_address = PropertySerializer(required=False)
+    pickup_address = PropertySerializer(required=False, fields=PROPERTY_FIELDS)
+    installation_or_remove_address = PropertySerializer(
+        required=False,
+        fields=PROPERTY_FIELDS,
+    )
 
     class Meta(TaskSerializer.Meta):
         model = LockBoxTaskIR
@@ -125,19 +119,6 @@ class LockBoxIRSerializer(TaskSerializer):
             validated_data["pickup_address"] = Property.objects.create(**pickup_address)
 
         return super().create(validated_data)
-
-    def to_representation(self, instance: Any) -> dict[str, Any]:
-        rep = super(TrackingModelSerializer, self).to_representation(instance)
-        rep["installation_or_remove_address"] = PropertySerializer(
-            instance=instance.installation_or_remove_address,
-            fields=self.get_property_fields(),
-        ).data
-        rep["pickup_address"] = PropertySerializer(
-            instance=instance.pickup_address,
-            fields=self.get_property_fields(),
-        ).data
-
-        return rep
 
 
 class OpenHouseTaskSerializer(TaskSerializer):
@@ -161,15 +142,19 @@ class RunnerTaskSerializer(TaskSerializer):
 class SignTaskSerializer(TaskSerializer):
     install_address = PropertySerializer(
         required=False,
+        fields=PROPERTY_FIELDS,
     )
     pickup_address = PropertySerializer(
         required=False,
+        fields=PROPERTY_FIELDS,
     )
     remove_address = PropertySerializer(
         required=False,
+        fields=PROPERTY_FIELDS,
     )
     dropoff_address = PropertySerializer(
         required=False,
+        fields=PROPERTY_FIELDS,
     )
 
     class Meta(TaskSerializer.Meta):
@@ -200,26 +185,10 @@ class SignTaskSerializer(TaskSerializer):
     def to_representation(self, instance: Any) -> dict[str, Any]:
         rep = super(TrackingModelSerializer, self).to_representation(instance)
         if instance.task_type == "INSTALL":
-            rep["install_address"] = PropertySerializer(
-                instance=instance.install_address,
-                fields=self.get_property_fields(),
-            ).data
-            rep["pickup_address"] = PropertySerializer(
-                instance=instance.install_address,
-                fields=self.get_property_fields(),
-            ).data
             rep.pop("remove_address", None)
             rep.pop("dropoff_address", None)
 
         if instance.task_type == "REMOVE":
-            rep["remove_address"] = PropertySerializer(
-                instance=instance.remove_address,
-                fields=self.get_property_fields(),
-            ).data
-            rep["dropoff_address"] = PropertySerializer(
-                instance=instance.dropoff_address,
-                fields=self.get_property_fields(),
-            ).data
             rep.pop("install_address", None)
             rep.pop("pickup_address", None)
         return rep
@@ -227,9 +196,26 @@ class SignTaskSerializer(TaskSerializer):
 
 class OngoingTaskSerializer(serializers.Serializer):
     showing_tasks = ShowingTaskSerializer(many=True, fields=ONGOING_FIELDS)
-    sign_tasks = SignTaskSerializer(many=True, fields=ONGOING_FIELDS)
-    runner_tasks = RunnerTaskSerializer(many=True, fields=ONGOING_FIELDS)
-    professional_tasks = ProfessionalTaskSerializer(many=True, fields=ONGOING_FIELDS)
+    sign_tasks = SignTaskSerializer(many=True, fields=[*ONGOING_FIELDS, "task_type"])
+    runner_tasks = RunnerTaskSerializer(
+        many=True,
+        fields=[*ONGOING_FIELDS, "task_type"],
+    )
+    professional_tasks = ProfessionalTaskSerializer(
+        many=True,
+        fields=[*ONGOING_FIELDS, "service_type"],
+    )
     openhouse_tasks = OpenHouseTaskSerializer(many=True, fields=ONGOING_FIELDS)
-    lockbox_tasks_bs = LockBoxBSSerializer(many=True, fields=ONGOING_FIELDS)
-    lockbox_tasks_ir = LockBoxIRSerializer(many=True, fields=ONGOING_FIELDS)
+    lockbox_tasks_bs = LockBoxBSSerializer(
+        many=True,
+        fields=[*ONGOING_FIELDS, "pickup_address", "task_type"],
+    )
+    lockbox_tasks_ir = LockBoxIRSerializer(
+        many=True,
+        fields=[
+            *ONGOING_FIELDS,
+            "pickup_address",
+            "installation_or_remove_address",
+            "task_type",
+        ],
+    )
