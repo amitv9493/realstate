@@ -8,19 +8,18 @@ from realstate_new.utils.serializers import DynamicSerializer
 
 
 class JobApplicationSerializer(DynamicSerializer):
-    id = serializers.IntegerField(read_only=True)
     job_type = serializers.ChoiceField(
         choices=list(JOB_TYPE_MAPPINGS.keys()),
         write_only=True,
     )
-    task_id = serializers.IntegerField()
+    task_id = serializers.IntegerField(write_only=True)
     status = serializers.CharField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
 
     def create(self, validated_data):
         user = self.context["request"].user
         data = validated_data
-        job_instance = self.get_instance(data["job_type"], data["object_id"])
+        job_instance = self.get_instance(data["job_type"], data["task_id"])
         try:
             instance = JobApplication.objects.create(
                 content_object=job_instance,
@@ -38,14 +37,14 @@ class JobApplicationSerializer(DynamicSerializer):
         return instance
 
     def validate(self, attrs):
-        instance = self.get_instance(attrs["job_type"], attrs["object_id"])
+        instance = self.get_instance(attrs["job_type"], attrs["task_id"])
         if instance.assigned_to:
             msg = "This job as been assigned to someone already."
             raise serializers.ValidationError(msg, code="AlreadyAssigned")
         return super().validate(attrs)
 
-    def get_instance(self, job_type, object_id):
-        return JOB_TYPE_MAPPINGS[job_type].objects.get(id=object_id)
+    def get_instance(self, job_type, task_id):
+        return JOB_TYPE_MAPPINGS[job_type].objects.get(id=task_id)
 
     def to_representation(self, instance):
         res = super().to_representation(instance)
