@@ -34,6 +34,8 @@ services:
       - realstate_new_local_postgres_data_backups:/backups
     env_file:
       - ./.envs/.local/.postgres
+    ports:
+      - "5433:5432"
 
   mailpit:
     image: docker.io/axllent/mailpit:latest

@@ -13,23 +13,11 @@ class PropertyFeatureAdmin(admin.ModelAdmin):
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "created_at",
-        "updated_at",
-        "created_by",
-        "status",
-        "price",
-        "year_built",
-        "mls_number",
-        "description",
-    )
     list_filter = (
         "created_at",
         "updated_at",
         "created_by",
     )
-    raw_id_fields = ("features",)
     date_hierarchy = "created_at"
 
     readonly_fields = ("created_by",)

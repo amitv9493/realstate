@@ -1,7 +1,9 @@
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from realstate_new.application.models import JobApplication
 from realstate_new.utils.base_models import TrackingModel
 
 from .choices import BrokerageType
@@ -61,6 +63,12 @@ class BaseTask(TrackingModel):
         choices=LockBoxType.choices,
         default=LockBoxType.OTHER,
         blank=True,
+    )
+
+    applications = GenericRelation(
+        JobApplication,
+        content_type_field="content_type",
+        object_id_field="task_id",
     )
 
     def __str__(self):

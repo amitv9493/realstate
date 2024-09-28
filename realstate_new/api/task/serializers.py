@@ -14,7 +14,8 @@ from realstate_new.task.models import ShowingTask
 from realstate_new.task.models import SignTask
 from realstate_new.utils.serializers import TrackingModelSerializer
 
-ONGOING_FIELDS = (
+EXTRA_FIELD = ["type_of_task"]
+JOB_DASHBOARD_COMMON_FIELDS = [
     "id",
     "job_type",
     "task_time",
@@ -22,8 +23,8 @@ ONGOING_FIELDS = (
     "created_by",
     "assigned_to",
     "property",
-    "type_of_task",
-)
+    *EXTRA_FIELD,
+]
 
 PROPERTY_FIELDS = [
     "state",
@@ -34,8 +35,26 @@ PROPERTY_FIELDS = [
     "longitude",
 ]
 
+ONGOING_FIELDS = {
+    "SHOWING": [*JOB_DASHBOARD_COMMON_FIELDS],
+    "SIGN": [*JOB_DASHBOARD_COMMON_FIELDS, "task_type"],
+    "RUNNER": [*JOB_DASHBOARD_COMMON_FIELDS, "task_type"],
+    "PROFESSIONAL": [*JOB_DASHBOARD_COMMON_FIELDS, "service_type"],
+    "OPENHOUSE": [*JOB_DASHBOARD_COMMON_FIELDS],
+    "LOCKBOXBS": [*JOB_DASHBOARD_COMMON_FIELDS, "pickup_address", "task_type"],
+    "LOCKBOXIR": [
+        *JOB_DASHBOARD_COMMON_FIELDS,
+        "pickup_address",
+        "installation_or_remove_address",
+        "task_type",
+    ],
+}
+LATEST_TASK_FIELDS = [*JOB_DASHBOARD_COMMON_FIELDS, "application_status"]
+
 
 class TaskSerializer(TrackingModelSerializer):
+    application_status = serializers.SerializerMethodField()
+
     type_of_task = serializers.CharField(read_only=True)
     property = PropertySerializer(
         fields=PROPERTY_FIELDS,
@@ -46,6 +65,13 @@ class TaskSerializer(TrackingModelSerializer):
         extra_kwargs = {
             "created_by": {"read_only": True},
         }
+
+    def get_application_status(self, obj):
+        request = self.context.get("request")
+        application = obj.applications.filter(applicant=request.user).first()
+        if application:
+            return application.status
+        return None
 
     def create(self, validated_data: Any) -> Any:
         property_address = validated_data.pop("property", None)
@@ -195,25 +221,56 @@ class SignTaskSerializer(TaskSerializer):
 
 
 class OngoingTaskSerializer(serializers.Serializer):
-    showing_tasks = ShowingTaskSerializer(many=True, fields=ONGOING_FIELDS)
-    sign_tasks = SignTaskSerializer(many=True, fields=[*ONGOING_FIELDS, "task_type"])
+    showing_tasks = ShowingTaskSerializer(
+        many=True,
+        fields=ONGOING_FIELDS["SHOWING"],
+    )
+    sign_tasks = SignTaskSerializer(many=True, fields=ONGOING_FIELDS["SIGN"])
+    runner_tasks = RunnerTaskSerializer(many=True, fields=ONGOING_FIELDS["RUNNER"])
+    professional_tasks = ProfessionalTaskSerializer(
+        many=True,
+        fields=ONGOING_FIELDS["PROFESSIONAL"],
+    )
+    openhouse_tasks = OpenHouseTaskSerializer(
+        many=True,
+        fields=ONGOING_FIELDS["OPENHOUSE"],
+    )
+    lockbox_tasks_bs = LockBoxBSSerializer(
+        many=True,
+        fields=ONGOING_FIELDS["LOCKBOXBS"],
+    )
+    lockbox_tasks_ir = LockBoxIRSerializer(
+        many=True,
+        fields=ONGOING_FIELDS["LOCKBOXIR"],
+    )
+
+
+class LatestTaskSerializer(serializers.Serializer):
+    showing_tasks = ShowingTaskSerializer(
+        many=True,
+        fields=[*LATEST_TASK_FIELDS],
+    )
+    sign_tasks = SignTaskSerializer(
+        many=True,
+        fields=[*LATEST_TASK_FIELDS, "task_type"],
+    )
     runner_tasks = RunnerTaskSerializer(
         many=True,
-        fields=[*ONGOING_FIELDS, "task_type"],
+        fields=[*LATEST_TASK_FIELDS, "task_type"],
     )
     professional_tasks = ProfessionalTaskSerializer(
         many=True,
-        fields=[*ONGOING_FIELDS, "service_type"],
+        fields=[*LATEST_TASK_FIELDS, "service_type"],
     )
-    openhouse_tasks = OpenHouseTaskSerializer(many=True, fields=ONGOING_FIELDS)
+    openhouse_tasks = OpenHouseTaskSerializer(many=True, fields=LATEST_TASK_FIELDS)
     lockbox_tasks_bs = LockBoxBSSerializer(
         many=True,
-        fields=[*ONGOING_FIELDS, "pickup_address", "task_type"],
+        fields=[*LATEST_TASK_FIELDS, "pickup_address", "task_type"],
     )
     lockbox_tasks_ir = LockBoxIRSerializer(
         many=True,
         fields=[
-            *ONGOING_FIELDS,
+            *LATEST_TASK_FIELDS,
             "pickup_address",
             "installation_or_remove_address",
             "task_type",
