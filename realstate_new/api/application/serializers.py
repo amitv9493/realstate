@@ -8,17 +8,14 @@ from realstate_new.utils.serializers import DynamicSerializer
 
 
 class JobApplicationSerializer(DynamicSerializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(read_only=True)
     job_type = serializers.ChoiceField(
         choices=list(JOB_TYPE_MAPPINGS.keys()),
         write_only=True,
     )
     task_id = serializers.IntegerField()
     status = serializers.CharField(read_only=True)
-    created_at = serializers.DateTimeField()
-
-    class Meta:
-        fields = "__all__"
+    created_at = serializers.DateTimeField(read_only=True)
 
     def create(self, validated_data):
         user = self.context["request"].user
