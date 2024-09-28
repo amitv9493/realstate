@@ -37,10 +37,6 @@ class LockBoxTask(BaseTask):
         blank=True,
     )
 
-    @property
-    def type_of_task(self):
-        return "Lockbox"
-
 
 class LockBoxTaskIR(LockBoxTask):
     class LockBoxTaskIRManager(models.Manager):
@@ -54,6 +50,10 @@ class LockBoxTaskIR(LockBoxTask):
 
     objects = LockBoxTaskIRManager()
 
+    @property
+    def type_of_task(self):
+        return "LockBoxIR"
+
 
 class LockBoxTaskBS(LockBoxTask):
     class LockBoxTaskBSManager(models.Manager):
@@ -65,6 +65,10 @@ class LockBoxTaskBS(LockBoxTask):
         verbose_name = "Lock Box (Buy / Sell)"
 
     objects = LockBoxTaskBSManager()
+
+    @property
+    def type_of_task(self):
+        return "LockBoxBS"
 
 
 class LockBox(models.Model):

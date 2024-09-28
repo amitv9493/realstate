@@ -12,7 +12,7 @@ class JobApplicationSerializer(DynamicSerializer):
         choices=list(JOB_TYPE_MAPPINGS.keys()),
         write_only=True,
     )
-    task_id = serializers.IntegerField(write_only=True)
+    task_id = serializers.IntegerField()
     status = serializers.CharField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
 
