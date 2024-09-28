@@ -28,12 +28,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ["id", "first_name", "last_name", "username", "email"]
 
 
-class LoginSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(max_length=255)
-
-    class Meta:
-        model = get_user_model()
-        fields = ["username", "password"]
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(max_length=255)
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -56,27 +53,14 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = (
-            "username",
             "password",
             "password2",
             "email",
-            "first_name",
-            "last_name",
-            "phone_country_code",
-            "phone",
         )
         extra_kwargs = {
             "first_name": {"required": True, "allow_null": False},
             "last_name": {"required": True, "allow_null": False},
         }
-
-    def validate_phone(self, value):
-        if value and value in set(
-            self.Meta.model.objects.values_list("phone", flat=True),
-        ):
-            error = "A user with this phone number already exists"
-            raise serializers.ValidationError(error)
-        return value
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password2"]:
@@ -87,13 +71,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = get_user_model().objects.create(
-            username=validated_data["username"],
+            username=validated_data["email"].split("@")[0],
             email=validated_data["email"],
-            first_name=validated_data["first_name"],
-            last_name=validated_data["last_name"],
             is_active=False,
-            phone=validated_data.get("phone", ""),
-            phone_country_code=validated_data.get("phone_country_code", ""),
         )
         user.set_password(validated_data["password"])
         user.save()

@@ -1,10 +1,10 @@
 from django.db import IntegrityError
 from rest_framework import serializers
-from utils.serializers import DynamicModelSerializer
-from utils.serializers import DynamicSerializer
 
 from realstate_new.application.models import JobApplication
 from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
+from realstate_new.utils.serializers import DynamicModelSerializer
+from realstate_new.utils.serializers import DynamicSerializer
 
 
 class JobApplicationSerializer(DynamicSerializer):

@@ -30,8 +30,10 @@ DAYS_OF_WEEK = (
 
 
 class User(AbstractUser):
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
     job_preferences = MultiSelectField(choices=JOB_TYPES, default="SHOWING")
-
+    email = models.EmailField(unique=True)
     # Preferences
     email_notification = models.BooleanField(default=True)
     whatsapp_notification = models.BooleanField(default=True)

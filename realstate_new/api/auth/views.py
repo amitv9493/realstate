@@ -110,9 +110,9 @@ class LoginView(PublicApi):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            username = serializer.data.get("username")
-            password = serializer.data.get("password")
-            user: UserType | None = authenticate(username=username, password=password)
+            email = serializer.data["email"]
+            password = serializer.data["password"]
+            user: UserType | None = authenticate(email=email, password=password)
             if user is not None:
                 try:
                     user_group = (Group.objects.get(user=user.id)).name

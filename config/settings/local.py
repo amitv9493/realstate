@@ -1,6 +1,5 @@
 # ruff: noqa: E501
 from .base import *  # noqa: F403
-from .base import BASE_DIR
 from .base import INSTALLED_APPS
 from .base import env
 
@@ -55,7 +54,6 @@ TIME_ZONE = "Asia/Kolkata"
 
 # EMAIL
 # ------------------------------------------------------------------------------
-EMAIL_HOST = "mailpit"  # env("EMAIL_HOST", default="mailpit")
-EMAIL_PORT = 1025
-EMAIL_FILE_PATH = BASE_DIR / "emails"
+EMAIL_HOST = env("EMAIL_HOST", default="mailpit")
+EMAIL_PORT = env("EMAIL_HOST", default=1025)
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
