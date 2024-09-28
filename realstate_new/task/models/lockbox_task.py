@@ -6,7 +6,7 @@ from .choices import TaskTypeChoices
 
 class LockBoxTask(BaseTask):
     task_type = models.CharField(max_length=50, choices=TaskTypeChoices.choices)
-    lockbox_code = models.CharField(max_length=50)
+    lockbox_code = models.CharField(max_length=50, blank=True, default="")
     instructions = models.TextField()
 
     # if task_type is BUY SELL
