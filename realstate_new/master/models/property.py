@@ -4,7 +4,6 @@ from realstate_new.utils.base_models import TrackingModel
 
 
 class Property(TrackingModel):
-    delivery_line = models.CharField(max_length=255, default="")
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
     zip = models.CharField(max_length=50)
