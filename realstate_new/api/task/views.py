@@ -26,6 +26,43 @@ from .serializers import ShowingTaskSerializer
 from .serializers import SignTaskSerializer
 
 
+class TaskListMixin:
+    def get_tasks(self, base_query):
+        showing_tasks = ShowingTask.objects.filter(**base_query)
+        sign_tasks = SignTask.objects.filter(**base_query)
+        runner_tasks = RunnerTask.objects.filter(**base_query)
+        professional_tasks = ProfessionalServiceTask.objects.filter(**base_query)
+        openhouse_tasks = OpenHouseTask.objects.filter(**base_query)
+        lockbox_tasks_bs = LockBoxTaskBS.objects.filter(**base_query)
+        lockbox_tasks_ir = LockBoxTaskIR.objects.filter(**base_query)
+
+        data = {
+            "showing_tasks": showing_tasks,
+            "sign_tasks": sign_tasks,
+            "runner_tasks": runner_tasks,
+            "professional_tasks": professional_tasks,
+            "openhouse_tasks": openhouse_tasks,
+            "lockbox_tasks_bs": lockbox_tasks_bs,
+            "lockbox_tasks_ir": lockbox_tasks_ir,
+        }
+
+        data = OngoingTaskSerializer(data).data
+        flattened_response = chain.from_iterable(filter(bool, data.values()))
+        return sorted(flattened_response, key=itemgetter("task_time"))
+
+    def get_paginated_response(self, page, page_size, response: list):
+        start = (page - 1) * page_size
+        end = start + page_size
+        return OrderedDict(
+            [
+                ("count", len(response)),
+                ("page", page),
+                ("page_size", page_size),
+                ("results", response[start:end]),
+            ],
+        )
+
+
 class TaskViewSet(ModelViewSet):
     def perform_create(self, serializer):
         amount = serializer.validated_data["payment_amount"]
@@ -72,89 +109,41 @@ class SignTaskViewSet(TaskViewSet):
     queryset = SignTask.objects.all()
 
 
-class OngoingTaskView(APIView):
+class OngoingTaskView(APIView, TaskListMixin):
     serializer_class = None
 
-    @silk_profile(name="ongoing task")
+    @silk_profile(name="Ongoing Task")
     def get(self, request, *args, **kwargs):
-        page_size = int(request.query_params.get("page_size", 10))
-        page = int(request.query_params.get("page", 1))
-        start = (page - 1) * page_size
-        end = start + page_size
-
         base_query = {"is_completed": False, "created_by": request.user}
-        showing_tasks = ShowingTask.objects.filter(**base_query)
-        sign_tasks = SignTask.objects.filter(**base_query)
-        runner_tasks = RunnerTask.objects.filter(**base_query)
-        professional_tasks = ProfessionalServiceTask.objects.filter(**base_query)
-        openhouse_tasks = OpenHouseTask.objects.filter(**base_query)
-        lockbox_tasks_bs = LockBoxTaskBS.objects.filter(**base_query)
-        lockbox_tasks_ir = LockBoxTaskIR.objects.filter(**base_query)
-
-        data = {
-            "showing_tasks": showing_tasks,
-            "sign_tasks": sign_tasks,
-            "runner_tasks": runner_tasks,
-            "professional_tasks": professional_tasks,
-            "openhouse_tasks": openhouse_tasks,
-            "lockbox_tasks_bs": lockbox_tasks_bs,
-            "lockbox_tasks_ir": lockbox_tasks_ir,
-        }
-
-        data = OngoingTaskSerializer(data).data
-        flattened_response = chain.from_iterable(filter(bool, data.values()))
-        sorted_data = sorted(flattened_response, key=itemgetter("task_time"))
-
-        data = OrderedDict(
-            [
-                ("count", len(sorted_data)),
-                ("page", page),
-                ("page_size", page_size),
-                ("results", sorted_data[start:end]),
-            ],
-        )
-        return Response(data, 200)
-
-
-class CompletedTaskView(APIView):
-    serializer_class = None
-
-    @silk_profile(name="ongoing task")
-    def get(self, request, *args, **kwargs):
         page_size = int(request.query_params.get("page_size", 10))
         page = int(request.query_params.get("page", 1))
-        start = (page - 1) * page_size
-        end = start + page_size
+        tasks = self.get_tasks(base_query)
+        paginated_response = self.get_paginated_response(page, page_size, tasks)
 
+        return Response(paginated_response, 200)
+
+
+class CompletedTaskView(APIView, TaskListMixin):
+    serializer_class = None
+
+    @silk_profile(name="Completed Task")
+    def get(self, request, *args, **kwargs):
         base_query = {"is_completed": True, "created_by": request.user}
-        showing_tasks = ShowingTask.objects.filter(**base_query)
-        sign_tasks = SignTask.objects.filter(**base_query)
-        runner_tasks = RunnerTask.objects.filter(**base_query)
-        professional_tasks = ProfessionalServiceTask.objects.filter(**base_query)
-        openhouse_tasks = OpenHouseTask.objects.filter(**base_query)
-        lockbox_tasks_bs = LockBoxTaskBS.objects.filter(**base_query)
-        lockbox_tasks_ir = LockBoxTaskIR.objects.filter(**base_query)
+        page_size = int(request.query_params.get("page_size", 10))
+        page = int(request.query_params.get("page", 1))
+        tasks = self.get_tasks(base_query)
+        paginated_response = self.get_paginated_response(page, page_size, tasks)
 
-        data = {
-            "showing_tasks": showing_tasks,
-            "sign_tasks": sign_tasks,
-            "runner_tasks": runner_tasks,
-            "professional_tasks": professional_tasks,
-            "openhouse_tasks": openhouse_tasks,
-            "lockbox_tasks_bs": lockbox_tasks_bs,
-            "lockbox_tasks_ir": lockbox_tasks_ir,
-        }
+        return Response(paginated_response, 200)
 
-        data = OngoingTaskSerializer(data).data
-        flattened_response = chain.from_iterable(filter(bool, data.values()))
-        sorted_data = sorted(flattened_response, key=itemgetter("job_deadline"))
 
-        data = OrderedDict(
-            [
-                ("count", len(sorted_data)),
-                ("page", page),
-                ("page_size", page_size),
-                ("results", sorted_data[start:end]),
-            ],
-        )
-        return Response(data, 200)
+class LatestTaskView(APIView, TaskListMixin):
+    @silk_profile(name="Latest Task")
+    def get(self, request, *args, **kwargs):
+        base_query = {"is_completed": False, "assigned_to__isnull": True}
+        page_size = int(request.query_params.get("page_size", 10))
+        page = int(request.query_params.get("page", 1))
+        tasks = self.get_tasks(base_query)
+        paginated_response = self.get_paginated_response(page, page_size, tasks)
+
+        return Response(paginated_response, 200)
