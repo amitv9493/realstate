@@ -1,8 +1,10 @@
 import json
 import logging
 import random
+import secrets
 
 from django import forms
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login
@@ -17,6 +19,7 @@ from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import DjangoUnicodeDecodeError
 from django.utils.encoding import force_bytes
@@ -35,12 +38,15 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from realstate_new.users.models import User as UserType
 from realstate_new.utils import send_email
+from realstate_new.utils.utils import generate_reset_token
 from realstate_new.utils.views import PublicApi
 
 from .renderers import UserRenderes
 from .serializers import ChangePasswordSerializer
 from .serializers import GoogleAUthVerifiedData
 from .serializers import LoginSerializer
+from .serializers import PasswordResetAfterVerificationSerializer
+from .serializers import PasswordResetOTPVerifySerializer
 from .serializers import PasswordResetSerializer
 from .serializers import RedirectLinkSerializer
 from .serializers import RegisterSerializer
@@ -79,14 +85,21 @@ class RegistrationView(PublicApi):
             current_site = get_current_site(request)
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
+            related_url = reverse(
+                "api:auth:confirm-user",
+                kwargs={"uid": uid, "token": token},
+            )
+            abs_url = f"http://{current_site.domain}{related_url}"
+            body = "Thanks for registering with Adoorable.\
+                Please click on the link below to verify and activate your account."
             context = {
-                "domain": current_site.domain,
-                "uid": uid,
-                "token": token,
+                "title": "Confirm Account",
+                "button_text": "Confirm Account",
+                "button_link": abs_url,
+                "body": body,
             }
-
             send_email.delay(
-                template_path="emails/email-verification.html",
+                template_path="emails/base.html",
                 recipient_list=recipient_list,
                 subject=subject,
                 context=context,
@@ -166,18 +179,59 @@ class ChangePasswordView(APIView):
         return Response(serializer.errors, 400)
 
 
-class SendPasswordResetView(PublicApi):
+class SendPasswordResetOTPView(PublicApi):
     serializer_class = PasswordResetSerializer
 
     def post(self, request):
         serializer = self.serializer_class(
             data=request.data,
-            context={"request": self.request},
         )
         if serializer.is_valid(raise_exception=True):  # noqa: RET503
+            user = User.objects.get(email=serializer.validated_data["email_id"])
+            otp = ""
+            for _ in range(6):
+                otp += str(secrets.randbelow(10))
+
+            # send email
+            body = "Please use this OTP to reset your password. This OTP is valid only for 10 mins."
+            context = {
+                "subject": "OTP Password Reset",
+                "title": "OTP for password Reset",
+                "button_text": otp,
+                "body": body,
+            }
+            cache.set(
+                f"password_reset:{user.id}",
+                otp,
+                timeout=settings.FORGET_PASSWORD_OTP_TIMEOUT,
+            )
+            send_email.delay(
+                template_path="emails/base.html",
+                recipient_list=[user.email],
+                subject=context["subject"],
+                context=context,
+            )
             return Response(
-                {"msg": "Password reset link is sent if it is registered"},
+                {"msg": "OTP sent"},
                 status=status.HTTP_200_OK,
+            )
+
+
+class PasswordResetOTPVerifyView(PublicApi):
+    serializer_class = PasswordResetOTPVerifySerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):  # noqa: RET503
+            user = User.objects.get(email=serializer.validated_data["email_id"])
+            token = generate_reset_token(user=user)
+
+            return Response(
+                {
+                    "status": True,
+                    "token": token,
+                },
+                200,
             )
 
 
@@ -187,13 +241,20 @@ class PasswordResetView(APIView):
     def post(self, request, uid, token):
         serializer = ResetPasswordSerializer(
             data=request.data,
-            context={"uid": uid, "token": token, "request": self.request},
         )
         if serializer.is_valid(raise_exception=True):  # noqa: RET503
             return Response(
                 {"msg": "password reset successfully"},
                 status=status.HTTP_200_OK,
             )
+
+
+class PasswordResetAfterVerificationView(PublicApi):
+    def post(self, request):
+        serializer = PasswordResetAfterVerificationSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):  # noqa: RET503
+            serializer.save()
+            return Response({"msg": "Password has been reset successfully."})
 
 
 class RedirectLinkView(APIView):
@@ -330,10 +391,12 @@ def confirm_user(request, uid, token):
 
     if user is not None and default_token_generator.check_token(user, token):
         user.is_active = True
-        link = f"http://{get_current_site(request).domain}/login"
         user.save(update_fields=["is_active"])
-
-        return render(request, "emails/account-active.html", context={"link": link})
+        context = {
+            "title": "Account Verified Successfully.",
+            "body": "Thank you for Verifying your Email. You can close this window now.",
+        }
+        return render(request, "emails/base.html", context=context)
 
     return JsonResponse("some error occured", safe=False)
 

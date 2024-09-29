@@ -7,6 +7,8 @@ from django.urls import path
 from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
 
+from realstate_new.api.notification.views import hello
+
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("silk/", include("silk.urls", namespace="silk")),
@@ -25,4 +27,5 @@ urlpatterns += [
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
+    path("hello", hello),
 ]

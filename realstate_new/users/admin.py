@@ -9,6 +9,7 @@ class CustomUserAdmin(UserAdmin):
     list_display = [
         "id",
         "full_name",
+        "email",
         "license_number",
         "license_status",
         "mile_radius_preference",

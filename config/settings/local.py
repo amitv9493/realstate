@@ -54,6 +54,6 @@ TIME_ZONE = "Asia/Kolkata"
 
 # EMAIL
 # ------------------------------------------------------------------------------
-EMAIL_HOST = env("EMAIL_HOST", default="mailpit")
-EMAIL_PORT = env("EMAIL_HOST", default=1025)
+EMAIL_HOST = "mailpit"  # env("EMAIL_HOST", default="mailpit")
+EMAIL_PORT = 1025  # env("EMAIL_PORT", default=1025)
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

@@ -4,8 +4,10 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from .views import ChangePasswordView
 from .views import GoogleVerificationView
 from .views import LoginView
+from .views import PasswordResetAfterVerificationView
+from .views import PasswordResetOTPVerifyView
 from .views import RegistrationView
-from .views import SendPasswordResetView
+from .views import SendPasswordResetOTPView
 from .views import UserResetPasswordView
 from .views import confirm_user
 
@@ -17,11 +19,24 @@ urlpatterns = [
         RegistrationView.as_view(),
     ),
     path("confirm/<uid>/<token>", confirm_user, name="confirm-user"),
-    path("resetpassword", SendPasswordResetView.as_view(), name="send-reset-password"),
+    path(
+        "sendresetpasswordotp",
+        SendPasswordResetOTPView.as_view(),
+        name="send-reset-password",
+    ),
     path(
         "resetpassword/<uid>/<token>",
         UserResetPasswordView.as_view(),
         name="reset-password",
+    ),
+    path(
+        "passwordresetverifyotp",
+        PasswordResetOTPVerifyView.as_view(),
+        name="password-reset-verify-otp",
+    ),
+    path(
+        "resetpassword",
+        PasswordResetAfterVerificationView.as_view(),
     ),
     path("login", LoginView.as_view()),
     path("changepassword", ChangePasswordView.as_view(), name="change-password"),

@@ -401,3 +401,6 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
 }
+
+
+FORGET_PASSWORD_OTP_TIMEOUT = timedelta(minutes=10).total_seconds()

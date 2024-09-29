@@ -4,17 +4,13 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.contrib.sites.shortcuts import get_current_site
+from django.core import signing
 from django.core.cache import cache
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.urls import reverse
+from django.utils import timezone
 from django.utils.encoding import DjangoUnicodeDecodeError
-from django.utils.encoding import force_bytes
 from django.utils.encoding import smart_str
-from django.utils.html import strip_tags
 from django.utils.http import urlsafe_base64_decode
-from django.utils.http import urlsafe_base64_encode
+from django.utils.timezone import now
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.validators import UniqueValidator
@@ -124,33 +120,36 @@ class PasswordResetSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         email = attrs["email_id"]
-        if User.objects.filter(email=email).exists():
-            request = self.context.get("request")
-            user = User.objects.get(email=email)
-            uid = urlsafe_base64_encode(force_bytes(user.id))
-            token = PasswordResetTokenGenerator().make_token(user)
-            link = f"http://{get_current_site(request).domain}"
-            link = f"{link}{reverse('reset-password', args=[uid, token])}"
-            # send email
+        if not User.objects.filter(email=email).exists():
+            msg = "This email is not registered!"
+            raise serializers.ValidationError(msg)
+        return attrs
 
-            context = {"link": link}
-            html_message = render_to_string(
-                "emails/forgot-password.html",
-                context=context,
-            )
-            plain_message = strip_tags(html_message)
 
-            send_mail(
-                subject="Reset Your Password",
-                message=plain_message,
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[user.email],
-                fail_silently=True,
-                html_message=html_message,
-            )
-            return attrs
-        msg = "This email is not registered!"
-        raise serializers.ValidationError(msg)
+class PasswordResetOTPVerifySerializer(serializers.Serializer):
+    email_id = serializers.EmailField()
+    otp = serializers.CharField(max_length=6)
+
+    class Meta:
+        fields = ["email_id"]
+
+    def validate_email_id(self, value):
+        if not User.objects.filter(email=value).exists():
+            msg = "This email is not registered!"
+            raise serializers.ValidationError(msg)
+        return value
+
+    def validate(self, attrs):
+        user = User.objects.filter(email=attrs["email_id"])
+        otp = attrs["otp"]
+        if not user.exists():
+            raise serializers.ValidationError({"email_id": "User does not exist."})
+
+        if not (cached_otp := cache.get(f"password_reset:{user[0].id}")) or cached_otp != otp:
+            raise serializers.ValidationError({"otp": "OTP is invalid."})
+
+        cache.delete(f"password_reset:{user[0].id}")
+        return super().validate(attrs)
 
 
 class ResetPasswordSerializer(serializers.Serializer):
@@ -298,3 +297,42 @@ class GoogleAUthVerifiedData(serializers.Serializer):
             last_name=last_name,
         )
         return user
+
+
+class PasswordResetAfterVerificationSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    new_password = serializers.CharField(validators=[validate_password])
+
+    def validate_token(self, value):
+        try:
+            data = signing.loads(value, salt="password-reset-salt")
+        except signing.BadSignature as e:
+            msg = "Invalid token."
+            raise serializers.ValidationError(msg) from e
+
+        try:
+            timestamp = timezone.datetime.fromisoformat(data["timestamp"])
+        except ValueError as e:
+            msg = "Invalid timestamp format."
+            raise serializers.ValidationError(msg) from e
+        if now() > timestamp:
+            msg = "Token has expired."
+            raise serializers.ValidationError(msg)
+
+        user = User.objects.get(id=data["user_id"])
+        if not user:
+            msg = "Invalid token."
+            raise serializers.ValidationError(msg)
+
+        self.user = user
+        return value
+
+    def update(self, instance, validated_data):
+        instance.set_password(validated_data["new_password"])
+        instance.save()
+        return instance
+
+    def save(self, *args, **kwargs):
+        self.user.set_password(self.validated_data["new_password"])
+        self.user.save()
+        return self.user
