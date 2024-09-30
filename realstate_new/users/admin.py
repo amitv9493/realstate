@@ -13,6 +13,8 @@ class CustomUserAdmin(UserAdmin):
         "license_number",
         "license_status",
         "mile_radius_preference",
+        "is_staff",
+        "is_active",
     ]
     list_filter = [
         "license_status",
