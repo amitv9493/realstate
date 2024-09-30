@@ -17,11 +17,17 @@ class BaseTaskAdmin(admin.ModelAdmin):
         "task_time",
         "client_name",
         "payment_amount",
+        "asap",
         "is_completed",
         "job_type",
         "assigned_to",
     )
-    list_filter = ("is_completed", "task_time", "job_type")
+    list_filter = (
+        "is_completed",
+        "task_time",
+        "job_type",
+        "asap",
+    )
     search_fields = ("property", "client_name", "client_email")
     date_hierarchy = "task_time"
     readonly_fields = ("created_at", "updated_at", "created_by")
@@ -36,6 +42,7 @@ class BaseTaskAdmin(admin.ModelAdmin):
                     "job_type",
                     "apply_deadline",
                     "brokerage",
+                    "asap",
                 ),
             },
         ),
@@ -183,7 +190,7 @@ class RunnerTaskAdmin(BaseTaskAdmin):
                     "vendor_name",
                     "vendor_phone",
                     "vendor_company_name",
-                    "vebdor_notes",
+                    "vendor_notes",
                 ),
             },
         ),

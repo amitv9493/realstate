@@ -1,6 +1,5 @@
 from collections import OrderedDict
 from itertools import chain
-from operator import itemgetter
 from typing import Any
 from typing import Literal
 
@@ -10,7 +9,6 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from silk.profiling.profiler import silk_profile
 
-from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
 from realstate_new.task.models import OpenHouseTask
@@ -19,6 +17,7 @@ from realstate_new.task.models.professional_task import ProfessionalServiceTask
 from realstate_new.task.models.sign_task import SignTask
 from realstate_new.users.models import User
 
+from .filters import filter_tasks
 from .serializers import LockBoxBSSerializer
 from .serializers import LockBoxIRSerializer
 from .serializers import OngoingTaskSerializer
@@ -38,20 +37,38 @@ class TaskListMixin:
         base_query,
         job: Literal["completed", "ongoing", "latest"],
     ):
+        query_params = self.request.query_params.copy()
+        query_params["flag"] = job
+
+        filtered_tasks = filter_tasks(self.request, base_query)
+
         data = {}
-        for k, job_model in JOB_TYPE_MAPPINGS.items():
-            if job == "latest":
-                # excluding those jobs where user has already made theh application
-                data[k] = job_model.objects.filter(**base_query).exclude(
-                    applications__applicant=self.request.user,
-                )
-            else:
-                data[k] = job_model.objects.filter(**base_query)
+        for task_type, task_filter in filtered_tasks.items():
+            data[task_type] = task_filter.qs
 
         serializer = self.get_updated_serializer(job=job)
         data = serializer(data, context={"request": self.request}).data
         flattened_response = chain.from_iterable(filter(bool, data.values()))
-        return sorted(flattened_response, key=itemgetter("task_time"))
+
+        # Apply type_of_task filter
+        type_of_task = query_params.get("type_of_task")
+        if type_of_task:
+            type_of_task_list = [t.strip() for t in type_of_task.split(",")]
+            flattened_response = [
+                task for task in flattened_response if task["type_of_task"] in type_of_task_list
+            ]
+
+        # Apply sorting
+        sort_by = query_params.get("sort_by", "task_time")
+        sort_order = query_params.get("sort_order", "asc")
+
+        if sort_order == "desc":
+            return sorted(
+                flattened_response,
+                key=lambda x: x.get(sort_by, ""),
+                reverse=True,
+            )
+        return sorted(flattened_response, key=lambda x: x.get(sort_by, ""))
 
     def get_paginated_response(self, page, page_size, response: list):
         start = (page - 1) * page_size

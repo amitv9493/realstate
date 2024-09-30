@@ -24,7 +24,7 @@ class CreatePaymentView(APIView):
             payment_id = serializer.save()
             request.user.wallet.transaction.create(
                 payment_id=payment_id,
-                transcation_type=TranscationTypeChoice.WITHDRAW,
+                transcation_type=TranscationTypeChoice.DIPOSIT,
                 amount=serializer.validated_data["amount"],
             )
             return Response({"payment_id": payment_id}, 200)

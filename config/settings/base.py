@@ -80,6 +80,7 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "drf_standardized_errors",
     "silk",
+    "django_filters",
 ]
 
 LOCAL_APPS = [
