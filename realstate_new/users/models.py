@@ -35,8 +35,8 @@ def upload_to(instance, filename):
 
 
 class User(AbstractUser):
-    USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = ["email"]
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
     profile_picture = models.ImageField(upload_to=upload_to, null=True, blank=True)
     job_preferences = MultiSelectField(choices=JOB_TYPES, default="SHOWING")
     email = models.EmailField(unique=True)
