@@ -38,6 +38,7 @@ class CustomUserAdmin(UserAdmin):
                     "mile_radius_preference",
                     "phone_country_code",
                     "phone",
+                    "profile_picture",
                 ),
             },
         ),

@@ -18,6 +18,7 @@ JOB_TYPES = (
     ("PROFESSIONAL", "Professional Services"),
 )
 
+
 DAYS_OF_WEEK = (
     ("MON", "Monday"),
     ("TUE", "Tuesday"),
@@ -29,9 +30,14 @@ DAYS_OF_WEEK = (
 )
 
 
+def upload_to(instance, filename):
+    return f"uploads/{instance.username}/{filename}"
+
+
 class User(AbstractUser):
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username"]
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["email"]
+    profile_picture = models.ImageField(upload_to=upload_to, null=True, blank=True)
     job_preferences = MultiSelectField(choices=JOB_TYPES, default="SHOWING")
     email = models.EmailField(unique=True)
     # Preferences
