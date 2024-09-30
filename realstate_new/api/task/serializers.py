@@ -221,25 +221,25 @@ class SignTaskSerializer(TaskSerializer):
 
 
 class OngoingTaskSerializer(serializers.Serializer):
-    showing_tasks = ShowingTaskSerializer(
+    Showing = ShowingTaskSerializer(
         many=True,
         fields=ONGOING_FIELDS["SHOWING"],
     )
-    sign_tasks = SignTaskSerializer(many=True, fields=ONGOING_FIELDS["SIGN"])
-    runner_tasks = RunnerTaskSerializer(many=True, fields=ONGOING_FIELDS["RUNNER"])
-    professional_tasks = ProfessionalTaskSerializer(
+    Sign = SignTaskSerializer(many=True, fields=ONGOING_FIELDS["SIGN"])
+    Runner = RunnerTaskSerializer(many=True, fields=ONGOING_FIELDS["RUNNER"])
+    Professional = ProfessionalTaskSerializer(
         many=True,
         fields=ONGOING_FIELDS["PROFESSIONAL"],
     )
-    openhouse_tasks = OpenHouseTaskSerializer(
+    OpenHouse = OpenHouseTaskSerializer(
         many=True,
         fields=ONGOING_FIELDS["OPENHOUSE"],
     )
-    lockbox_tasks_bs = LockBoxBSSerializer(
+    LockBoxIR = LockBoxBSSerializer(
         many=True,
         fields=ONGOING_FIELDS["LOCKBOXBS"],
     )
-    lockbox_tasks_ir = LockBoxIRSerializer(
+    LockBoxBS = LockBoxIRSerializer(
         many=True,
         fields=ONGOING_FIELDS["LOCKBOXIR"],
     )

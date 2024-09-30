@@ -301,7 +301,7 @@ class GoogleAUthVerifiedData(serializers.Serializer):
 
 class PasswordResetAfterVerificationSerializer(serializers.Serializer):
     token = serializers.CharField()
-    new_password = serializers.CharField(validators=[validate_password])
+    new_password = serializers.CharField()
 
     def validate_token(self, value):
         try:
