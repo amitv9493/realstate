@@ -119,7 +119,7 @@ class SignTaskViewSet(TaskViewSet):
     queryset = SignTask.objects.all()
 
 
-class OngoingTaskView(APIView, TaskListMixin):
+class JobCreaterDashboardView(APIView, TaskListMixin):
     """Returns the list of the pending/ongoing tasks for the Job Creater."""
 
     serializer_class = None
@@ -127,43 +127,31 @@ class OngoingTaskView(APIView, TaskListMixin):
     @silk_profile(name="Ongoing Task")
     def get(self, request, *args, **kwargs):
         params = request.query_params
-        base_query = {"is_completed": False, "created_by": request.user}
         page_size = int(params.get("page_size", 10))
         page = int(params.get("page", 1))
-        tasks = self.get_tasks(base_query, "ongoing")
+        flag = params.get("flag", "").lower()
+        if flag == "ongoing":
+            base_query = {"is_completed": False, "created_by": request.user}
+            tasks = self.get_tasks(base_query, "ongoing")
+        if flag == "completed":
+            base_query = {"is_completed": True, "created_by": request.user}
+            tasks = self.get_tasks(base_query, "completed")
+
         paginated_response = self.get_paginated_response(page, page_size, tasks)
 
         return Response(paginated_response, 200)
 
 
-class CompletedTaskView(APIView, TaskListMixin):
-    """Returns the list of the completed tasks for the Job Creater."""
-
-    serializer_class = None
-
-    @silk_profile(name="Completed Task")
-    def get(self, request, *args, **kwargs):
-        params = request.query_params
-        base_query = {"is_completed": True, "created_by": request.user}
-        page_size = int(params.get("page_size", 10))
-        page = int(params.get("page", 1))
-        tasks = self.get_tasks(base_query, "completed")
-        paginated_response = self.get_paginated_response(page, page_size, tasks)
-
-        return Response(paginated_response, 200)
-
-
-class LatestTaskView(APIView, TaskListMixin):
-    """Returns the list of the Available tasks for the Job Seeker.
-    It does not include those tasks which the seeker has already applied to."""
-
+class JobSeekerDashboardView(APIView, TaskListMixin):
     @silk_profile(name="Latest Task")
     def get(self, request, *args, **kwargs):
         params = request.query_params
         base_query = {"is_completed": False, "assigned_to__isnull": True}
         page_size = int(params.get("page_size", 10))
         page = int(params.get("page", 1))
-        tasks = self.get_tasks(base_query, "latest")
+        flag = params.get("flag", "").lower()
+        if flag == "latest":
+            tasks = self.get_tasks(base_query, "latest")
         paginated_response = self.get_paginated_response(page, page_size, tasks)
 
         return Response(paginated_response, 200)

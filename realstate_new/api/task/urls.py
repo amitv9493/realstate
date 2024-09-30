@@ -1,11 +1,10 @@
 from django.urls import path
 from rest_framework import routers
 
-from .views import CompletedTaskView
-from .views import LatestTaskView
+from .views import JobCreaterDashboardView
+from .views import JobSeekerDashboardView
 from .views import LockBoxTaskBSViewSet
 from .views import LockBoxTaskIRViewSet
-from .views import OngoingTaskView
 from .views import OpenHouseTaskViewSet
 from .views import ProfessionalTaskViewSet
 from .views import RunnerTaskViewSet
@@ -23,8 +22,7 @@ router.register("signtask", SignTaskViewSet, "sign-task")
 
 
 urlpatterns = [
-    path("ongoingtasks/", OngoingTaskView.as_view()),
-    path("completedtasks/", CompletedTaskView.as_view()),
-    path("latesttasks/", LatestTaskView.as_view()),
+    path("dashboard/jobcreater", JobCreaterDashboardView.as_view()),
+    path("dashboard/jobseeker", JobSeekerDashboardView.as_view()),
     *router.urls,
 ]
