@@ -19,15 +19,15 @@ class TaskFilter(django_filters.FilterSet):
     )
     task_time_gte = django_filters.DateTimeFilter(
         field_name="task_time",
-        lookup_expr="gte",
+        lookup_expr="date__gte",
     )
     task_time_lte = django_filters.DateTimeFilter(
         field_name="task_time",
-        lookup_expr="lte",
+        lookup_expr="date__lte",
     )
     task_time = django_filters.DateTimeFilter(
         field_name="task_time",
-        lookup_expr="exact",
+        lookup_expr="date__exact",
     )
     asap = django_filters.BooleanFilter(method="filter_asap")
 
@@ -53,10 +53,10 @@ def filter_tasks(request, base_query):
     filtered_tasks = {}
     for task_type, task_model in JOB_TYPE_MAPPINGS.items():
         queryset = task_model.objects.filter(**base_query)
-        filtered_tasks[task_type] = TaskFilter(
+        task_filter = TaskFilter(
             request.query_params,
             queryset=queryset,
             request=request,
         )
-
+        filtered_tasks[task_type] = task_filter
     return filtered_tasks
