@@ -37,30 +37,35 @@ class TaskListMixin:
         base_query,
         job: Literal["completed", "ongoing", "latest"],
     ):
-        query_params = self.request.query_params.copy()
-        query_params["flag"] = job
+        filter_data = self.filter_data(base_query)
+        serialized_data = self.serialize_data(filter_data, job)
 
-        filtered_tasks = filter_tasks(self.request, base_query)
+        return self.apply_sorting(flattened_response=serialized_data)
 
+    def filter_data(self, base_query):
         data = {}
+        filtered_tasks = filter_tasks(self.request, base_query)
         for task_type, task_filter in filtered_tasks.items():
             data[task_type] = task_filter.qs
+        return data
 
+    def serialize_data(self, data, job):
         serializer = self.get_updated_serializer(job=job)
         data = serializer(data, context={"request": self.request}).data
         flattened_response = chain.from_iterable(filter(bool, data.values()))
 
         # Apply type_of_task filter
-        type_of_task = query_params.get("type_of_task")
+        type_of_task = self.request.query_params.get("type_of_task")
         if type_of_task:
             type_of_task_list = [t.strip() for t in type_of_task.split(",")]
             flattened_response = [
                 task for task in flattened_response if task["type_of_task"] in type_of_task_list
             ]
+        return flattened_response
 
-        # Apply sorting
-        sort_by = query_params.get("sort_by", "task_time")
-        sort_order = query_params.get("sort_order", "asc")
+    def apply_sorting(self, flattened_response):
+        sort_by = self.request.query_params.get("sort_by", "task_time")
+        sort_order = self.request.query_params.get("sort_order", "asc")
 
         if sort_order == "desc":
             return sorted(
@@ -70,7 +75,7 @@ class TaskListMixin:
             )
         return sorted(flattened_response, key=lambda x: x.get(sort_by, ""))
 
-    def get_paginated_response(self, page, page_size, response: list):
+    def get_paginated_response(self, page: int, page_size: int, response: list):
         start = (page - 1) * page_size
         end = start + page_size
         return OrderedDict(
@@ -144,8 +149,12 @@ class JobCreaterDashboardView(APIView, TaskListMixin):
     @silk_profile(name="Ongoing Task")
     def get(self, request, *args, **kwargs):
         params = request.query_params
-        page_size = int(params.get("page_size", 10))
-        page = int(params.get("page", 1))
+        page_size = params.get("page_size", 10)
+        page = params.get("page", 1)
+
+        page_size = int(page_size) if page_size else 10
+        page = int(page) if page else 1
+
         flag = params.get("flag", "").lower()
         if flag == "ongoing":
             base_query = {"is_completed": False, "created_by": request.user}
@@ -163,12 +172,18 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
     @silk_profile(name="Latest Task")
     def get(self, request, *args, **kwargs):
         params = request.query_params
+        page_size = params.get("page_size", 10)
+        page = params.get("page", 1)
+
+        page_size = int(page_size) if page_size else 10
+        page = int(page) if page else 1
+
         base_query = {"is_completed": False, "assigned_to__isnull": True}
-        page_size = int(params.get("page_size", 10))
-        page = int(params.get("page", 1))
         flag = params.get("flag", "").lower()
         if flag == "latest":
             tasks = self.get_tasks(base_query, "latest")
+            base_query.update({"applications__applicant": request.user})
+
         paginated_response = self.get_paginated_response(page, page_size, tasks)
 
         return Response(paginated_response, 200)

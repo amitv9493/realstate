@@ -48,16 +48,6 @@ class TaskFilter(django_filters.FilterSet):
             return queryset.filter(asap=True).order_by("task_time")
         return queryset
 
-    @property
-    def qs(self):
-        parent = super().qs
-        user = getattr(self.request, "user", None)
-
-        if user and user.is_authenticated:
-            if self.data.get("flag") == "latest":
-                return parent.exclude(applications__applicant=user)
-        return parent
-
 
 def filter_tasks(request, base_query):
     filtered_tasks = {}
