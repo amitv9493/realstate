@@ -282,3 +282,4 @@ realstate_new/media/
 .env
 # .envs/.local/
 .envs/*
+./config/settings/servicekey.json
