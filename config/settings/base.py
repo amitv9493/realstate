@@ -6,11 +6,16 @@ from pathlib import Path
 
 import environ
 import paypalrestsdk
+from firebase_admin import credentials
+from firebase_admin import initialize_app
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
-# realstate_new/
 APPS_DIR = BASE_DIR / "realstate_new"
+FIREBASE_ADMIN_CERT = Path(BASE_DIR / "config" / "settings" / "servicekey.json")
+
 env = environ.Env()
+cred = credentials.Certificate(FIREBASE_ADMIN_CERT)
+firebase_app = initialize_app(cred)
 
 
 READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=True)

@@ -1,9 +1,11 @@
 from django.db.models.query import QuerySet
+from firebase_admin import messaging
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from realstate_new.users.models import FCMDevice
 from realstate_new.users.models import ProfessionalDetail
 from realstate_new.users.models import User
 
@@ -62,3 +64,25 @@ class ProfessionalDetailViewSet(ModelViewSet):
         serializer.validated_data["user"] = self.request.user
         serializer.validated_data["created_by"] = self.request.user
         return super().perform_create(serializer)
+
+
+class TestNotification(APIView):
+    def get(self, request, *args, **kwargs):
+        devices_ids = list(
+            FCMDevice.objects.all().values_list("registration_id", flat=True),
+        )
+        title = request.data.get("title", None)
+        body = request.data.get("body", None)
+        data = request.data.get("data", None)
+
+        message = messaging.MulticastMessage(
+            notification=messaging.Notification(
+                title=title,
+                body=body,
+            ),
+            data=data,
+            tokens=devices_ids,
+        )
+
+        response = messaging.send_multicast(message)
+        return Response(f"{response.success_count} messages were sent successfully")

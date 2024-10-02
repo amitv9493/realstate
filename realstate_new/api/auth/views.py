@@ -36,6 +36,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from realstate_new.users.models import FCMDevice
 from realstate_new.users.models import User as UserType
 from realstate_new.utils import send_email
 from realstate_new.utils.utils import generate_reset_token
@@ -134,7 +135,11 @@ class LoginView(PublicApi):
 
                 token = get_tokens_for_user(user)
                 user_role = get_user_role(user)
-
+                FCMDevice.objects.get_or_create(
+                    user=user,
+                    device_type=self.validated_data["device_type"],
+                    registration_id=self.validated_data["registration_id"],
+                )
                 return Response(
                     {
                         "token": token,
@@ -432,7 +437,11 @@ class GoogleVerificationView(PublicApi):
                 user_group = (Group.objects.get(user=user.id)).name
             except Exception:  # noqa: BLE001
                 user_group = "None"
-
+            FCMDevice.objects.get_or_create(
+                user=user,
+                device_type=self.validated_data["device_type"],
+                registration_id=self.validated_data["registration_id"],
+            )
             return Response(
                 {
                     "status": True,

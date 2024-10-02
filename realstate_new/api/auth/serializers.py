@@ -27,6 +27,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=255)
+    fcm_token = serializers.CharField(required=False)
+    device_type = serializers.CharField(required=False)
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -284,6 +286,8 @@ class GoogleAUthVerifiedData(serializers.Serializer):
     email = serializers.EmailField()
     family_name = serializers.CharField()
     given_name = serializers.CharField()
+    fcm_token = serializers.CharField(required=False)
+    device_type = serializers.CharField(required=False)
 
     def create(self, validated_data):
         first_name = validated_data["family_name"]

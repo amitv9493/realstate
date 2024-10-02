@@ -226,3 +226,14 @@ class EducationDetail(TrackingModel):
     year_of_graduation = models.PositiveIntegerField()
     start_date = models.DateField()
     end_date = models.DateField()
+
+
+class FCMDevice(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    device_type = models.CharField(max_length=55, blank=True, default="")
+    registration_id = models.TextField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s device"
