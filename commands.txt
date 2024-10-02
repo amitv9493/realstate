@@ -2,3 +2,32 @@ to create a requirements.txt file
 
 uv pip freeze | uv pip compile - -o requirements.txt
 celery -A realstate.celery worker -l info
+
+
+# type: ignore  # noqa: PGH003
+
+# from django.db.models.signals import post_save
+# from django.dispatch import receiver
+# from django.core.cache import cache
+
+
+# def ready(self) -> None:
+#     from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
+
+#     @receiver(post_save)
+#     def update_cache(sender, instance, created, **kwargs):
+#         # Fields to watch for changes
+#         watched_fields = ['assigned_to', 'task_time']
+
+#         # Check if it's a new instance or if watched fields have changed
+#         if created or any(field in instance._state.fields_cache for field in watched_fields):
+#             cache_key = f"{sender.__name__}_{instance.id}"
+#             cache.set(cache_key, instance, timeout=3600)  # Cache for 1 hour
+#         else:
+#             # No relevant changes, do nothing
+#             pass
+
+#     for job_model in JOB_TYPE_MAPPINGS.values():
+#         post_save.connect(update_cache, sender=job_model)
+
+#     return super().ready()

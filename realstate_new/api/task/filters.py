@@ -51,8 +51,13 @@ class TaskFilter(django_filters.FilterSet):
 
 def filter_tasks(request, base_query):
     filtered_tasks = {}
-    for task_type, task_model in JOB_TYPE_MAPPINGS.items():
-        queryset = task_model.objects.filter(**base_query)
+    type_of_task = request.query_params.get("type_of_task", "")
+    if type_of_task:
+        type_of_task_list = [t.strip() for t in type_of_task.split(",")]
+    else:
+        type_of_task_list = list(JOB_TYPE_MAPPINGS.keys())
+    for task_type in type_of_task_list:
+        queryset = JOB_TYPE_MAPPINGS[task_type].objects.filter(**base_query)
         task_filter = TaskFilter(
             request.query_params,
             queryset=queryset,

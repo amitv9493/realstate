@@ -5,6 +5,7 @@ from typing import Literal
 
 from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
+from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from silk.profiling.profiler import silk_profile
@@ -35,14 +36,14 @@ class TaskListMixin:
     def get_tasks(
         self,
         base_query,
-        job: Literal["completed", "ongoing", "latest"],
+        job: Literal["completed", "ongoing", "latest"] | None = None,
     ):
-        filter_data = self.filter_data(base_query)
+        filter_data = self.get_filtered_qs(base_query)
         serialized_data = self.serialize_data(filter_data, job)
 
         return self.apply_sorting(flattened_response=serialized_data)
 
-    def filter_data(self, base_query):
+    def get_filtered_qs(self, base_query):
         data = {}
         filtered_tasks = filter_tasks(self.request, base_query)
         for task_type, task_filter in filtered_tasks.items():
@@ -52,16 +53,7 @@ class TaskListMixin:
     def serialize_data(self, data, job):
         serializer = self.get_updated_serializer(job=job)
         data = serializer(data, context={"request": self.request}).data
-        flattened_response = chain.from_iterable(filter(bool, data.values()))
-
-        # Apply type_of_task filter
-        type_of_task = self.request.query_params.get("type_of_task")
-        if type_of_task:
-            type_of_task_list = [t.strip() for t in type_of_task.split(",")]
-            flattened_response = [
-                task for task in flattened_response if task["type_of_task"] in type_of_task_list
-            ]
-        return flattened_response
+        return chain.from_iterable(filter(bool, data.values()))
 
     def apply_sorting(self, flattened_response):
         sort_by = self.request.query_params.get("sort_by", "task_time")
@@ -80,10 +72,10 @@ class TaskListMixin:
         end = start + page_size
         return OrderedDict(
             [
-                ("count", len(response)),
-                ("page", page),
-                ("page_size", page_size),
-                ("results", response[start:end]),
+                ("count", len(response) if response else 0),
+                ("page", page if response else 0),
+                ("page_size", page_size if response else 0),
+                ("results", response[start:end] if response else []),
             ],
         )
 
@@ -149,20 +141,27 @@ class JobCreaterDashboardView(APIView, TaskListMixin):
     @silk_profile(name="Ongoing Task")
     def get(self, request, *args, **kwargs):
         params = request.query_params
-        page_size = params.get("page_size", 10)
-        page = params.get("page", 1)
-
-        page_size = int(page_size) if page_size else 10
-        page = int(page) if page else 1
-
         flag = params.get("flag", "").lower()
+        if not flag:
+            raise ValidationError(
+                {
+                    "flag": "flag is required",
+                },
+                code="required",
+            )
         if flag == "ongoing":
             base_query = {"is_completed": False, "created_by": request.user}
             tasks = self.get_tasks(base_query, "ongoing")
+
         if flag == "completed":
             base_query = {"is_completed": True, "created_by": request.user}
             tasks = self.get_tasks(base_query, "completed")
 
+        # pagination related data
+        page_size = params.get("page_size", 10)
+        page = params.get("page", 1)
+        page_size = int(page_size) if page_size else 10
+        page = int(page) if page else 1
         paginated_response = self.get_paginated_response(page, page_size, tasks)
 
         return Response(paginated_response, 200)
@@ -180,9 +179,16 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
 
         base_query = {"is_completed": False, "assigned_to__isnull": True}
         flag = params.get("flag", "").lower()
+        if not flag:
+            raise ValidationError(
+                {
+                    "flag": "Flag is required",
+                },
+                code="required",
+            )
         if flag == "latest":
-            tasks = self.get_tasks(base_query, "latest")
             base_query.update({"applications__applicant": request.user})
+            tasks = self.get_tasks(base_query, "latest")
 
         paginated_response = self.get_paginated_response(page, page_size, tasks)
 
