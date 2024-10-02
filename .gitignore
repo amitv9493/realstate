@@ -10,6 +10,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 config/project.conf
+config/settings/servicekey.json
 build/
 develop-eggs/
 dist/

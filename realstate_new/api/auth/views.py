@@ -135,11 +135,13 @@ class LoginView(PublicApi):
 
                 token = get_tokens_for_user(user)
                 user_role = get_user_role(user)
-                FCMDevice.objects.get_or_create(
-                    user=user,
-                    device_type=self.validated_data["device_type"],
-                    registration_id=self.validated_data["registration_id"],
-                )
+                data = serializer.validated_data
+                if data["device_type"] and data["registration_id"]:
+                    FCMDevice.objects.get_or_create(
+                        user=user,
+                        device_type=serializer.validated_data["device_type"],
+                        registration_id=serializer.validated_data["registration_id"],
+                    )
                 return Response(
                     {
                         "token": token,
@@ -437,11 +439,13 @@ class GoogleVerificationView(PublicApi):
                 user_group = (Group.objects.get(user=user.id)).name
             except Exception:  # noqa: BLE001
                 user_group = "None"
-            FCMDevice.objects.get_or_create(
-                user=user,
-                device_type=self.validated_data["device_type"],
-                registration_id=self.validated_data["registration_id"],
-            )
+            data = serializer.validated_data
+            if data["device_type"] and data["registration_id"]:
+                FCMDevice.objects.get_or_create(
+                    user=user,
+                    device_type=serializer.validated_data["device_type"],
+                    registration_id=serializer.validated_data["registration_id"],
+                )
             return Response(
                 {
                     "status": True,
