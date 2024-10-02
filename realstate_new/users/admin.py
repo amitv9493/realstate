@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
+from .models import FCMDevice
 from .models import User
 
 
@@ -82,3 +83,9 @@ class CustomUserAdmin(UserAdmin):
     )
 
     fieldsets = UserAdmin.fieldsets + custom_fieldsets
+
+
+@admin.register(FCMDevice)
+class FCMDeviceAdmin(admin.ModelAdmin):
+    list_display = ["user", "device_type", "created_at"]
+    list_filter = ["user", "device_type"]
