@@ -57,7 +57,7 @@ def filter_tasks(request, base_query):
     else:
         type_of_task_list = list(JOB_TYPE_MAPPINGS.keys())
     for task_type in type_of_task_list:
-        queryset = JOB_TYPE_MAPPINGS[task_type].objects.filter(**base_query)
+        queryset = JOB_TYPE_MAPPINGS[task_type].objects.filter(base_query)
         task_filter = TaskFilter(
             request.query_params,
             queryset=queryset,

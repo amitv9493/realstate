@@ -1,8 +1,8 @@
 from collections import OrderedDict
 from itertools import chain
 from typing import Any
-from typing import Literal
 
+from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 from rest_framework.serializers import ValidationError
@@ -30,16 +30,15 @@ from .serializers import SignTaskSerializer
 
 
 class TaskListMixin:
-    def get_updated_serializer(self, job):
+    def get_updated_serializer(self):
         return OngoingTaskSerializer
 
     def get_tasks(
         self,
         base_query,
-        job: Literal["completed", "ongoing", "latest"] | None = None,
     ):
         filter_data = self.get_filtered_qs(base_query)
-        serialized_data = self.serialize_data(filter_data, job)
+        serialized_data = self.serialize_data(filter_data)
 
         return self.apply_sorting(flattened_response=serialized_data)
 
@@ -50,8 +49,8 @@ class TaskListMixin:
             data[task_type] = task_filter.qs
         return data
 
-    def serialize_data(self, data, job):
-        serializer = self.get_updated_serializer(job=job)
+    def serialize_data(self, data):
+        serializer = self.get_updated_serializer()
         data = serializer(data, context={"request": self.request}).data
         return chain.from_iterable(filter(bool, data.values()))
 
@@ -78,6 +77,75 @@ class TaskListMixin:
                 ("results", response[start:end] if response else []),
             ],
         )
+
+
+class JobCreaterDashboardView(APIView, TaskListMixin):
+    """Returns the list of the pending/ongoing tasks for the Job Creater."""
+
+    serializer_class = None
+
+    @silk_profile(name="Ongoing Task")
+    def get(self, request, *args, **kwargs):
+        params = request.query_params
+        flag = params.get("flag", "").lower()
+        if not flag:
+            raise ValidationError(
+                {
+                    "flag": "flag is required",
+                },
+                code="required",
+            )
+        base_query = Q(created_by=request.user)
+        if flag == "ongoing":
+            base_query &= Q(is_completed=False)
+
+        if flag == "completed":
+            base_query &= Q(is_completed=True)
+
+        tasks = self.get_tasks(base_query)
+
+        # pagination related data
+        page_size = params.get("page_size", 10)
+        page = params.get("page", 1)
+        page_size = int(page_size) if page_size else 10
+        page = int(page) if page else 1
+
+        paginated_response = self.get_paginated_response(page, page_size, tasks)
+
+        return Response(paginated_response, 200)
+
+
+class JobSeekerDashboardView(APIView, TaskListMixin):
+    @silk_profile(name="Latest Task")
+    def get(self, request, *args, **kwargs):
+        params = request.query_params
+        page_size = params.get("page_size", 10)
+        page = params.get("page", 1)
+
+        page_size = int(page_size) if page_size else 10
+        page = int(page) if page else 1
+
+        query = (
+            Q(is_completed=False)
+            & Q(assigned_to__isnull=True)
+            & ~Q(
+                applications__applicant__in=[request.user],
+            )
+        )
+
+        flag = params.get("flag", "").lower()
+        if not flag:
+            raise ValidationError(
+                {
+                    "flag": "Flag is required",
+                },
+                code="required",
+            )
+        if flag == "latest":
+            tasks = self.get_tasks(query)
+        paginated_response = self.get_paginated_response(page, page_size, tasks)
+
+        return Response(paginated_response, 200)
 
 
 class TaskViewSet(ModelViewSet):
@@ -131,65 +199,3 @@ class RunnerTaskViewSet(TaskViewSet):
 class SignTaskViewSet(TaskViewSet):
     serializer_class = SignTaskSerializer
     queryset = SignTask.objects.all()
-
-
-class JobCreaterDashboardView(APIView, TaskListMixin):
-    """Returns the list of the pending/ongoing tasks for the Job Creater."""
-
-    serializer_class = None
-
-    @silk_profile(name="Ongoing Task")
-    def get(self, request, *args, **kwargs):
-        params = request.query_params
-        flag = params.get("flag", "").lower()
-        if not flag:
-            raise ValidationError(
-                {
-                    "flag": "flag is required",
-                },
-                code="required",
-            )
-        if flag == "ongoing":
-            base_query = {"is_completed": False, "created_by": request.user}
-            tasks = self.get_tasks(base_query, "ongoing")
-
-        if flag == "completed":
-            base_query = {"is_completed": True, "created_by": request.user}
-            tasks = self.get_tasks(base_query, "completed")
-
-        # pagination related data
-        page_size = params.get("page_size", 10)
-        page = params.get("page", 1)
-        page_size = int(page_size) if page_size else 10
-        page = int(page) if page else 1
-        paginated_response = self.get_paginated_response(page, page_size, tasks)
-
-        return Response(paginated_response, 200)
-
-
-class JobSeekerDashboardView(APIView, TaskListMixin):
-    @silk_profile(name="Latest Task")
-    def get(self, request, *args, **kwargs):
-        params = request.query_params
-        page_size = params.get("page_size", 10)
-        page = params.get("page", 1)
-
-        page_size = int(page_size) if page_size else 10
-        page = int(page) if page else 1
-
-        base_query = {"is_completed": False, "assigned_to__isnull": True}
-        flag = params.get("flag", "").lower()
-        if not flag:
-            raise ValidationError(
-                {
-                    "flag": "Flag is required",
-                },
-                code="required",
-            )
-        if flag == "latest":
-            base_query.update({"applications__applicant": request.user})
-            tasks = self.get_tasks(base_query, "latest")
-
-        paginated_response = self.get_paginated_response(page, page_size, tasks)
-
-        return Response(paginated_response, 200)

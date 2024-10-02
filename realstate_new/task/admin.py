@@ -21,6 +21,7 @@ class BaseTaskAdmin(admin.ModelAdmin):
         "is_completed",
         "job_type",
         "assigned_to",
+        "created_by",
     )
     list_filter = (
         "is_completed",
