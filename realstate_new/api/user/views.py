@@ -67,7 +67,7 @@ class ProfessionalDetailViewSet(ModelViewSet):
 
 
 class TestNotification(APIView):
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         devices_ids = list(
             FCMDevice.objects.all().values_list("registration_id", flat=True),
         )
