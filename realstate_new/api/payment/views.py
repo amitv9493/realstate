@@ -1,5 +1,4 @@
 import logging
-from decimal import Decimal
 
 from django.db import transaction
 from rest_framework.exceptions import APIException
@@ -22,11 +21,12 @@ class CreatePaymentView(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):  # noqa: RET503
             payment_id = serializer.save()
-            request.user.wallet.transaction.create(
+            request.user.transactions.create(
                 payment_id=payment_id,
                 transcation_type=TranscationTypeChoice.DIPOSIT,
                 amount=serializer.validated_data["amount"],
             )
+
             return Response({"payment_id": payment_id}, 200)
 
 
@@ -39,18 +39,15 @@ class ExecutePaymentView(APIView):
         if serializer.is_valid(raise_exception=True):  # noqa: RET503
             if serializer.save():
                 data = serializer.validated_data
-                user = self.request.user
+                user = request.user
                 try:
                     with transaction.atomic():
-                        tsc = user.wallet.transaction.all().get(
+                        tsc = user.transactions.get(
                             payment_id=data["payment_id"],
                         )
                         tsc.success = True
                         tsc.amount = data["amount"]
                         tsc.save(update_fields=["amount", "success"])
-                        user.wallet.add_amount(
-                            Decimal(data["amount"]),
-                        )
                         user.save()
                 except Exception:
                     _logger.exception("some error in the transcation block")
@@ -59,7 +56,6 @@ class ExecutePaymentView(APIView):
                 return Response(
                     {
                         "status": True,
-                        "balance": user.wallet.balance,
                     },
                     200,
                 )

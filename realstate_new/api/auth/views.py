@@ -136,7 +136,7 @@ class LoginView(PublicApi):
                 token = get_tokens_for_user(user)
                 user_role = get_user_role(user)
                 data = serializer.validated_data
-                if data["device_type"] and data["registration_id"]:
+                if data.get("device_type") and data.get("registration_id"):
                     FCMDevice.objects.get_or_create(
                         user=user,
                         device_type=serializer.validated_data["device_type"],
@@ -440,7 +440,7 @@ class GoogleVerificationView(PublicApi):
             except Exception:  # noqa: BLE001
                 user_group = "None"
             data = serializer.validated_data
-            if data["device_type"] and data["registration_id"]:
+            if data.get("device_type") and data.get("registration_id"):
                 FCMDevice.objects.get_or_create(
                     user=user,
                     device_type=serializer.validated_data["device_type"],

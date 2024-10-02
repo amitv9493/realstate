@@ -149,11 +149,6 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
 
 
 class TaskViewSet(ModelViewSet):
-    def perform_create(self, serializer):
-        amount = serializer.validated_data["payment_amount"]
-        self.request.user.wallet.deduct_amount(amount)
-        return super().perform_create(serializer)
-
     def get_serializer(self, *args: Any, **kwargs: Any) -> BaseSerializer:
         return super().get_serializer(
             *args,

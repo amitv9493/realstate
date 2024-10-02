@@ -1,6 +1,5 @@
+from django.conf import settings
 from django.db import models
-
-from .wallet import Wallet
 
 
 class TranscationTypeChoice(models.TextChoices):
@@ -9,10 +8,12 @@ class TranscationTypeChoice(models.TextChoices):
 
 
 class PayPalPayementHistory(models.Model):
-    wallet = models.ForeignKey(
-        Wallet,
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="transaction",
+        null=True,
+        blank=True,
+        related_name="transactions",
     )
     date_created = models.DateTimeField(auto_now_add=True)
     transcation_type = models.CharField(

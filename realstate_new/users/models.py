@@ -6,7 +6,6 @@ from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
 
-from realstate_new.payment.models import Wallet
 from realstate_new.utils import TrackingModel
 
 JOB_TYPES = (
@@ -133,12 +132,6 @@ class User(AbstractUser):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
-
-    def save(self, *args, **kwargs):
-        is_new = self._state.adding
-        super().save(*args, **kwargs)
-        if is_new:
-            Wallet.objects.create(user=self, balance=00.00)
 
     def get_basic_info(self):
         "Returns users basic info"

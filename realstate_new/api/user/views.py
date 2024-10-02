@@ -73,14 +73,12 @@ class TestNotification(APIView):
         )
         title = request.data.get("title", None)
         body = request.data.get("body", None)
-        data = request.data.get("data", None)
 
         message = messaging.MulticastMessage(
             notification=messaging.Notification(
                 title=title,
                 body=body,
             ),
-            data=data,
             tokens=devices_ids,
         )
 
