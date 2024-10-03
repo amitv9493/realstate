@@ -137,7 +137,7 @@ class LoginView(PublicApi):
                 user_role = get_user_role(user)
                 data = serializer.validated_data
                 if data.get("device_type") and data.get("registration_id"):
-                    device = FCMDevice.objects.get_or_create(
+                    device, _ = FCMDevice.objects.get_or_create(
                         user=user,
                         device_type=serializer.validated_data["device_type"],
                     )
@@ -442,7 +442,7 @@ class GoogleVerificationView(PublicApi):
                 user_group = "None"
             data = serializer.validated_data
             if data.get("device_type") and data.get("registration_id"):
-                device = FCMDevice.objects.get_or_create(
+                device, _ = FCMDevice.objects.get_or_create(
                     user=user,
                     device_type=serializer.validated_data["device_type"],
                 )
