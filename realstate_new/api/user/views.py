@@ -1,3 +1,5 @@
+import logging
+
 from django.db.models.query import QuerySet
 from firebase_admin import messaging
 from rest_framework.response import Response
@@ -12,6 +14,8 @@ from realstate_new.users.models import User
 from .serializers import ProfessionalDetailSerializer
 from .serializers import UserMeSerializer
 from .serializers import UserSerializer
+
+logger = logging.getLogger(__name__)
 
 
 class UserView(APIView):
@@ -81,6 +85,14 @@ class TestNotification(APIView):
             ),
             tokens=devices_ids,
         )
-
         response = messaging.send_multicast(message)
+        if response.failure_count > 0:
+            for idx, resp in enumerate(response.responses):
+                if not resp.success:
+                    logging.error(
+                        "Failed for token %s: %s",
+                        devices_ids[idx],
+                        resp.exception,
+                    )
+
         return Response(f"{response.success_count} messages were sent successfully")
