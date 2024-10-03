@@ -4,6 +4,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from realstate_new.application.models import JobApplication
+from realstate_new.users.models import FCMDevice
+from realstate_new.users.tasks import send_fcm_notification
 from realstate_new.utils.base_models import TrackingModel
 
 from .choices import BrokerageType
@@ -85,3 +87,18 @@ class BaseTask(TrackingModel):
         """This function initiates the payment after the task creater has approved the task submission."""  # noqa: E501
         # TODO:
         # Trigger after the task is approved by the creater.
+
+    def save(self, *args, **kwargs) -> None:
+        try:
+            old_instance = self.__class__.objects.get(id=self.id)
+        except Exception:  # noqa: BLE001
+            old_instance = None
+        if old_instance and not old_instance.assigned_to and self.assigned_to:
+            device = FCMDevice.objects.get(user=self.created_by)
+            send_fcm_notification.delay(
+                title=f"Your task has been accepted by {self.assigned_to.username}",
+                device_ids=[device.registration_id],
+                body="Click to know more.",
+                data={},
+            )
+        return super().save(*args, **kwargs)

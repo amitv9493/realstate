@@ -89,7 +89,6 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    # "master",
     "realstate_new.users",
     "realstate_new.master",
     "realstate_new.task",

@@ -1,2 +1,2 @@
-def update_cache(sender, instance, created, **kwargs):
+def send_notification_upon_task_acceptance(sender, instance, created, **kwargs):
     pass
