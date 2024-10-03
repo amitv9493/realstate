@@ -141,7 +141,7 @@ class LoginView(PublicApi):
                         user=user,
                         device_type=serializer.validated_data["device_type"],
                     )
-                    device.registration_id = (serializer.validated_data["registration_id"],)
+                    device.registration_id = serializer.validated_data["registration_id"]
                     device.save(update_fields=["registration_id"])
                 return Response(
                     {
@@ -446,7 +446,7 @@ class GoogleVerificationView(PublicApi):
                     user=user,
                     device_type=serializer.validated_data["device_type"],
                 )
-                device.count = (serializer.validated_data["registration_id"],)
+                device.registration_id = serializer.validated_data["registration_id"]
                 device.save(update_fields=["registration_id"])
             return Response(
                 {
