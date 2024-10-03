@@ -1,5 +1,3 @@
-import logging
-
 from django.db.models.query import QuerySet
 from firebase_admin import messaging
 from rest_framework.response import Response
@@ -14,8 +12,6 @@ from realstate_new.users.models import User
 from .serializers import ProfessionalDetailSerializer
 from .serializers import UserMeSerializer
 from .serializers import UserSerializer
-
-logger = logging.getLogger(__name__)
 
 
 class UserView(APIView):
@@ -72,27 +68,22 @@ class ProfessionalDetailViewSet(ModelViewSet):
 
 class TestNotification(APIView):
     def post(self, request, *args, **kwargs):
-        devices_ids = list(
-            FCMDevice.objects.all().values_list("registration_id", flat=True),
-        )
-        title = request.data.get("title", None)
-        body = request.data.get("body", None)
+        # Retrieve a single device token (for testing)
+        device_id = list(FCMDevice.objects.values_list("registration_id", flat=True))
 
-        message = messaging.MulticastMessage(
-            notification=messaging.Notification(
-                title=title,
-                body=body,
-            ),
-            tokens=devices_ids,
-        )
-        response = messaging.send_multicast(message)
-        if response.failure_count > 0:
-            for idx, resp in enumerate(response.responses):
-                if not resp.success:
-                    logging.error(
-                        "Failed for token %s: %s",
-                        devices_ids[idx],
-                        resp.exception,
-                    )
+        title = request.data.get("title", "Default Title")
+        body = request.data.get("body", "Default Body")
 
-        return Response(f"{response.success_count} messages were sent successfully")
+        messages = []
+        for i in device_id:
+            message = messaging.Message(
+                notification=messaging.Notification(
+                    title=title,
+                    body=body,
+                ),
+                token=i,
+            )
+            messages.append(message)
+        messaging.send_each(messages)
+
+        return Response("message sent:", status=200)

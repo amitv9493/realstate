@@ -15,7 +15,7 @@ FIREBASE_ADMIN_CERT = Path(BASE_DIR / "config" / "settings" / "servicekey.json")
 
 env = environ.Env()
 cred = credentials.Certificate(FIREBASE_ADMIN_CERT)
-firebase_app = initialize_app(cred)
+initialize_app(cred)
 
 
 READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=True)
