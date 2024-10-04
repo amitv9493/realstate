@@ -20,7 +20,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     "check-task-expiry-cronjob": {
         "task": "realstate_new.task.tasks.check_task_expiry",
-        "schedule": crontab(minute="*/5"),
+        "schedule": crontab(minute="*/1"),
         "args": [],
     },
 }
