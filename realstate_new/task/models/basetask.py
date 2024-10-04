@@ -3,9 +3,9 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from realstate_new.api.notification.notification_service import celery_send_fcm_notification
 from realstate_new.application.models import JobApplication
 from realstate_new.users.models import FCMDevice
-from realstate_new.users.tasks import send_fcm_notification
 from realstate_new.utils.base_models import TrackingModel
 
 from .choices import BrokerageType
@@ -73,6 +73,7 @@ class BaseTask(TrackingModel):
         content_type_field="content_type",
         object_id_field="task_id",
     )
+    not_acceptance_notification_sent = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.client_name}-{self.payment_amount}"
@@ -95,10 +96,12 @@ class BaseTask(TrackingModel):
             old_instance = None
         if old_instance and not old_instance.assigned_to and self.assigned_to:
             device = FCMDevice.objects.get(user=self.created_by)
-            send_fcm_notification.delay(
+            body = f"Great news! {self.assigned_to.get_full_name}\
+                     has accepted your job {self.title}."
+            celery_send_fcm_notification.delay(
                 title=f"Your task has been accepted by {self.assigned_to.username}",
                 device_ids=[device.registration_id],
-                body="Click to know more.",
+                body=body,
                 data={},
             )
         return super().save(*args, **kwargs)
