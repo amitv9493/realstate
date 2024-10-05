@@ -1,5 +1,4 @@
 from django.apps import AppConfig
-from django.db.models.signals import post_save
 
 
 class TaskConfig(AppConfig):
@@ -8,11 +7,6 @@ class TaskConfig(AppConfig):
     label = "task"
 
     def ready(self) -> None:
-        from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
-
-        from .receivers import send_notification_upon_task_acceptance
-
-        for job_model in JOB_TYPE_MAPPINGS.values():
-            post_save.connect(send_notification_upon_task_acceptance, sender=job_model)
+        from .celery_tasks import check_task_expiry  # noqa: F401
 
         return super().ready()

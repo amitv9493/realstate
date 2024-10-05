@@ -9,6 +9,7 @@ from .models import OpenHouseTask
 from .models import ProfessionalServiceTask
 from .models import RunnerTask
 from .models import ShowingTask
+from .models import TaskHistory
 from .models import ThirdPartyCall
 
 
@@ -38,6 +39,7 @@ class BaseTaskAdmin(admin.ModelAdmin):
             _("Task Information"),
             {
                 "fields": (
+                    "title",
                     "property",
                     "task_time",
                     "job_type",
@@ -81,7 +83,12 @@ class BaseTaskAdmin(admin.ModelAdmin):
         (
             _("Metadata"),
             {
-                "fields": ("created_by", "created_at", "updated_at"),
+                "fields": (
+                    "created_by",
+                    "created_at",
+                    "updated_at",
+                    "not_acceptance_notification_sent",
+                ),
                 "classes": ("collapse",),
             },
         ),
@@ -226,3 +233,17 @@ class ThirdPartyCallAdmin(admin.ModelAdmin):
         "date_created",
     )
     ordering = ("-date_created",)
+
+
+@admin.register(TaskHistory)
+class TaskHistoryAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "content_type",
+        "object_id",
+        "event",
+        "timestamp",
+        "description",
+        "extra_data",
+    )
+    list_filter = ("content_type", "timestamp")

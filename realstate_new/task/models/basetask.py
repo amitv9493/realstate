@@ -3,14 +3,14 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from realstate_new.api.notification.notification_service import celery_send_fcm_notification
 from realstate_new.application.models import JobApplication
-from realstate_new.users.models import FCMDevice
 from realstate_new.utils.base_models import TrackingModel
 
 from .choices import BrokerageType
+from .choices import EventChoices
 from .choices import JobType
 from .choices import LockBoxType
+from .taskhistory import TaskHistory
 
 
 class BaseTask(TrackingModel):
@@ -81,27 +81,23 @@ class BaseTask(TrackingModel):
     class Meta:
         abstract = True
 
-    def process_payment_after_approve(
-        self,
-        amount,
-    ):
-        """This function initiates the payment after the task creater has approved the task submission."""  # noqa: E501
-        # TODO:
-        # Trigger after the task is approved by the creater.
-
     def save(self, *args, **kwargs) -> None:
+        return super().save(*args, **kwargs)
+
+    def save_event(self, event: EventChoices.choices):
+        return TaskHistory.objects.create(content_object=self, event=event)
+
+    def check_user_assignment(self):
         try:
             old_instance = self.__class__.objects.get(id=self.id)
         except Exception:  # noqa: BLE001
             old_instance = None
-        if old_instance and not old_instance.assigned_to and self.assigned_to:
-            device = FCMDevice.objects.get(user=self.created_by)
-            body = f"Great news! {self.assigned_to.get_full_name}\
-                     has accepted your job {self.title}."
-            celery_send_fcm_notification.delay(
-                title=f"Your task has been accepted by {self.assigned_to.username}",
-                device_ids=[device.registration_id],
-                body=body,
-                data={},
-            )
-        return super().save(*args, **kwargs)
+
+        if old_instance:
+            if not old_instance.assigned_to and self.assigned_to:
+                return self.save_event(event=EventChoices.ASSIGNED)
+
+            if old_instance.assigned_to and not self.assigned_to:
+                return self.save_event(event=EventChoices.CANCELLED)
+
+        return None

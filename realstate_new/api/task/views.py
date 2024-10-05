@@ -1,8 +1,11 @@
+import json
 from collections import OrderedDict
 from itertools import chain
+from typing import TYPE_CHECKING
 from typing import Any
 
 from django.db.models import Q
+from django_redis import get_redis_connection
 from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 from rest_framework.serializers import ValidationError
@@ -10,12 +13,14 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from silk.profiling.profiler import silk_profile
 
+from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
 from realstate_new.task.models import OpenHouseTask
+from realstate_new.task.models import ProfessionalServiceTask
 from realstate_new.task.models import ShowingTask
-from realstate_new.task.models.professional_task import ProfessionalServiceTask
-from realstate_new.task.models.sign_task import SignTask
+from realstate_new.task.models import SignTask
+from realstate_new.task.models.choices import EventChoices
 from realstate_new.users.models import User
 
 from .filters import filter_tasks
@@ -27,6 +32,11 @@ from .serializers import ProfessionalTaskSerializer
 from .serializers import RunnerTaskSerializer
 from .serializers import ShowingTaskSerializer
 from .serializers import SignTaskSerializer
+
+if TYPE_CHECKING:
+    from realstate_new.task.celery_tasks import EventMessage
+
+redis_conn = get_redis_connection("default")
 
 
 class TaskListMixin:
@@ -155,6 +165,21 @@ class TaskViewSet(ModelViewSet):
             **kwargs,
             remove_fields=["application_status"],
         )
+
+    def perform_create(self, serializer) -> None:
+        instance = serializer.save()
+        model = None
+        for k, v in JOB_TYPE_MAPPINGS.items():
+            if serializer.Meta.model == v:
+                model = k
+                break
+        event_message: EventMessage = {
+            "model": model,
+            "content_id": instance.id,
+            "event_type": EventChoices.CREATED,
+        }
+        json_message = json.dumps(event_message)
+        redis_conn.rpush("task-history-queue", json_message)
 
 
 class ShowingTaskViewSet(TaskViewSet):
