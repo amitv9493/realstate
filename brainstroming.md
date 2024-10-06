@@ -9,6 +9,10 @@
    - slower
    - no setup required.
 
-```python
-
-```
+#### Action types (send to Frontend dev in small case)
+   - ASSIGNED
+   - REASSIGNED
+   - STARTED
+   - COMPLETED
+   - CREATER_CANCELLED
+   - ASSIGNER_CANCELLED

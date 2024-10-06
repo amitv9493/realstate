@@ -8,5 +8,6 @@ class TaskConfig(AppConfig):
 
     def ready(self) -> None:
         from .celery_tasks import check_task_expiry  # noqa: F401
+        from .celery_tasks import job_reminder  # noqa: F401
 
         return super().ready()

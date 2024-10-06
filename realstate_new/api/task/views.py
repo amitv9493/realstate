@@ -1,11 +1,8 @@
-import json
 from collections import OrderedDict
 from itertools import chain
-from typing import TYPE_CHECKING
 from typing import Any
 
 from django.db.models import Q
-from django_redis import get_redis_connection
 from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 from rest_framework.serializers import ValidationError
@@ -14,13 +11,14 @@ from rest_framework.viewsets import ModelViewSet
 from silk.profiling.profiler import silk_profile
 
 from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
+from realstate_new.notification.models import EventChoices
+from realstate_new.notification.models import Notification
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
 from realstate_new.task.models import OpenHouseTask
 from realstate_new.task.models import ProfessionalServiceTask
 from realstate_new.task.models import ShowingTask
 from realstate_new.task.models import SignTask
-from realstate_new.task.models.choices import EventChoices
 from realstate_new.users.models import User
 
 from .filters import filter_tasks
@@ -32,11 +30,7 @@ from .serializers import ProfessionalTaskSerializer
 from .serializers import RunnerTaskSerializer
 from .serializers import ShowingTaskSerializer
 from .serializers import SignTaskSerializer
-
-if TYPE_CHECKING:
-    from realstate_new.task.celery_tasks import EventMessage
-
-redis_conn = get_redis_connection("default")
+from .serializers import TaskActionSerializer
 
 
 class TaskListMixin:
@@ -168,18 +162,21 @@ class TaskViewSet(ModelViewSet):
 
     def perform_create(self, serializer) -> None:
         instance = serializer.save()
-        model = None
-        for k, v in JOB_TYPE_MAPPINGS.items():
-            if serializer.Meta.model == v:
-                model = k
-                break
-        event_message: EventMessage = {
-            "model": model,
-            "content_id": instance.id,
-            "event_type": EventChoices.CREATED,
-        }
-        json_message = json.dumps(event_message)
-        redis_conn.rpush("task-history-queue", json_message)
+        Notification.objects.create(
+            event=EventChoices.CREATED,
+            content_object=instance,
+            user=self.request.user,
+        )
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        Notification.objects.create_notifications(
+            task=instance,
+            event=EventChoices.DETAILS_UPDATED,
+            users=[instance.created_by, instance.assigned_to],
+        )
+
+        return super().perform_update(serializer)
 
 
 class ShowingTaskViewSet(TaskViewSet):
@@ -219,3 +216,65 @@ class RunnerTaskViewSet(TaskViewSet):
 class SignTaskViewSet(TaskViewSet):
     serializer_class = SignTaskSerializer
     queryset = SignTask.objects.all()
+
+
+class TaskActionView(APIView):
+    serializer_class = TaskActionSerializer
+
+    def post(self, request, task_type, task_id, task_action, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            data = serializer.validated_data
+            task_model = JOB_TYPE_MAPPINGS[task_type]
+            task_instance = task_model.objects.get(id=task_id)
+            task_action = getattr(EventChoices, task_action.upper())
+
+            if task_action == EventChoices.ASSIGNED:
+                task_instance.assigned_to = data["assigned_to"]
+                task_instance.save(update_fields=["assigned_to"])
+                Notification.objects.create_notifications(
+                    task_instance,
+                    event=task_action,
+                    users=[task_instance.assigned_to, task_instance.created_by],
+                )
+
+            if task_action == EventChoices.REASSIGNED:
+                task_instance.assigned_to = data["assigned_to"]
+                task_instance.save(update_fields=["assigned_to"])
+                Notification.objects.create_notifications(
+                    task_instance,
+                    event=task_action,
+                    users=[task_instance.assigned_to, task_instance.created_by],
+                )
+
+            if task_action == EventChoices.COMPLETED:
+                task_instance.is_completed = True
+                task_instance.save(update_fields=["is_completed"])
+                Notification.objects.create_notifications(
+                    task_instance,
+                    event=task_action,
+                    users=[task_instance.assigned_to, task_instance.created_by],
+                )
+
+            if task_action == EventChoices.CREATER_CANCELLED:
+                task_instance.is_cancelled = True
+                task_instance.save(update_fields=["is_cancelled"])
+                users = [task_instance.created_by]
+                if u := task_instance.assigned_to:
+                    users.append(u)
+
+                Notification.objects.create_notifications(
+                    task_instance,
+                    event=task_action,
+                    users=users,
+                )
+            if task_action == EventChoices.ASSIGNER_CANCELLED:
+                task_instance.assigned_to = None
+                task_instance.save(update_fields=["assigned_to"])
+
+                Notification.objects.create_notifications(
+                    task_instance,
+                    event=task_action,
+                    users=[task_instance.assigned_to, task_instance.created_by],
+                )
+        return Response({"status": True}, 200)

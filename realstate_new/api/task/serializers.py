@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from realstate_new.api.property.serializers import PropertySerializer
@@ -288,4 +289,11 @@ class LatestTaskSerializer(serializers.Serializer):
             "installation_or_remove_address",
             "task_type",
         ],
+    )
+
+
+class TaskActionSerializer(serializers.Serializer):
+    assigned_to = serializers.PrimaryKeyRelatedField(
+        queryset=get_user_model().objects.all(),
+        required=False,
     )

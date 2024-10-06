@@ -95,6 +95,7 @@ LOCAL_APPS = [
     "realstate_new.application",
     "realstate_new.payment",
     "realstate_new.review",
+    "realstate_new.notification",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

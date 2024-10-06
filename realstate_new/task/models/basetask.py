@@ -4,13 +4,12 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from realstate_new.application.models import JobApplication
+from realstate_new.notification.models import Notification
 from realstate_new.utils.base_models import TrackingModel
 
 from .choices import BrokerageType
-from .choices import EventChoices
 from .choices import JobType
 from .choices import LockBoxType
-from .taskhistory import TaskHistory
 
 
 class BaseTask(TrackingModel):
@@ -74,30 +73,11 @@ class BaseTask(TrackingModel):
         object_id_field="task_id",
     )
     not_acceptance_notification_sent = models.BooleanField(default=False)
+    is_cancelled = models.BooleanField(default=False)
+    notifications = GenericRelation(Notification)
 
     def __str__(self):
         return f"{self.client_name}-{self.payment_amount}"
 
     class Meta:
         abstract = True
-
-    def save(self, *args, **kwargs) -> None:
-        return super().save(*args, **kwargs)
-
-    def save_event(self, event: EventChoices.choices):
-        return TaskHistory.objects.create(content_object=self, event=event)
-
-    def check_user_assignment(self):
-        try:
-            old_instance = self.__class__.objects.get(id=self.id)
-        except Exception:  # noqa: BLE001
-            old_instance = None
-
-        if old_instance:
-            if not old_instance.assigned_to and self.assigned_to:
-                return self.save_event(event=EventChoices.ASSIGNED)
-
-            if old_instance.assigned_to and not self.assigned_to:
-                return self.save_event(event=EventChoices.CANCELLED)
-
-        return None

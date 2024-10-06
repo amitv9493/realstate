@@ -1,31 +1,20 @@
-import json
 from datetime import timedelta
-from typing import TypedDict
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 from django_redis import get_redis_connection
 
-from realstate_new.api.notification import NotificationMetaData
-from realstate_new.api.notification import NotificationTemplates
-from realstate_new.api.notification import send_individual_notification
 from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
-
-from .models import TaskHistory
+from realstate_new.notification.celery_tasks import send_individual_notification
+from realstate_new.notification.models import EventChoices
+from realstate_new.notification.models import Notification
+from realstate_new.notification.templates import NotificationMetaData
+from realstate_new.notification.templates import NotificationTemplates
 
 redis_conn = get_redis_connection("default")
 
 logger = get_task_logger(__name__)
-
-
-class EventMessage(TypedDict):
-    event_type: str
-    model: str
-    content_id: int
-    description: str | None
-    extra_data: dict | None
 
 
 @shared_task(bind=True)
@@ -40,6 +29,8 @@ def check_task_expiry(self):
         qs = job_models.objects.filter(
             asap=False,
             not_acceptance_notification_sent=False,
+            is_cancelled=False,
+            assigned_to__isnull=True,
             task_time__lte=now() + timedelta(hours=24),
         )
         filtered_qs.append(qs)
@@ -67,26 +58,26 @@ def check_task_expiry(self):
 
 
 @shared_task(bind=True)
-def process_task_events(self, queue_name, batch_size=100):
-    events = 0
-    for _ in range(batch_size):
-        message = redis_conn.lpop(queue_name)
-
-        if message:
-            decode_msg = message.decode("utf-8")
-            msg = json.loads(decode_msg)
-            model = JOB_TYPE_MAPPINGS[msg["model"]]
-            content_object = model.objects.get(id=int(msg["content_id"]))
-            desc = None
-            if user_id := msg.get("extra_data", {}).get("cancelled_by", None):
-                assigned_user = get_user_model().objects.get(id=user_id)
-                desc = f"Task was cancelled by user {assigned_user.get_username()}"
-
-            TaskHistory.objects.create(
-                event=msg["event_type"],
-                content_object=content_object,
-                description=desc if desc else "",
+def job_reminder(self, reminder_time):
+    filtered_qs = []
+    for job_models in JOB_TYPE_MAPPINGS.values():
+        qs = (
+            job_models.objects.filter(
+                asap=False,
+                is_cancelled=False,
+                assigned_to__isnull=False,
+                task_time__lte=now() + timedelta(seconds=reminder_time),
             )
-            events += 1
-
-    logger.info("Successfully processed %d task events.", events)
+            .exclude(Notifications__event=EventChoices.REMINDER_24)
+            .distinct()
+        )
+        filtered_qs.append(qs)
+        count = 0
+        for i in filtered_qs:
+            Notification.objects.create_notifications(
+                task=i,
+                event=EventChoices.REMINDER_24,
+                users=[i.created_by, i.assigned_to],
+            )
+            count += 1
+    return "Successfully processed %d tasks." % count

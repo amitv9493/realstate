@@ -6,7 +6,6 @@ from .professional_task import ProfessionalServiceTask
 from .runner_task import RunnerTask
 from .showing_task import ShowingTask
 from .sign_task import SignTask
-from .taskhistory import TaskHistory
 from .third_party_call import ThirdPartyCall
 
 __all__ = [
@@ -18,6 +17,5 @@ __all__ = [
     "RunnerTask",
     "ShowingTask",
     "SignTask",
-    "TaskHistory",
     "ThirdPartyCall",
 ]

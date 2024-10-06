@@ -10,6 +10,7 @@ from .views import ProfessionalTaskViewSet
 from .views import RunnerTaskViewSet
 from .views import ShowingTaskViewSet
 from .views import SignTaskViewSet
+from .views import TaskActionView
 
 router = routers.SimpleRouter()
 router.register("showingtask", ShowingTaskViewSet, "showing-task")
@@ -24,5 +25,9 @@ router.register("signtask", SignTaskViewSet, "sign-task")
 urlpatterns = [
     path("dashboard/jobcreater", JobCreaterDashboardView.as_view()),
     path("dashboard/jobseeker", JobSeekerDashboardView.as_view()),
+    path(
+        "<str:task_type>/<int:task_id>/<str:task_action>",
+        TaskActionView.as_view(),
+    ),
     *router.urls,
 ]

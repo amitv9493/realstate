@@ -9,7 +9,6 @@ from .models import OpenHouseTask
 from .models import ProfessionalServiceTask
 from .models import RunnerTask
 from .models import ShowingTask
-from .models import TaskHistory
 from .models import ThirdPartyCall
 
 
@@ -233,17 +232,3 @@ class ThirdPartyCallAdmin(admin.ModelAdmin):
         "date_created",
     )
     ordering = ("-date_created",)
-
-
-@admin.register(TaskHistory)
-class TaskHistoryAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "content_type",
-        "object_id",
-        "event",
-        "timestamp",
-        "description",
-        "extra_data",
-    )
-    list_filter = ("content_type", "timestamp")

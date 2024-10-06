@@ -20,12 +20,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     "check-task-expiry-cronjob": {
         "task": "realstate_new.task.celery_tasks.check_task_expiry",
-        "schedule": crontab(hour="*/1"),
+        "schedule": crontab(minute="*/1"),
         "args": [],
-    },
-    "process-task-events": {
-        "task": "realstate_new.task.celery_tasks.process_task_events",
-        "schedule": 10,
-        "args": ["task-history-queue"],
     },
 }
