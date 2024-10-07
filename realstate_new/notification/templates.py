@@ -40,9 +40,20 @@ class NotificationTemplates:
         body="Your job {job_title} has been started by {agent_name} at {now}.",
         body2="",
     )
+    MARK_COMPLETED = NotificationTemplate(
+        title="Job Marked Completed",
+        body=(
+            "{agent_name} has marked your job {job_title} as completed."
+            "Please review and confirm."
+        ),
+        body2=(
+            "You have marked the job {job_title} as completed."
+            "Awaiting confirmation from the job creator.",
+        ),
+    )
     COMPLETED = NotificationTemplate(
         title="Job Completed",
-        body="Your job {job_title} has been marked completed by {agent_name} at {now}.",
+        body="You have confirmed the completion of '{job_title}. Thank you for using our service!",
         body2="",
     )
     DETAILS_UPDATED = NotificationTemplate(

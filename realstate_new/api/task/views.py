@@ -246,7 +246,14 @@ class TaskActionView(APIView):
                     event=task_action,
                     users=[task_instance.assigned_to, task_instance.created_by],
                 )
-
+            if task_action == EventChoices.MARK_COMPLETED:
+                task_instance.mark_completed = True
+                task_instance.save(update_fields=["mark_completed"])
+                Notification.objects.create_notifications(
+                    task_instance,
+                    event=task_action,
+                    users=[task_instance.assigned_to, task_instance.created_by],
+                )
             if task_action == EventChoices.COMPLETED:
                 task_instance.is_completed = True
                 task_instance.save(update_fields=["is_completed"])

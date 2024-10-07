@@ -29,4 +29,9 @@ app.conf.beat_schedule = {
         "schedule": crontab(minute="*/1"),
         "args": [timedelta(hours=24).total_seconds()],
     },
+    "job-reminder-1-hour": {
+        "task": "realstate_new.task.celery_tasks.job_reminder",
+        "schedule": crontab(minute="*/1"),
+        "args": [timedelta(hours=1).total_seconds()],
+    },
 }

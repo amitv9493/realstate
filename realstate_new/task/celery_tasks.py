@@ -58,6 +58,11 @@ def check_task_expiry(self):
 
 @shared_task(bind=True)
 def job_reminder(self, reminder_time):
+    event = (
+        EventChoices.REMINDER_24
+        if reminder_time == timedelta(hours=24).total_seconds()
+        else EventChoices.REMINDER_1
+    )
     filtered_qs = []
     for job_models in JOB_TYPE_MAPPINGS.values():
         qs = (
@@ -67,7 +72,7 @@ def job_reminder(self, reminder_time):
                 assigned_to__isnull=False,
                 task_time__lte=now() + timedelta(seconds=reminder_time),
             )
-            .exclude(notifications__event=EventChoices.REMINDER_24)
+            .exclude(notifications__event=event)
             .distinct()
         )
         filtered_qs.extend(list(qs))
@@ -75,7 +80,7 @@ def job_reminder(self, reminder_time):
     for i in filtered_qs:
         Notification.objects.create_notifications(
             task=i,
-            event=EventChoices.REMINDER_24,
+            event=event,
             users=[i.created_by, i.assigned_to],
         )
         count += 1

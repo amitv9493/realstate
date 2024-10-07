@@ -75,6 +75,7 @@ class BaseTask(TrackingModel):
     not_acceptance_notification_sent = models.BooleanField(default=False)
     is_cancelled = models.BooleanField(default=False)
     notifications = GenericRelation(Notification)
+    mark_completed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.client_name}-{self.payment_amount}"
