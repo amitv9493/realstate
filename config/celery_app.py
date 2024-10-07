@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 from celery import Celery
 from celery.schedules import crontab
@@ -22,5 +23,10 @@ app.conf.beat_schedule = {
         "task": "realstate_new.task.celery_tasks.check_task_expiry",
         "schedule": crontab(minute="*/1"),
         "args": [],
+    },
+    "job-reminder-24-hour": {
+        "task": "realstate_new.task.celery_tasks.job_reminder",
+        "schedule": crontab(hour="*/1"),
+        "args": [timedelta(hours=24).total_seconds()],
     },
 }

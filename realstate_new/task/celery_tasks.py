@@ -3,7 +3,6 @@ from datetime import timedelta
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.utils.timezone import now
-from django_redis import get_redis_connection
 
 from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
 from realstate_new.notification.celery_tasks import send_individual_notification
@@ -11,8 +10,6 @@ from realstate_new.notification.models import EventChoices
 from realstate_new.notification.models import Notification
 from realstate_new.notification.templates import NotificationMetaData
 from realstate_new.notification.templates import NotificationTemplates
-
-redis_conn = get_redis_connection("default")
 
 logger = get_task_logger(__name__)
 
@@ -54,7 +51,9 @@ def check_task_expiry(self):
         send_individual_notification(data_list=messages)
         for _qs in filtered_qs:
             _qs.update(not_acceptance_notification_sent=True)
-    return "Successfully processed %d tasks." % (len(messages))
+    msg = "Successfully processed %d tasks." % (len(messages))
+    logger.info(msg)
+    return msg
 
 
 @shared_task(bind=True)
@@ -68,10 +67,10 @@ def job_reminder(self, reminder_time):
                 assigned_to__isnull=False,
                 task_time__lte=now() + timedelta(seconds=reminder_time),
             )
-            .exclude(Notifications__event=EventChoices.REMINDER_24)
+            .exclude(notifications__event=EventChoices.REMINDER_24)
             .distinct()
         )
-        filtered_qs.append(qs)
+        filtered_qs.extend(list(qs))
         count = 0
         for i in filtered_qs:
             Notification.objects.create_notifications(
@@ -80,4 +79,6 @@ def job_reminder(self, reminder_time):
                 users=[i.created_by, i.assigned_to],
             )
             count += 1
-    return "Successfully processed %d tasks." % count
+    msg = "Successfully processed %d tasks." % count
+    logger.info(msg)
+    return msg
