@@ -71,14 +71,14 @@ def job_reminder(self, reminder_time):
             .distinct()
         )
         filtered_qs.extend(list(qs))
-        count = 0
-        for i in filtered_qs:
-            Notification.objects.create_notifications(
-                task=i,
-                event=EventChoices.REMINDER_24,
-                users=[i.created_by, i.assigned_to],
-            )
-            count += 1
+    count = 0
+    for i in filtered_qs:
+        Notification.objects.create_notifications(
+            task=i,
+            event=EventChoices.REMINDER_24,
+            users=[i.created_by, i.assigned_to],
+        )
+        count += 1
     msg = "Successfully processed %d tasks." % count
     logger.info(msg)
     return msg
