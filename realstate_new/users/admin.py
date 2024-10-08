@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from .models import FCMDevice
+from .models import Rating
 from .models import User
 
 
@@ -89,3 +90,8 @@ class CustomUserAdmin(UserAdmin):
 class FCMDeviceAdmin(admin.ModelAdmin):
     list_display = ["user", "device_type", "created_at"]
     list_filter = ["user", "device_type"]
+
+
+@admin.register(Rating)
+class RatingAdmin(admin.ModelAdmin):
+    pass

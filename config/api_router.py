@@ -17,5 +17,6 @@ urlpatterns = [
     path("application/", include("realstate_new.api.application.urls")),
     path("arello/", include("realstate_new.api.third_party_apis.arello.urls")),
     path("slipstream/", include("realstate_new.api.third_party_apis.slipstream.urls")),
+    path("notification/", include("realstate_new.api.notification.urls")),
     *router.urls,
 ]

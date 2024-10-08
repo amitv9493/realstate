@@ -1,5 +1,9 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Avg
 from django.utils.timezone import now
@@ -31,6 +35,34 @@ DAYS_OF_WEEK = (
 
 def upload_to(instance, filename):
     return f"uploads/{instance.username}/{filename}"
+
+
+class Rating(models.Model):
+    rating = models.DecimalField(max_digits=2, decimal_places=1)
+    comment = models.TextField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
+    rated_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="ratings_received",
+        on_delete=models.CASCADE,
+    )
+    rated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="ratings_given",
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
+
+    def __str__(self):
+        return f"{self.content_object} {self.rating}"
 
 
 class User(AbstractUser):
@@ -117,14 +149,15 @@ class User(AbstractUser):
         max_length=50,
         blank=True,
     )
+    ratings = GenericRelation(Rating)
 
     @property
     def total_reviews(self):
-        return self.review_creator.count()
+        return self.ratings.count()
 
     @property
     def average_rating(self):
-        return self.review_creator.all().aggregate(Avg("rating"))["rating__avg"] or None
+        return self.ratings.all().aggregate(Avg("rating"))["rating__avg"] or None
 
     def get_recent_reviews(self, limit=5):
         return self.review_creator.all()[:limit]

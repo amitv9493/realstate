@@ -54,43 +54,44 @@ class Notification(models.Model):
         return f"{self.get_event_display()} - {self.content_object} at {self.timestamp}"
 
     def save(self, *args, **kwargs):
-        ctx_obj = self.content_object
+        if self._state.adding:
+            ctx_obj = self.content_object
 
-        task_time = timezone.localtime(ctx_obj.task_time).strftime("%I:%M %p")
-        time = timezone.localtime(timezone.now()).strftime("%I:%M %p")
+            task_time = timezone.localtime(ctx_obj.task_time).strftime("%I:%M %p")
+            time = timezone.localtime(timezone.now()).strftime("%I:%M %p")
 
-        n_title, n_body, n_body2 = get_notification_template(
-            event_type=self.event,
-            job_title=ctx_obj.title,
-            agent_name=(ctx_obj.assigned_to.get_full_name() if ctx_obj.assigned_to else None),
-            now=time,
-            task_time=task_time,
-        )
-        # Check if the notification is for job creater.
-        if self.user == ctx_obj.created_by:
-            notification_body = n_body
-            device_ids = list(
-                ctx_obj.created_by.fcmdevices.all().values_list(
-                    "registration_id",
-                    flat=True,
-                ),
+            n_title, n_body, n_body2 = get_notification_template(
+                event_type=self.event,
+                job_title=ctx_obj.title,
+                agent_name=(ctx_obj.assigned_to.get_full_name() if ctx_obj.assigned_to else None),
+                now=time,
+                task_time=task_time,
             )
-        # Check if the notification is for job assigner.
-        if self.user == ctx_obj.assigned_to:
-            notification_body = n_body2
+            # Check if the notification is for job creater.
+            if self.user == ctx_obj.created_by:
+                notification_body = n_body
+                device_ids = list(
+                    ctx_obj.created_by.fcmdevices.all().values_list(
+                        "registration_id",
+                        flat=True,
+                    ),
+                )
+            # Check if the notification is for job assigner.
+            if self.user == ctx_obj.assigned_to:
+                notification_body = n_body2
 
-            device_ids = list(
-                ctx_obj.assigned_to.fcmdevices.all().values_list(
-                    "registration_id",
-                    flat=True,
-                ),
+                device_ids = list(
+                    ctx_obj.assigned_to.fcmdevices.all().values_list(
+                        "registration_id",
+                        flat=True,
+                    ),
+                )
+            self.description = notification_body
+
+            celery_send_fcm_notification.delay(
+                title=n_title,
+                body=notification_body,
+                data={},
+                device_ids=device_ids,
             )
-        self.description = notification_body
         super().save(*args, **kwargs)
-
-        celery_send_fcm_notification.delay(
-            title=n_title,
-            body=notification_body,
-            data={},
-            device_ids=device_ids,
-        )
