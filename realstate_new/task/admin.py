@@ -76,6 +76,7 @@ class BaseTaskAdmin(admin.ModelAdmin):
                     "alarm_code",
                     "gate_code",
                     "notes",
+                    "audio_file",
                 ),
                 "classes": ("collapse",),
             },

@@ -76,6 +76,11 @@ class BaseTask(TrackingModel):
     is_cancelled = models.BooleanField(default=False)
     notifications = GenericRelation(Notification)
     marked_completed_by_assignee = models.BooleanField(default=False)
+    audio_file = models.FileField(
+        upload_to="additional-audio-notes/",
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return f"{self.client_name}-{self.payment_amount}"
