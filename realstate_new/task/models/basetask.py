@@ -29,7 +29,7 @@ class BaseTask(TrackingModel):
     notes = models.TextField(blank=True, default="")
 
     payment_amount = models.PositiveIntegerField()
-    is_completed = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
     job_type = models.CharField(
         max_length=5,
         choices=JobType.choices,
@@ -75,7 +75,7 @@ class BaseTask(TrackingModel):
     not_acceptance_notification_sent = models.BooleanField(default=False)
     is_cancelled = models.BooleanField(default=False)
     notifications = GenericRelation(Notification)
-    mark_completed = models.BooleanField(default=False)
+    marked_completed_by_assignee = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.client_name}-{self.payment_amount}"

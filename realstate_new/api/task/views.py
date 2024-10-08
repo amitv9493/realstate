@@ -101,10 +101,10 @@ class JobCreaterDashboardView(APIView, TaskListMixin):
             )
         base_query = Q(created_by=request.user)
         if flag == "ongoing":
-            base_query &= Q(is_completed=False)
+            base_query &= Q(is_verified=False)
 
         if flag == "completed":
-            base_query &= Q(is_completed=True)
+            base_query &= Q(is_verified=True)
 
         tasks = self.get_tasks(base_query)
 
@@ -130,7 +130,7 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
         page = int(page) if page else 1
 
         query = (
-            Q(is_completed=False)
+            Q(is_verified=False)
             & Q(assigned_to__isnull=True)
             & ~Q(
                 applications__applicant__in=[request.user],
@@ -255,8 +255,8 @@ class TaskActionView(APIView):
                     users=[task_instance.assigned_to, task_instance.created_by],
                 )
             if task_action == EventChoices.COMPLETED:
-                task_instance.is_completed = True
-                task_instance.save(update_fields=["is_completed"])
+                task_instance.is_verified = True
+                task_instance.save(update_fields=["is_verified"])
                 Notification.objects.create_notifications(
                     task_instance,
                     event=task_action,

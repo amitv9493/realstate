@@ -27,7 +27,9 @@ def check_task_expiry(self):
             asap=False,
             not_acceptance_notification_sent=False,
             is_cancelled=False,
+            marked_completed_by_assignee=False,
             assigned_to__isnull=True,
+            task_time__gte=now(),
             task_time__lte=now() + timedelta(hours=24),
         )
         filtered_qs.append(qs)
@@ -70,6 +72,7 @@ def job_reminder(self, reminder_time):
                 asap=False,
                 is_cancelled=False,
                 assigned_to__isnull=False,
+                task_time__gte=now(),
                 task_time__lte=now() + timedelta(seconds=reminder_time),
             )
             .exclude(notifications__event=event)

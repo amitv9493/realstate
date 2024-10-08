@@ -14,17 +14,18 @@ from .models import ThirdPartyCall
 
 class BaseTaskAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
         "task_time",
         "client_name",
         "payment_amount",
         "asap",
-        "is_completed",
+        "is_verified",
         "job_type",
         "assigned_to",
         "created_by",
     )
     list_filter = (
-        "is_completed",
+        "is_verified",
         "task_time",
         "job_type",
         "asap",
@@ -63,7 +64,7 @@ class BaseTaskAdmin(admin.ModelAdmin):
             _("Payment Details"),
             {"fields": ("payment_amount",)},
         ),
-        (_("Assignment"), {"fields": ("assigned_to", "is_completed")}),
+        (_("Assignment"), {"fields": ("assigned_to", "is_verified")}),
         (
             _("Additional Information"),
             {

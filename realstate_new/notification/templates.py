@@ -51,7 +51,7 @@ class NotificationTemplates:
             "Awaiting confirmation from the job creator.",
         ),
     )
-    COMPLETED = NotificationTemplate(
+    VERIFIED = NotificationTemplate(
         title="Job Completed",
         body="You have confirmed the completion of '{job_title}. Thank you for using our service!",
         body2="",
