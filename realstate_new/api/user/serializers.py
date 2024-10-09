@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import fields
+from rest_framework import serializers
 
 from realstate_new.users.models import DAYS_OF_WEEK
 from realstate_new.users.models import JOB_TYPES
@@ -11,6 +12,7 @@ from realstate_new.utils.serializers import TrackingSerializer
 class UserSerializer(DynamicModelSerializer):
     job_preferences = fields.MultipleChoiceField(choices=JOB_TYPES)
     days_of_week_preferences = fields.MultipleChoiceField(choices=DAYS_OF_WEEK)
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = get_user_model()
@@ -25,6 +27,9 @@ class UserSerializer(DynamicModelSerializer):
             "is_active",
             "date_joined",
         ]
+
+    def get_rating(self, obj):
+        return obj
 
 
 class UserMeSerializer(UserSerializer):
