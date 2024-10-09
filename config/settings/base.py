@@ -1,8 +1,9 @@
 # ruff: noqa: ERA001, E501
 """Base settings to build other settings files upon."""
 
-from datetime import timedelta
+from datetime import timedelta  # noqa: I001
 from pathlib import Path
+from paypalpayoutssdk.core import PayPalHttpClient, SandboxEnvironment
 
 import environ
 import paypalrestsdk
@@ -415,3 +416,10 @@ SIMPLE_JWT = {
 
 FORGET_PASSWORD_OTP_TIMEOUT = timedelta(minutes=10).total_seconds()
 redbeat_redis_url = "redis://redis:6379/1"
+
+
+environment = SandboxEnvironment(
+    client_id=env("PAYPAL_CLIENT_ID"),
+    client_secret=env("PAYPAL_CLIENT_SECRET"),
+)
+CLIENT = PayPalHttpClient(environment)

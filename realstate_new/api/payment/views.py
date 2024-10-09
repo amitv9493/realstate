@@ -1,6 +1,9 @@
 import logging
 
+from django.conf import settings
 from django.db import transaction
+from paypalhttp import HttpError
+from paypalpayoutssdk.payouts import PayoutsGetRequest
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -60,3 +63,20 @@ class ExecutePaymentView(APIView):
                     200,
                 )
             raise PaymentVerificationFailedError
+
+
+class CreatepaypalBatchView(APIView):
+    permission_classes = []
+    authentication_classes = []
+
+    def post(self, request, *args, **kwargs):
+        request = PayoutsGetRequest("batch_id")
+
+        try:
+            response = settings.CLIENT.execute(request)
+            batch_status = response.result.batch_header.batch_status
+            _logger.info(batch_status)
+        except OSError as ioe:
+            if isinstance(ioe, HttpError):
+                pass
+        return Response("", 200)
