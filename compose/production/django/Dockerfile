@@ -88,6 +88,11 @@ RUN chown -R django:django ${APP_HOME}
 
 USER django
 
+RUN mkdir -p ${APP_HOME}/realstate_new/media \
+  && chown -R django:django ${APP_HOME}/realstate_new/media \
+  && chmod -R 755 ${APP_HOME}/realstate_new/media
+
+
 RUN DATABASE_URL="" \
   CELERY_BROKER_URL="" \
   DJANGO_SETTINGS_MODULE="config.settings.test"
