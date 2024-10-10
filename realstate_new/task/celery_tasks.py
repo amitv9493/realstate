@@ -36,7 +36,7 @@ def check_task_expiry(self):
             users=[task.created_by],
         )
         task.not_acceptance_notification_sent = True
-        task.save(updated_fields=["not_acceptance_notification_sent"])
+        task.save(update_fields=["not_acceptance_notification_sent"])
 
     msg = "Successfully processed %d tasks." % (len(filtered_qs))
     logger.info(msg)
