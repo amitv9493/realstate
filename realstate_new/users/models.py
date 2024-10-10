@@ -45,7 +45,7 @@ class Rating(models.Model):
     content_object = GenericForeignKey("content_type", "object_id")
     rated_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name="ratings_received",
+        related_name="ratings",
         on_delete=models.CASCADE,
     )
     rated_by = models.ForeignKey(
@@ -157,10 +157,10 @@ class User(AbstractUser):
 
     @property
     def average_rating(self):
-        return self.ratings.all().aggregate(Avg("rating"))["rating__avg"] or None
+        return float(self.ratings.all().aggregate(Avg("rating"))["rating__avg"]) or None
 
-    def get_recent_reviews(self, limit=5):
-        return self.review_creator.all()[:limit]
+    def get_recent_ratings(self, limit=5):
+        raise NotImplementedError
 
     @property
     def full_name(self):

@@ -21,12 +21,12 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     "check-task-expiry-cronjob": {
         "task": "realstate_new.task.celery_tasks.check_task_expiry",
-        "schedule": schedule(run_every=timedelta(hours=1)),
+        "schedule": schedule(run_every=timedelta(minutes=1)),
         "args": [],
     },
     "job-reminder-24-hour": {
         "task": "realstate_new.task.celery_tasks.job_reminder",
-        "schedule": schedule(run_every=timedelta(hours=1)),
+        "schedule": schedule(run_every=timedelta(minutes=1)),
         "args": [timedelta(hours=24).total_seconds()],
     },
     "job-reminder-1-hour": {

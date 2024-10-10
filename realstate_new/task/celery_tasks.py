@@ -33,7 +33,7 @@ def check_task_expiry(self):
             task_time__lte=now() + timedelta(hours=24),
         )
         filtered_qs.append(qs)
-
+    logger.info(filtered_qs)
     messages = []
     for qs in filtered_qs:
         device_ids = qs.values(
