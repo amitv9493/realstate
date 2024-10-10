@@ -27,6 +27,7 @@ class EventChoices(models.TextChoices):
     REMINDER_24 = "REMINDER_24", "24 Hour Reminder"
     REMINDER_1 = "REMINDER_1", "1 Hour Reminder"
     MARK_COMPLETED = "MARK_COMPLETED", "Task Marked Completed"
+    JOB_NOT_ACCEPTED_YET = "JOB_NOT_ACCEPTED_YET", "JOB_NOT_ACCEPTED_YET"
 
 
 class Notification(models.Model):
