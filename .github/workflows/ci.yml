@@ -1,6 +1,5 @@
 name: CI
 
-# Enable Buildkit and let compose use it to speed up image building
 env:
   DOCKER_BUILDKIT: 1
   COMPOSE_DOCKER_CLI_BUILD: 1
@@ -9,7 +8,6 @@ on:
   pull_request:
     branches: ['master', 'main']
     paths-ignore: ['docs/**']
-
   push:
     branches: ['master', 'main']
     paths-ignore: ['docs/**']
@@ -24,7 +22,6 @@ jobs:
     steps:
       - name: Checkout Code Repository
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -32,13 +29,15 @@ jobs:
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
 
-  # With no caching at all the entire ci process takes 3m to complete!
   pytest:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code Repository
         uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.ENV_FILE_CONTENT }}" > .envs/.local/.django
 
       - name: Build the Stack
         run: docker compose -f docker-compose.local.yml build django
