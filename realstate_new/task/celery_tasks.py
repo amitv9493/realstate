@@ -31,7 +31,7 @@ def check_task_expiry(self):
     logger.info(filtered_qs)
     for task in filtered_qs:
         Notification.objects.create_notifications(
-            task=qs,
+            task=task,
             event=EventChoices.JOB_NOT_ACCEPTED_YET,
             users=[task.created_by],
         )
