@@ -40,6 +40,8 @@ jobs:
           mkdir -p .envs/.local
           echo "${{ secrets.DJANGO }}" > .envs/.local/.django
           echo "${{ secrets.POSTGRES }}" > .envs/.local/.postgres
+          echo "${{ secrets.SERVICEKEY }}" > config/settings/servicekey.json
+
 
 
       - name: Build the Stack
