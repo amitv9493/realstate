@@ -1,10 +1,19 @@
 from celery import shared_task
 from firebase_admin import messaging
+from firebase_admin.exceptions import UnknownError
 
 from .templates import NotificationMetaData
 
 
-@shared_task(bind=True)
+@shared_task(
+    bind=True,
+    autoretry_for=(
+        Exception,
+        UnknownError,
+    ),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 5},
+)
 def celery_send_fcm_notification(
     self,
     device_ids: list,
@@ -20,7 +29,7 @@ def celery_send_fcm_notification(
         body (None): body
         data (dict): extra data (Optional)
     """
-    send_bulk_notification(
+    send_notification(
         device_ids,
         title,
         body,
@@ -28,7 +37,7 @@ def celery_send_fcm_notification(
     )
 
 
-def send_bulk_notification(
+def send_notification(
     device_ids: list,
     title: None,
     body: None,
@@ -52,7 +61,7 @@ def send_bulk_notification(
             token=i,
         )
         messages.append(message)
-        messaging.send_each(messages)
+    messaging.send_each(messages)
 
 
 @shared_task
