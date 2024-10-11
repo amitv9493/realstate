@@ -10,6 +10,7 @@ from realstate_new.utils.base_models import TrackingModel
 from .choices import BrokerageType
 from .choices import JobType
 from .choices import LockBoxType
+from .choices import TaskStatusChoices
 
 
 class BaseTask(TrackingModel):
@@ -80,6 +81,11 @@ class BaseTask(TrackingModel):
         upload_to="additional-audio-notes/",
         null=True,
         blank=True,
+    )
+    status = models.CharField(
+        max_length=50,
+        default=TaskStatusChoices.CREATED,
+        choices=TaskStatusChoices.choices,
     )
 
     def __str__(self):

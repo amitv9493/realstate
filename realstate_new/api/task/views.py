@@ -128,15 +128,6 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
 
         page_size = int(page_size) if page_size else 10
         page = int(page) if page else 1
-
-        query = (
-            Q(is_verified=False)
-            & Q(assigned_to__isnull=True)
-            & ~Q(
-                applications__applicant__in=[request.user],
-            )
-        )
-
         flag = params.get("flag", "").lower()
         if not flag:
             raise ValidationError(
@@ -146,7 +137,17 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
                 code="required",
             )
         if flag == "latest":
-            tasks = self.get_tasks(query)
+            query = (
+                Q(is_verified=False)
+                & Q(assigned_to__isnull=True)
+                & ~Q(
+                    applications__applicant__in=[request.user],
+                )
+            )
+        if flag == "appliedjobs":
+            query = Q(assigned_to=request.user)
+
+        tasks = self.get_tasks(query)
         paginated_response = self.get_paginated_response(page, page_size, tasks)
 
         return Response(paginated_response, 200)

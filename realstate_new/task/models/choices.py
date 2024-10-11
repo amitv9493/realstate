@@ -55,3 +55,14 @@ class ProfessionalServiceType(models.TextChoices):
 class SignTaskType(models.TextChoices):
     install = "INSTALL", "Install"
     remove = "REMOVE", "Remove"
+
+
+class TaskStatusChoices(models.TextChoices):
+    CREATED = "CREATED", "Task Created"
+    ASSIGNED = "ASSIGNED", "Task Assigned"
+    STARTED = "STARTED", "Task Started"
+    VERIFIED = "VERIFIED", "Task Verified"
+    CREATER_CANCELLED = "CREATER_CANCELLED", "Task Cancelled by creater"
+    ASSIGNER_CANCELLED = "ASSIGNER_CANCELLED", "Task Cancelled by assigner"
+    REASSIGNED = "REASSIGNED", "Task Reassigned"
+    MARK_COMPLETED = "MARK_COMPLETED", "Task Marked Completed"

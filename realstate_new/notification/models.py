@@ -4,6 +4,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
 
+from realstate_new.task.models.choices import TaskStatusChoices
+
 from .celery_tasks import celery_send_fcm_notification
 from .templates import get_notification_template
 
@@ -16,17 +18,9 @@ class NotificationManager(models.Manager):
 
 
 class EventChoices(models.TextChoices):
-    CREATED = "CREATED", "Task Created"
-    ASSIGNED = "ASSIGNED", "Task Assigned"
-    STARTED = "STARTED", "Task Started"
-    VERIFIED = "VERIFIED", "Task Verified"
-    CREATER_CANCELLED = "CREATER_CANCELLED", "Task Cancelled by creater"
-    ASSIGNER_CANCELLED = "ASSIGNER_CANCELLED", "Task Cancelled by assigner"
-    REASSIGNED = "REASSIGNED", "Task Reassigned"
     DETAILS_UPDATED = "DETAILS_UPDATED", "Details Updated"
     REMINDER_24 = "REMINDER_24", "24 Hour Reminder"
     REMINDER_1 = "REMINDER_1", "1 Hour Reminder"
-    MARK_COMPLETED = "MARK_COMPLETED", "Task Marked Completed"
     JOB_NOT_ACCEPTED_YET = "JOB_NOT_ACCEPTED_YET", "JOB_NOT_ACCEPTED_YET"
 
 
@@ -36,7 +30,10 @@ class Notification(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
 
-    event = models.CharField(max_length=20, choices=EventChoices.choices)
+    event = models.CharField(
+        max_length=20,
+        choices=EventChoices.choices + TaskStatusChoices.choices,
+    )
     timestamp = models.DateTimeField(auto_now_add=True)
 
     description = models.TextField(blank=True, default="")
