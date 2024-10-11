@@ -49,6 +49,22 @@ class TaskFilter(django_filters.FilterSet):
         return queryset
 
 
+select_related = {
+    "LockBoxBS": ["pickup_address", "installation_or_remove_address"],
+    "LockBoxIR": ["pickup_address"],
+    "Showing": ["property"],
+    "OpenHouse": ["property"],
+    "Runner": ["pickup_address", "dropoff_address"],
+    "Sign": [
+        "install_address",
+        "pickup_address",
+        "remove_address",
+        "dropoff_address",
+    ],
+    "Professional": ["property"],
+}
+
+
 def filter_tasks(request, base_query):
     filtered_tasks = {}
     type_of_task = request.query_params.get("type_of_task", "")
@@ -57,7 +73,11 @@ def filter_tasks(request, base_query):
     else:
         type_of_task_list = list(JOB_TYPE_MAPPINGS.keys())
     for task_type in type_of_task_list:
-        queryset = JOB_TYPE_MAPPINGS[task_type].objects.filter(base_query)
+        queryset = (
+            JOB_TYPE_MAPPINGS[task_type]
+            .objects.filter(base_query)
+            .select_related(*select_related[task_type])
+        )
         task_filter = TaskFilter(
             request.query_params,
             queryset=queryset,
