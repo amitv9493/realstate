@@ -14,3 +14,6 @@ class Property(TrackingModel):
 
     def __str__(self):
         return f"{self.street}"
+
+    class Meta:
+        indexes = [models.Index(fields=["id"])]

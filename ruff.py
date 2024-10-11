@@ -1,9 +1,6 @@
-x = [
-    "CREATED",
-    "ASSIGNED",
-    "STARTED",
-    "COMPLETED",
-    "CREATER_CANCELLED",
-    "ASSIGNER_CANCELLED",
-    "REASSIGNED",
-]
+import msgspec
+
+
+class User(msgspec.Struct):
+    first_name: str
+    last_name: str
