@@ -11,14 +11,15 @@ from rest_framework.viewsets import ModelViewSet
 from silk.profiling.profiler import silk_profile
 
 from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
-from realstate_new.notification.models import EventChoices
 from realstate_new.notification.models import Notification
+from realstate_new.notification.models import NotificationChoices
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
 from realstate_new.task.models import OpenHouseTask
 from realstate_new.task.models import ProfessionalServiceTask
 from realstate_new.task.models import ShowingTask
 from realstate_new.task.models import SignTask
+from realstate_new.task.models.choices import TaskStatusChoices
 from realstate_new.users.models import User
 
 from .filters import filter_tasks
@@ -164,7 +165,7 @@ class TaskViewSet(ModelViewSet):
     def perform_create(self, serializer) -> None:
         instance = serializer.save()
         Notification.objects.create(
-            event=EventChoices.CREATED,
+            event=TaskStatusChoices.CREATED,
             content_object=instance,
             user=self.request.user,
         )
@@ -173,7 +174,7 @@ class TaskViewSet(ModelViewSet):
         instance = serializer.save()
         Notification.objects.create_notifications(
             task=instance,
-            event=EventChoices.DETAILS_UPDATED,
+            event=NotificationChoices.DETAILS_UPDATED,
             users=[instance.created_by, instance.assigned_to],
         )
 
@@ -228,9 +229,9 @@ class TaskActionView(APIView):
             data = serializer.validated_data
             task_model = JOB_TYPE_MAPPINGS[task_type]
             task_instance = task_model.objects.get(id=task_id)
-            task_action = getattr(EventChoices, task_action.upper())
+            task_action = getattr(NotificationChoices, task_action.upper())
 
-            if task_action == EventChoices.ASSIGNED:
+            if task_action == TaskStatusChoices.ASSIGNED:
                 task_instance.assigned_to = data["assigned_to"]
                 task_instance.save(update_fields=["assigned_to"])
                 Notification.objects.create_notifications(
@@ -239,7 +240,7 @@ class TaskActionView(APIView):
                     users=[task_instance.assigned_to, task_instance.created_by],
                 )
 
-            if task_action == EventChoices.REASSIGNED:
+            if task_action == TaskStatusChoices.REASSIGNED:
                 task_instance.assigned_to = data["assigned_to"]
                 task_instance.save(update_fields=["assigned_to"])
                 Notification.objects.create_notifications(
@@ -247,7 +248,7 @@ class TaskActionView(APIView):
                     event=task_action,
                     users=[task_instance.assigned_to, task_instance.created_by],
                 )
-            if task_action == EventChoices.MARK_COMPLETED:
+            if task_action == TaskStatusChoices.MARK_COMPLETED:
                 task_instance.marked_completed_by_assignee = True
                 task_instance.save(update_fields=["marked_completed_by_assignee"])
                 Notification.objects.create_notifications(
@@ -255,7 +256,7 @@ class TaskActionView(APIView):
                     event=task_action,
                     users=[task_instance.assigned_to, task_instance.created_by],
                 )
-            if task_action == EventChoices.COMPLETED:
+            if task_action == TaskStatusChoices.COMPLETED:
                 task_instance.is_verified = True
                 task_instance.save(update_fields=["is_verified"])
                 Notification.objects.create_notifications(
@@ -264,7 +265,7 @@ class TaskActionView(APIView):
                     users=[task_instance.assigned_to, task_instance.created_by],
                 )
 
-            if task_action == EventChoices.CREATER_CANCELLED:
+            if task_action == TaskStatusChoices.CREATER_CANCELLED:
                 task_instance.is_cancelled = True
                 task_instance.save(update_fields=["is_cancelled"])
                 users = [task_instance.created_by]
@@ -276,7 +277,7 @@ class TaskActionView(APIView):
                     event=task_action,
                     users=users,
                 )
-            if task_action == EventChoices.ASSIGNER_CANCELLED:
+            if task_action == TaskStatusChoices.ASSIGNER_CANCELLED:
                 task_instance.assigned_to = None
                 task_instance.save(update_fields=["assigned_to"])
 

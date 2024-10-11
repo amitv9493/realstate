@@ -85,6 +85,7 @@ class BaseTaskAdmin(admin.ModelAdmin):
             _("Metadata"),
             {
                 "fields": (
+                    "status",
                     "created_by",
                     "created_at",
                     "updated_at",

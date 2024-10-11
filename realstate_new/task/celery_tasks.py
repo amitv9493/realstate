@@ -5,8 +5,8 @@ from celery.utils.log import get_task_logger
 from django.utils.timezone import now
 
 from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
-from realstate_new.notification.models import EventChoices
 from realstate_new.notification.models import Notification
+from realstate_new.notification.models import NotificationChoices
 
 logger = get_task_logger(__name__)
 
@@ -32,7 +32,7 @@ def check_task_expiry(self):
     for task in filtered_qs:
         Notification.objects.create_notifications(
             task=task,
-            event=EventChoices.JOB_NOT_ACCEPTED_YET,
+            event=NotificationChoices.JOB_NOT_ACCEPTED_YET,
             users=[task.created_by],
         )
         task.not_acceptance_notification_sent = True
@@ -46,9 +46,9 @@ def check_task_expiry(self):
 @shared_task(bind=True)
 def job_reminder(self, reminder_time):
     event = (
-        EventChoices.REMINDER_24
+        NotificationChoices.REMINDER_24
         if reminder_time == timedelta(hours=24).total_seconds()
-        else EventChoices.REMINDER_1
+        else NotificationChoices.REMINDER_1
     )
     filtered_qs = []
     for job_models in JOB_TYPE_MAPPINGS.values():

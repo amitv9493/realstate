@@ -17,7 +17,7 @@ class NotificationManager(models.Manager):
         return True
 
 
-class EventChoices(models.TextChoices):
+class NotificationChoices(models.TextChoices):
     DETAILS_UPDATED = "DETAILS_UPDATED", "Details Updated"
     REMINDER_24 = "REMINDER_24", "24 Hour Reminder"
     REMINDER_1 = "REMINDER_1", "1 Hour Reminder"
@@ -32,7 +32,7 @@ class Notification(models.Model):
 
     event = models.CharField(
         max_length=20,
-        choices=EventChoices.choices + TaskStatusChoices.choices,
+        choices=NotificationChoices.choices + TaskStatusChoices.choices,
     )
     timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -93,3 +93,7 @@ class Notification(models.Model):
                 device_ids=device_ids,
             )
         super().save(*args, **kwargs)
+
+        if self.event in TaskStatusChoices._member_names_:
+            self.content_object.status = self.event
+            self.content_object.save(update_fields=["status"])
