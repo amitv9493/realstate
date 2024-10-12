@@ -43,15 +43,6 @@ http:
       tls:
         certResolver: letsencrypt
 
-    web-media-router:
-      rule: 'Host(`engagepluse.com`) && PathPrefix(`/media/`)'
-      entryPoints:
-        - web-secure
-      middlewares:
-        - csrf
-      service: django-media
-      tls:
-        certResolver: letsencrypt
 
   middlewares:
     csrf:
@@ -69,10 +60,6 @@ http:
         servers:
           - url: http://flower:5555
 
-    django-media:
-      loadBalancer:
-        servers:
-          - url: http://django:5000  # Point this to the Django app
 
 providers:
   file:
