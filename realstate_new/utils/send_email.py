@@ -32,4 +32,4 @@ def send_email(
     if html_message:
         message.attach_alternative(html_message, "text/html")
 
-    return message.send()
+    return message.send(fail_silently=False)

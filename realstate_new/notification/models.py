@@ -5,6 +5,7 @@ from django.db import models
 from django.utils import timezone
 
 from realstate_new.task.models.choices import TaskStatusChoices
+from realstate_new.utils import send_email
 
 from .celery_tasks import celery_send_fcm_notification
 from .templates import get_notification_template
@@ -60,7 +61,7 @@ class Notification(models.Model):
 
             n_title, n_body, n_body2 = get_notification_template(
                 event_type=self.event,
-                job_title=ctx_obj.title,
+                type_of_task=ctx_obj.type_of_task,
                 agent_name=(ctx_obj.assigned_to.get_full_name() if ctx_obj.assigned_to else None),
                 now=time,
                 task_time=task_time,
@@ -74,6 +75,8 @@ class Notification(models.Model):
                         flat=True,
                     ),
                 )
+                email_reciver = [self.user.email]
+
             # Check if the notification is for job assigner.
             if self.user == ctx_obj.assigned_to:
                 notification_body = n_body2
@@ -84,6 +87,8 @@ class Notification(models.Model):
                         flat=True,
                     ),
                 )
+                email_reciver = [self.user.email]
+
             self.description = notification_body
 
             celery_send_fcm_notification.delay(
@@ -92,8 +97,19 @@ class Notification(models.Model):
                 data={},
                 device_ids=device_ids,
             )
-        super().save(*args, **kwargs)
 
-        if self.event in TaskStatusChoices._member_names_:
-            self.content_object.status = self.event
-            self.content_object.save(update_fields=["status"])
+            if self.event in TaskStatusChoices._member_names_:
+                self.content_object.status = self.event
+                self.content_object.save(update_fields=["status"])
+
+            send_email.delay(
+                recipient_list=email_reciver,
+                subject=n_title,
+                body=notification_body,
+                context={
+                    "title": n_title,
+                    "body": notification_body,
+                },
+                template_path="emails/base.html",
+            )
+        super().save(*args, **kwargs)
