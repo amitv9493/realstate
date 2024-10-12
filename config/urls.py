@@ -8,10 +8,12 @@ from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
 
 from realstate_new.api.notification.views import hello
+from realstate_new.master.views import protected_media_view
 
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("silk/", include("silk.urls", namespace="silk")),
+    path("media/<path:file_path>", protected_media_view, name="protected_media"),
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
 if settings.DEBUG:

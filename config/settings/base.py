@@ -423,3 +423,12 @@ environment = SandboxEnvironment(
     client_secret=env("PAYPAL_CLIENT_SECRET"),
 )
 CLIENT = PayPalHttpClient(environment)
+
+STORAGES = {
+    "default": {
+        "BACKEND": "config.storages.ExpiringURLFileStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
