@@ -385,6 +385,14 @@ class MetaData:
                 "defaultValue": "",
                 "readonly": False,
             },
+            {
+                "id": "phone",
+                "label": "Phone",
+                "type": "string",
+                "required": False,
+                "defaultValue": "",
+                "readonly": True,
+            },
         ]
 
     @property

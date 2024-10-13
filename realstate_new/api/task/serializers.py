@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from realstate_new.api.property.serializers import PropertySerializer
+from realstate_new.api.user.serializers import UserSerializer
 from realstate_new.master.models.property import Property
 from realstate_new.task.models import LockBox
 from realstate_new.task.models import LockBoxTaskBS
@@ -61,6 +62,10 @@ LATEST_TASK_FIELDS = [*JOB_DASHBOARD_COMMON_FIELDS, "application_status"]
 
 
 class TaskSerializer(TrackingModelSerializer):
+    assigned_to = UserSerializer(
+        fields=["username", "first_name", "last_name", "email", "phone"],
+        read_only=True,
+    )
     application_status = serializers.SerializerMethodField()
 
     type_of_task = serializers.CharField(read_only=True)
