@@ -31,7 +31,7 @@ class BaseTask(TrackingModel):
 
     payment_amount = models.PositiveIntegerField()
     is_verified = models.BooleanField(default=False)
-    job_type = models.CharField(
+    application_type = models.CharField(
         max_length=5,
         choices=JobType.choices,
         default=JobType.apply,

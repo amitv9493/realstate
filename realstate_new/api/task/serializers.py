@@ -18,12 +18,19 @@ from realstate_new.utils.serializers import TrackingModelSerializer
 EXTRA_FIELD = ["type_of_task"]
 JOB_DASHBOARD_COMMON_FIELDS = [
     "id",
-    "job_type",
+    "application_type",
     "task_time",
     "payment_amount",
     "created_by",
     "assigned_to",
     "property",
+    "status",
+    "asap",
+    "vacant",
+    "pets",
+    "concierge",
+    "alarm_code",
+    "gate_code",
     *EXTRA_FIELD,
 ]
 

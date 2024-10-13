@@ -20,14 +20,14 @@ class BaseTaskAdmin(admin.ModelAdmin):
         "payment_amount",
         "asap",
         "is_verified",
-        "job_type",
+        "application_type",
         "assigned_to",
         "created_by",
     )
     list_filter = (
         "is_verified",
         "task_time",
-        "job_type",
+        "application_type",
         "asap",
     )
     search_fields = ("property", "client_name", "client_email")
@@ -42,7 +42,7 @@ class BaseTaskAdmin(admin.ModelAdmin):
                     "title",
                     "property",
                     "task_time",
-                    "job_type",
+                    "application_type",
                     "apply_deadline",
                     "brokerage",
                     "asap",
@@ -217,10 +217,12 @@ class ProfessionalServiceTaskAdmin(BaseTaskAdmin):
             {
                 "fields": (
                     "service_type",
-                    "service_provider_name",
-                    "service_provider_phone",
-                    "service_provider_email",
-                    "service_instructions",
+                    "name",
+                    "company_name",
+                    "phone",
+                    "email",
+                    "address",
+                    "website",
                 ),
             },
         ),

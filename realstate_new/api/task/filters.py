@@ -56,10 +56,7 @@ select_related = {
     "OpenHouse": ["property"],
     "Runner": ["pickup_address", "dropoff_address"],
     "Sign": [
-        "install_address",
-        "pickup_address",
-        "remove_address",
-        "dropoff_address",
+        "property",
     ],
     "Professional": ["property"],
 }

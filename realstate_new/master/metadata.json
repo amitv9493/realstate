@@ -1,0 +1,935 @@
+[
+    {
+        "type": "task",
+        "child": "Showing",
+        "fields": [
+            {
+                "id": "id",
+                "label": "Task ID",
+                "required": false,
+                "dataType": "Integer",
+                "defaultValue": null,
+                "readOnly": true
+            },
+            {
+                "id": "typeOfTask",
+                "label": "Job Type",
+                "required": false,
+                "dataType": "String",
+                "defaultValue": "Showing",
+                "readOnly": true
+            },
+            {
+                "id": "property",
+                "label": "Property Details",
+                "required": true,
+                "dataType": "Object",
+                "defaultValue": null,
+                "fields": [
+                    {
+                        "id": "city",
+                        "label": "City",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "state",
+                        "label": "State",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "zip",
+                        "label": "ZIP Code",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "street",
+                        "label": "Street",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "latitude",
+                        "label": "Latitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "longitude",
+                        "label": "Longitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    }
+                ]
+            },
+            {
+                "id": "taskTime",
+                "label": "Task Time",
+                "required": true,
+                "dataType": "DateTime",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "paymentAmount",
+                "label": "Payment Amount",
+                "required": true,
+                "dataType": "Decimal",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "jobType",
+                "label": "Job Type",
+                "required": true,
+                "dataType": "String",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "createdBy",
+                "label": "Created By",
+                "required": true,
+                "dataType": "Integer",
+                "defaultValue": null,
+                "readOnly": true
+            },
+            {
+                "id": "assignedTo",
+                "label": "Assigned To",
+                "required": false,
+                "dataType": "Object",
+                "defaultValue": null,
+                "readOnly": true,
+                "fields": [
+                    {
+                        "id": "username",
+                        "label": "Username",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "firstName",
+                        "label": "First Name",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "lastName",
+                        "label": "Last Name",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "email",
+                        "label": "Email",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "type": "task",
+        "child": "Sign",
+        "fields": [
+            {
+                "id": "id",
+                "label": "Task ID",
+                "required": false,
+                "dataType": "Integer",
+                "defaultValue": null,
+                "readOnly": true
+            },
+            {
+                "id": "typeOfTask",
+                "label": "Job Type",
+                "required": false,
+                "dataType": "String",
+                "defaultValue": "Showing",
+                "readOnly": true
+            },
+            {
+                "id": "property",
+                "label": "Property Details",
+                "required": true,
+                "dataType": "Object",
+                "defaultValue": null,
+                "fields": [
+                    {
+                        "id": "city",
+                        "label": "City",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "state",
+                        "label": "State",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "zip",
+                        "label": "ZIP Code",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "street",
+                        "label": "Street",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "latitude",
+                        "label": "Latitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "longitude",
+                        "label": "Longitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    }
+                ]
+            },
+            {
+                "id": "taskTime",
+                "label": "Task Time",
+                "required": true,
+                "dataType": "DateTime",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "paymentAmount",
+                "label": "Payment Amount",
+                "required": true,
+                "dataType": "Decimal",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "jobType",
+                "label": "Job Type",
+                "required": true,
+                "dataType": "String",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "createdBy",
+                "label": "Created By",
+                "required": true,
+                "dataType": "Integer",
+                "defaultValue": null,
+                "readOnly": true
+            },
+            {
+                "id": "assignedTo",
+                "label": "Assigned To",
+                "required": false,
+                "dataType": "Object",
+                "defaultValue": null,
+                "readOnly": true,
+                "fields": [
+                    {
+                        "id": "username",
+                        "label": "Username",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "firstName",
+                        "label": "First Name",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "lastName",
+                        "label": "Last Name",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "email",
+                        "label": "Email",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "type": "task",
+        "child": "Runner",
+        "fields": [
+            {
+                "id": "id",
+                "label": "Task ID",
+                "required": false,
+                "dataType": "Integer",
+                "defaultValue": null,
+                "readOnly": true
+            },
+            {
+                "id": "typeOfTask",
+                "label": "Job Type",
+                "required": false,
+                "dataType": "String",
+                "defaultValue": "Showing",
+                "readOnly": true
+            },
+            {
+                "id": "property",
+                "label": "Property Details",
+                "required": true,
+                "dataType": "Object",
+                "defaultValue": null,
+                "fields": [
+                    {
+                        "id": "city",
+                        "label": "City",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "state",
+                        "label": "State",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "zip",
+                        "label": "ZIP Code",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "street",
+                        "label": "Street",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "latitude",
+                        "label": "Latitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "longitude",
+                        "label": "Longitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    }
+                ]
+            },
+            {
+                "id": "taskTime",
+                "label": "Task Time",
+                "required": true,
+                "dataType": "DateTime",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "paymentAmount",
+                "label": "Payment Amount",
+                "required": true,
+                "dataType": "Decimal",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "jobType",
+                "label": "Job Type",
+                "required": true,
+                "dataType": "String",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "createdBy",
+                "label": "Created By",
+                "required": true,
+                "dataType": "Integer",
+                "defaultValue": null,
+                "readOnly": true
+            },
+            {
+                "id": "assignedTo",
+                "label": "Assigned To",
+                "required": false,
+                "dataType": "Object",
+                "defaultValue": null,
+                "readOnly": true,
+                "fields": [
+                    {
+                        "id": "username",
+                        "label": "Username",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "firstName",
+                        "label": "First Name",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "lastName",
+                        "label": "Last Name",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "email",
+                        "label": "Email",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "type": "task",
+        "child": "OpenHouse",
+        "fields": [
+            {
+                "id": "id",
+                "label": "Task ID",
+                "required": false,
+                "dataType": "Integer",
+                "defaultValue": null,
+                "readOnly": true
+            },
+            {
+                "id": "typeOfTask",
+                "label": "Job Type",
+                "required": false,
+                "dataType": "String",
+                "defaultValue": "Showing",
+                "readOnly": true
+            },
+            {
+                "id": "property",
+                "label": "Property Details",
+                "required": true,
+                "dataType": "Object",
+                "defaultValue": null,
+                "fields": [
+                    {
+                        "id": "city",
+                        "label": "City",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "state",
+                        "label": "State",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "zip",
+                        "label": "ZIP Code",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "street",
+                        "label": "Street",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "latitude",
+                        "label": "Latitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "longitude",
+                        "label": "Longitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    }
+                ]
+            },
+            {
+                "id": "taskTime",
+                "label": "Task Time",
+                "required": true,
+                "dataType": "DateTime",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "paymentAmount",
+                "label": "Payment Amount",
+                "required": true,
+                "dataType": "Decimal",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "jobType",
+                "label": "Job Type",
+                "required": true,
+                "dataType": "String",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "createdBy",
+                "label": "Created By",
+                "required": true,
+                "dataType": "Integer",
+                "defaultValue": null,
+                "readOnly": true
+            },
+            {
+                "id": "assignedTo",
+                "label": "Assigned To",
+                "required": false,
+                "dataType": "Object",
+                "defaultValue": null,
+                "readOnly": true,
+                "fields": [
+                    {
+                        "id": "username",
+                        "label": "Username",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "firstName",
+                        "label": "First Name",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "lastName",
+                        "label": "Last Name",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "email",
+                        "label": "Email",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "type": "task",
+        "child": "LockBoxBS",
+        "fields": [
+            {
+                "id": "id",
+                "label": "Task ID",
+                "required": false,
+                "dataType": "Integer",
+                "defaultValue": null,
+                "readOnly": true
+            },
+            {
+                "id": "typeOfTask",
+                "label": "Job Type",
+                "required": false,
+                "dataType": "String",
+                "defaultValue": "Showing",
+                "readOnly": true
+            },
+            {
+                "id": "taskTime",
+                "label": "Task Time",
+                "required": true,
+                "dataType": "DateTime",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "paymentAmount",
+                "label": "Payment Amount",
+                "required": true,
+                "dataType": "Decimal",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "jobType",
+                "label": "Job Type",
+                "required": true,
+                "dataType": "String",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "createdBy",
+                "label": "Created By",
+                "required": true,
+                "dataType": "Integer",
+                "defaultValue": null,
+                "readOnly": true
+            },
+            {
+                "id": "assignedTo",
+                "label": "Assigned To",
+                "required": false,
+                "dataType": "Object",
+                "defaultValue": null,
+                "readOnly": true,
+                "fields": [
+                    {
+                        "id": "username",
+                        "label": "Username",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "firstName",
+                        "label": "First Name",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "lastName",
+                        "label": "Last Name",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "email",
+                        "label": "Email",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    }
+                ]
+            },
+            {
+                "id": "pickupAddress",
+                "label": "Pickup Address",
+                "dataType": "Object",
+                "defaultValue": null,
+                "required": true,
+                "fields": [
+                    {
+                        "id": "city",
+                        "label": "City",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "state",
+                        "label": "State",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "zip",
+                        "label": "ZIP Code",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "street",
+                        "label": "Street",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "latitude",
+                        "label": "Latitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "longitude",
+                        "label": "Longitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "type": "task",
+        "child": "LockBoxIR",
+        "fields": [
+            {
+                "id": "id",
+                "label": "Task ID",
+                "required": false,
+                "dataType": "Integer",
+                "defaultValue": null,
+                "readOnly": true
+            },
+            {
+                "id": "typeOfTask",
+                "label": "Job Type",
+                "required": false,
+                "dataType": "String",
+                "defaultValue": "Showing",
+                "readOnly": true
+            },
+            {
+                "id": "taskTime",
+                "label": "Task Time",
+                "required": true,
+                "dataType": "DateTime",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "paymentAmount",
+                "label": "Payment Amount",
+                "required": true,
+                "dataType": "Decimal",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "jobType",
+                "label": "Job Type",
+                "required": true,
+                "dataType": "String",
+                "defaultValue": null,
+                "readOnly": false
+            },
+            {
+                "id": "createdBy",
+                "label": "Created By",
+                "required": true,
+                "dataType": "Integer",
+                "defaultValue": null,
+                "readOnly": true
+            },
+            {
+                "id": "assignedTo",
+                "label": "Assigned To",
+                "required": false,
+                "dataType": "Object",
+                "defaultValue": null,
+                "readOnly": true,
+                "fields": [
+                    {
+                        "id": "username",
+                        "label": "Username",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "firstName",
+                        "label": "First Name",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "lastName",
+                        "label": "Last Name",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    },
+                    {
+                        "id": "email",
+                        "label": "Email",
+                        "type": "string",
+                        "required": true,
+                        "defaultValue": "",
+                        "readonly": false
+                    }
+                ]
+            },
+            {
+                "id": "pickupAddress",
+                "label": "Pickup Address",
+                "dataType": "Object",
+                "defaultValue": null,
+                "required": true,
+                "fields": [
+                    {
+                        "id": "city",
+                        "label": "City",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "state",
+                        "label": "State",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "zip",
+                        "label": "ZIP Code",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "street",
+                        "label": "Street",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "latitude",
+                        "label": "Latitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "longitude",
+                        "label": "Longitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    }
+                ]
+            },
+            {
+                "id": "installationRemoveAddress",
+                "label": "Installation/Remove Address",
+                "dataType": "Object",
+                "defaultValue": null,
+                "required": true,
+                "fields": [
+                    {
+                        "id": "city",
+                        "label": "City",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "state",
+                        "label": "State",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "zip",
+                        "label": "ZIP Code",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "street",
+                        "label": "Street",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "latitude",
+                        "label": "Latitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    },
+                    {
+                        "id": "longitude",
+                        "label": "Longitude",
+                        "required": true,
+                        "dataType": "String",
+                        "defaultValue": null
+                    }
+                ]
+            }
+        ]
+    }
+]

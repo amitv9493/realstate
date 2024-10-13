@@ -8,6 +8,7 @@ from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
 
 from realstate_new.api.notification.views import hello
+from realstate_new.master.views import MetaDataView
 from realstate_new.master.views import protected_media_view
 
 urlpatterns = [
@@ -28,6 +29,10 @@ urlpatterns += [
         "api/docs/",
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
+    ),
+    path(
+        "metadata",
+        MetaDataView.as_view(),
     ),
     path("hello", hello),
 ]

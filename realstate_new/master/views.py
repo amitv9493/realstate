@@ -3,11 +3,16 @@ import hashlib
 import hmac
 import os
 import time
+from collections import defaultdict
 
 from django.conf import settings
 from django.http import Http404
 from django.http import HttpResponseForbidden
 from django.http import StreamingHttpResponse
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .metadata import MetaData
 
 
 def verify_token(file_path, expires_at, token):
@@ -40,6 +45,8 @@ def get_content_type(file_path):
         return "video/mp4"
     if file_path.endswith(".mp3"):
         return "audio/mpeg"
+    if file_path.endswith(".jpeg"):
+        return "image/jpeg"
     return "application/octet-stream"  # Fallback content type
 
 
@@ -76,3 +83,54 @@ def protected_media_view(request, file_path):
     response["Content-Disposition"] = f'inline; filename="{os.path.basename(file_full_path)}"'  # noqa: PTH119
 
     return response
+
+
+class MetaDataView(APIView):
+    permission_classes = []
+    authentication_classes = []
+
+    def get(self, request, *args, **kwargs):
+        metadata = MetaData()
+        data = defaultdict(list)
+        ongoing_task = metadata.ongoing_task_metadata
+        data["ongoingTask"] = ongoing_task
+        data["createTask"].extend(
+            [
+                metadata.get_metadata_list(
+                    type="task",
+                    child="Showing",
+                    fields=metadata.post_showing_metadata,
+                ),
+                metadata.get_metadata_list(
+                    type="task",
+                    child="LockBoxBS",
+                    fields=metadata.post_lockbox_bs_metadata,
+                ),
+                metadata.get_metadata_list(
+                    type="task",
+                    child="LockBoxIR",
+                    fields=metadata.post_lockbox_ir_metadata,
+                ),
+                metadata.get_metadata_list(
+                    type="task",
+                    child="OpenHouse",
+                    fields=metadata.post_openhouse_metadata,
+                ),
+                metadata.get_metadata_list(
+                    type="task",
+                    child="Runner",
+                    fields=metadata.post_runner_metadata,
+                ),
+                metadata.get_metadata_list(
+                    type="task",
+                    child="Sign",
+                    fields=metadata.post_sign_metadata,
+                ),
+                metadata.get_metadata_list(
+                    type="task",
+                    child="Professional",
+                    fields=metadata.post_professional_metadata,
+                ),
+            ],
+        )
+        return Response(data, 200)
