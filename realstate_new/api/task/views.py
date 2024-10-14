@@ -225,65 +225,90 @@ class TaskActionView(APIView):
 
     def post(self, request, task_type, task_id, task_action, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid(raise_exception=True):
+
+        if serializer.is_valid(raise_exception=True):  # noqa: RET503
             data = serializer.validated_data
-            task_model = JOB_TYPE_MAPPINGS[task_type]
-            task_instance = task_model.objects.get(id=task_id)
-            task_action = getattr(NotificationChoices, task_action.upper())
+            task_instance = JOB_TYPE_MAPPINGS[task_type].objects.get(id=task_id)
 
-            if task_action == TaskStatusChoices.ASSIGNED:
-                task_instance.assigned_to = data["assigned_to"]
-                task_instance.save(update_fields=["assigned_to"])
-                Notification.objects.create_notifications(
-                    task_instance,
-                    event=task_action,
-                    users=[task_instance.assigned_to, task_instance.created_by],
-                )
+            task_type = getattr(TaskStatusChoices, task_action.upper())
+            action_handler = self.get_action_handler(task_type)
+            action_handler(task_instance, data)
 
-            if task_action == TaskStatusChoices.REASSIGNED:
-                task_instance.assigned_to = data["assigned_to"]
-                task_instance.save(update_fields=["assigned_to"])
-                Notification.objects.create_notifications(
-                    task_instance,
-                    event=task_action,
-                    users=[task_instance.assigned_to, task_instance.created_by],
-                )
-            if task_action == TaskStatusChoices.MARK_COMPLETED:
-                task_instance.marked_completed_by_assignee = True
-                task_instance.save(update_fields=["marked_completed_by_assignee"])
-                Notification.objects.create_notifications(
-                    task_instance,
-                    event=task_action,
-                    users=[task_instance.assigned_to, task_instance.created_by],
-                )
-            if task_action == TaskStatusChoices.COMPLETED:
-                task_instance.is_verified = True
-                task_instance.save(update_fields=["is_verified"])
-                Notification.objects.create_notifications(
-                    task_instance,
-                    event=task_action,
-                    users=[task_instance.assigned_to, task_instance.created_by],
-                )
+            return Response({"status": True}, 200)
 
-            if task_action == TaskStatusChoices.CREATER_CANCELLED:
-                task_instance.is_cancelled = True
-                task_instance.save(update_fields=["is_cancelled"])
-                users = [task_instance.created_by]
-                if u := task_instance.assigned_to:
-                    users.append(u)
+    def get_action_handler(self, task_action):
+        """Map task action to the appropriate handler method."""
+        return {
+            TaskStatusChoices.ASSIGNED: self.handle_assigned,
+            TaskStatusChoices.STARTED: self.handle_started,
+            TaskStatusChoices.VERIFIED: self.handle_verify,
+            TaskStatusChoices.CREATER_CANCELLED: self.handle_creater_cancelled,
+            TaskStatusChoices.ASSIGNER_CANCELLED: self.handle_assigner_cancelled,
+            TaskStatusChoices.REASSIGNED: self.handle_reassigned,
+            TaskStatusChoices.MARK_COMPLETED: self.handle_mark_completed,
+        }.get(task_action)
 
-                Notification.objects.create_notifications(
-                    task_instance,
-                    event=task_action,
-                    users=users,
-                )
-            if task_action == TaskStatusChoices.ASSIGNER_CANCELLED:
-                task_instance.assigned_to = None
-                task_instance.save(update_fields=["assigned_to"])
+    def handle_started(self, task_instance, validated_data):
+        self.create_notifications(
+            task_instance,
+            event=TaskStatusChoices.STARTED,
+        )
 
-                Notification.objects.create_notifications(
-                    task_instance,
-                    event=task_action,
-                    users=[task_instance.assigned_to, task_instance.created_by],
-                )
-        return Response({"status": True}, 200)
+    def handle_assigned(self, task_instance, validated_data):
+        task_instance.assigned_to = validated_data["assigned_to"]
+        task_instance.save(update_fields=["assigned_to"])
+        self.create_notifications(
+            task_instance,
+            event=TaskStatusChoices.ASSIGNED,
+        )
+
+    def handle_reassigned(self, task_instance, validated_data):
+        task_instance.assigned_to = validated_data["assigned_to"]
+        task_instance.save(update_fields=["assigned_to"])
+        self.create_notifications(
+            task_instance,
+            event=TaskStatusChoices.REASSIGNED,
+        )
+
+    def handle_mark_completed(self, task_instance, validated_data):
+        task_instance.marked_completed_by_assignee = True
+        task_instance.save(update_fields=["marked_completed_by_assignee"])
+        self.create_notifications(
+            task_instance,
+            event=TaskStatusChoices.MARK_COMPLETED,
+        )
+
+    def handle_verify(self, task_instance, validated_data):
+        task_instance.is_verified = True
+        task_instance.save(update_fields=["is_verified"])
+        self.create_notifications(task_instance, event=TaskStatusChoices.VERIFIED)
+
+    def handle_creater_cancelled(self, task_instance, validated_data):
+        task_instance.is_cancelled = True
+        task_instance.save(update_fields=["is_cancelled"])
+        users = [task_instance.created_by]
+        if u := task_instance.assigned_to:
+            users.append(u)
+
+        self.create_notifications(
+            task_instance,
+            event=TaskStatusChoices.CREATER_CANCELLED,
+            users=users,
+        )
+
+    def handle_assigner_cancelled(self, task_instance, validated_data):
+        task_instance.assigned_to = None
+        task_instance.save(update_fields=["assigned_to"])
+        self.create_notifications(
+            task_instance,
+            event=TaskStatusChoices.ASSIGNER_CANCELLED,
+        )
+
+    def create_notifications(self, task_instance, event, users: list | None = None):
+        if not users:
+            users = [task_instance.assigned_to, task_instance.created_by]
+        Notification.objects.create_notifications(
+            task_instance,
+            event=event,
+            users=users,
+        )

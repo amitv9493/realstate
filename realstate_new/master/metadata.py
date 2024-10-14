@@ -19,33 +19,25 @@ class TaskMetaData(TypedDict):
 
 
 class MetaData:
-    def get_field_type(  # noqa: PLR0913
-        self,
-        id,  # noqa: A002
-        label,
-        data_type,
-        default_value: str | None = None,
-        fields: list | None = None,
-        required=False,  # noqa: FBT002
-        read_only=False,  # noqa: FBT002
-    ):
-        data: FieldDataType = {
-            "id": id,
-            "label": label,
-            "dataType": data_type,
-            "defaultValue": default_value,
-            "fields": fields,
-            "required": required,
-            "readOnly": read_only,
+    def get_field_type(self, **kwargs):
+        defaults = {
+            "id": None,
+            "label": None,
+            "dataType": None,
+            "defaultValue": None,
+            "fields": None,
+            "required": False,
+            "readOnly": False,
         }
-        return data
+        defaults.update(kwargs)
+        return defaults
 
     @property
     def task_type(self):
         return self.get_field_type(
             id="taskType",
             label="Task Type",
-            data_type="String",
+            dataType="String",
         )
 
     @property
@@ -65,22 +57,22 @@ class MetaData:
             self.get_field_type(
                 id="dropoffAddress",
                 label="Dropoff Address",
-                data_type="Object",
+                dataType="Object",
             ),
             self.get_field_type(
                 id="installAddress",
                 label="Install Address",
-                data_type="Object",  # Assuming this is a related object reference
+                dataType="Object",  # Assuming this is a related object reference
             ),
             self.get_field_type(
                 id="pickupAddress",
                 label="Pickup Address",
-                data_type="Object",
+                dataType="Object",
             ),
             self.get_field_type(
                 id="removeAddress",
                 label="Remove Address",
-                data_type="Object",
+                dataType="Object",
             ),
             self.task_type,
         ]
@@ -146,13 +138,13 @@ class MetaData:
             self.get_field_type(
                 id="pickupAddress",
                 label="Pickup Address",
-                data_type="Object",
+                dataType="Object",
                 fields=self.property_metadata,
             ),
             self.get_field_type(
                 id="installationOrRemoveAddress",
                 label="Installation/Remove Address",
-                data_type="Object",
+                dataType="Object",
                 fields=self.property_metadata,
             ),
         ]
@@ -244,109 +236,109 @@ class MetaData:
             self.get_field_type(
                 id="id",
                 label="Task ID",
-                data_type="Integer",
-                default_value=None,
+                dataType="Integer",
+                defaultValue=None,
                 required=False,
-                read_only=True,
+                readOnly=True,
             ),
             self.get_field_type(
                 id="typeOfTask",
                 label="Job Type",
-                data_type="String",
-                default_value="Showing",
+                dataType="String",
+                defaultValue="Showing",
                 required=False,
-                read_only=True,
+                readOnly=True,
             ),
             self.get_field_type(
                 id="property",
                 label="Property Details",
-                data_type="Object",
-                default_value=None,
+                dataType="Object",
+                defaultValue=None,
                 fields=self.property_metadata,
                 required=True,
-                read_only=False,
+                readOnly=False,
             ),
             self.get_field_type(
                 id="taskTime",
                 label="Task Time",
-                data_type="DateTime",
-                default_value=None,
+                dataType="DateTime",
+                defaultValue=None,
                 required=True,
-                read_only=False,
+                readOnly=False,
             ),
             self.get_field_type(
                 id="paymentAmount",
                 label="Payment Amount",
-                data_type="Decimal",
-                default_value=None,
+                dataType="Decimal",
+                defaultValue=None,
                 required=True,
-                read_only=False,
+                readOnly=False,
             ),
             self.get_field_type(
                 id="applicationType",
                 label="Application Type",
-                data_type="String",
-                default_value=None,
+                dataType="String",
+                defaultValue=None,
                 required=True,
-                read_only=False,
+                readOnly=False,
             ),
             self.get_field_type(
                 id="createdBy",
                 label="Created By",
-                data_type="Integer",
-                default_value=None,
+                dataType="Integer",
+                defaultValue=None,
                 required=False,
-                read_only=True,
+                readOnly=True,
             ),
             self.get_field_type(
                 id="assignedTo",
                 label="Assigned To",
-                data_type="Object",
-                default_value=None,
+                dataType="Object",
+                defaultValue=None,
                 fields=self.user_metadata,
                 required=False,
-                read_only=True,
+                readOnly=True,
             ),
             self.get_field_type(
                 id="status",
                 label="status",
-                data_type="String",
-                read_only=True,
+                dataType="String",
+                readOnly=True,
             ),
             self.get_field_type(
-                "asap",
-                "ASAP",
-                "Boolean",
+                id="asap",
+                label="ASAP",
+                defaultValue="Boolean",
             ),
             self.get_field_type(
                 id="vacant",
                 label="Vacant",
-                data_type="Boolean",
+                dataType="Boolean",
             ),
             self.get_field_type(
                 id="pets",
                 label="Pets",
-                data_type="Boolean",
+                dataType="Boolean",
             ),
             self.get_field_type(
                 id="concierge",
                 label="Concierge",
-                data_type="Boolean",
+                dataType="Boolean",
             ),
             self.get_field_type(
                 id="alarmCode",
                 label="Alarm Code",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
                 id="gateCode",
                 label="Gate Code",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
                 id="lockboxType",
                 label="Lockbox Type",
-                data_type="String",
+                dataType="String",
             ),
         ]
 
@@ -404,57 +396,57 @@ class MetaData:
             self.get_field_type(
                 id="clientPhone",
                 label="Client Phone",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
-                "asap",
-                "ASAP",
-                "Boolean",
+                id="asap",
+                label="ASAP",
+                defaultValue="Boolean",
             ),
             self.get_field_type(
                 id="clientName",
                 label="Client Name",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
                 id="lockboxType",
                 label="Lockbox Type",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
                 id="audioFile",
                 label="Audio File",
-                data_type="File",
+                dataType="File",
             ),
             self.get_field_type(
                 id="vacant",
                 label="Vacant",
-                data_type="Boolean",
+                dataType="Boolean",
             ),
             self.get_field_type(
                 id="pets",
                 label="Pets",
-                data_type="Boolean",
+                dataType="Boolean",
             ),
             self.get_field_type(
                 id="concierge",
                 label="Concierge",
-                data_type="Boolean",
+                dataType="Boolean",
             ),
             self.get_field_type(
                 id="alarmCode",
                 label="Alarm Code",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
                 id="gateCode",
                 label="Gate Code",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
                 id="notes",
                 label="Additional Notes",
-                data_type="String",
+                dataType="String",
             ),
         ]
         _data.extend(extra_fields)
@@ -471,12 +463,12 @@ class MetaData:
             self.get_field_type(
                 id="listingAgent",
                 label="Listing Agent",
-                data_type="Boolean",
+                dataType="Boolean",
             ),
             self.get_field_type(
                 id="hostingAgent",
                 label="Hosting Agent",
-                data_type="Boolean",
+                dataType="Boolean",
             ),
         ]
         _data.extend(extra_fields)
@@ -501,24 +493,24 @@ class MetaData:
             self.get_field_type(
                 id="pickupAddress",
                 label="Pickup Address",
-                data_type="Object",
+                dataType="Object",
                 fields=self.property_metadata,
             ),
             self.get_field_type(
                 id="installationOrRemoveAddress",
                 label="Installation/Remove Address",
-                data_type="Object",
+                dataType="Object",
                 fields=self.property_metadata,
             ),
             self.get_field_type(
                 id="includeSign",
                 label="Include Sign",
-                data_type="Boolean",
+                dataType="Boolean",
             ),
             self.get_field_type(
                 id="removeSign",
                 label="Remove Sign",
-                data_type="Boolean",
+                dataType="Boolean",
             ),
         ]
         _data.extend(extra_fields)
@@ -537,36 +529,36 @@ class MetaData:
             self.get_field_type(
                 id="installAddress",
                 label="Install Address",
-                data_type="Object",
+                dataType="Object",
                 fields=self.property_metadata,
             ),
             self.get_field_type(
                 id="pickupAddress",
                 label="Pickup Address",
-                data_type="Object",
+                dataType="Object",
                 fields=self.property_metadata,
             ),
             self.get_field_type(
                 id="removeAddress",
                 label="Remove Address",
-                data_type="Object",
+                dataType="Object",
                 fields=self.property_metadata,
             ),
             self.get_field_type(
                 id="dropoffAddress",
                 label="Dropoff Address",
-                data_type="Object",
+                dataType="Object",
                 fields=self.property_metadata,
             ),
             self.get_field_type(
                 id="signType",
                 label="Sign Type",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
                 id="instructions",
                 label="Instructions",
-                data_type="String",
+                dataType="String",
             ),
             self.task_type,
         ]
@@ -581,7 +573,7 @@ class MetaData:
             self.get_field_type(
                 id="instructions",
                 label="Instructions",
-                data_type="String",
+                dataType="String",
             ),
             self.task_type,
         ]
@@ -595,37 +587,37 @@ class MetaData:
             self.get_field_type(
                 id="serviceType",
                 label="Service Type",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
                 id="name",
                 label="Name",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
                 id="companyName",
                 label="Company Name",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
                 id="phone",
                 label="Phone",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
                 id="email",
                 label="Email",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
                 id="address",
                 label="Address",
-                data_type="String",
+                dataType="String",
             ),
             self.get_field_type(
                 id="website",
                 label="Website",
-                data_type="String",
+                dataType="String",
             ),
         ]
         _data.extend(extra_fields)
