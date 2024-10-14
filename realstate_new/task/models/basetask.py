@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -9,21 +10,17 @@ from realstate_new.utils.base_models import TrackingModel
 
 from .choices import BrokerageType
 from .choices import JobType
-from .choices import LockBoxType
 from .choices import TaskStatusChoices
 
 
 class BaseTask(TrackingModel):
-    title = models.CharField(max_length=50, default="")
-    property = models.ForeignKey(
-        "master.Property",
-        on_delete=models.SET_NULL,
+    client_name = models.CharField(max_length=50, default="", blank=True)
+    client_phone = ArrayField(
+        base_field=models.CharField(max_length=50),
         null=True,
         blank=True,
     )
-    client_name = models.CharField(max_length=50, default="", blank=True)
-    client_phone = models.CharField(max_length=50, default="", blank=True)
-    client_email = models.EmailField(blank=True)
+    client_email = ArrayField(base_field=models.EmailField(), null=True, blank=True)
 
     task_time = models.DateTimeField()
     asap = models.BooleanField(_("As Soon As Possible"), default=False)
@@ -54,28 +51,9 @@ class BaseTask(TrackingModel):
     show_client_info = models.BooleanField(default=False)
 
     # extra info
-    vacant = models.BooleanField(default=False)
-    pets = models.BooleanField(default=False)
-    concierge = models.BooleanField(default=False)
 
-    alarm_code = models.CharField(max_length=50, default="", blank=True)
-    gate_code = models.CharField(max_length=50, default="", blank=True)
-
-    lockbox_type = models.CharField(
-        max_length=50,
-        choices=LockBoxType.choices,
-        default=LockBoxType.OTHER,
-        blank=True,
-    )
-
-    applications = GenericRelation(
-        JobApplication,
-        content_type_field="content_type",
-        object_id_field="task_id",
-    )
     not_acceptance_notification_sent = models.BooleanField(default=False)
     is_cancelled = models.BooleanField(default=False)
-    notifications = GenericRelation(Notification)
     marked_completed_by_assignee = models.BooleanField(default=False)
     audio_file = models.FileField(
         upload_to="additional-audio-notes/",
@@ -86,6 +64,13 @@ class BaseTask(TrackingModel):
         max_length=50,
         default=TaskStatusChoices.CREATED,
         choices=TaskStatusChoices.choices,
+    )
+    # GenericRelations
+    notifications = GenericRelation(Notification)
+    applications = GenericRelation(
+        JobApplication,
+        content_type_field="content_type",
+        object_id_field="task_id",
     )
 
     def __str__(self):

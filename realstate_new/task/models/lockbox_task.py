@@ -1,6 +1,7 @@
 from django.db import models
 
 from .basetask import BaseTask
+from .choices import LockBoxType
 from .choices import TaskTypeChoices
 
 
@@ -39,6 +40,12 @@ class LockBoxTask(BaseTask):
         null=True,
         blank=True,
     )
+    lockbox_type = models.CharField(
+        max_length=50,
+        choices=LockBoxType.choices,
+        default=LockBoxType.OTHER,
+        blank=True,
+    )
 
 
 class LockBoxTaskIR(LockBoxTask):
@@ -72,20 +79,3 @@ class LockBoxTaskBS(LockBoxTask):
     @property
     def type_of_task(self):
         return "LockBoxBS"
-
-
-class LockBox(models.Model):
-    name = models.CharField(max_length=50)
-    lockbox_type = models.CharField(max_length=50)
-    brand = models.CharField(max_length=50)
-    model = models.CharField(max_length=50)
-    price = models.PositiveIntegerField()
-    lockbox_task = models.OneToOneField(
-        LockBoxTask,
-        on_delete=models.CASCADE,
-        related_name="lockbox",
-        verbose_name="Lock Boxes",
-    )
-
-    def __str__(self) -> str:
-        return super().__str__()

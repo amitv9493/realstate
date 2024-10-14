@@ -3,12 +3,6 @@ from typing import Any
 from django.contrib import admin
 
 from .models import Property
-from .models import PropertyFeature
-
-
-@admin.register(PropertyFeature)
-class PropertyFeatureAdmin(admin.ModelAdmin):
-    list_display = ("id", "feature_name")
 
 
 @admin.register(Property)

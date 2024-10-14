@@ -124,12 +124,14 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
     @silk_profile(name="Latest Task")
     def get(self, request, *args, **kwargs):
         params = request.query_params
-        page_size = params.get("page_size", 10)
-        page = params.get("page", 1)
 
-        page_size = int(page_size) if page_size else 10
+        # pagination
+        page = params.get("page", 1)
         page = int(page) if page else 1
+        page_size = params.get("page_size", 10)
+        page_size = int(page_size) if page_size else 10
         flag = params.get("flag", "").lower()
+
         if not flag:
             raise ValidationError(
                 {
@@ -137,16 +139,24 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
                 },
                 code="required",
             )
+
         if flag == "latest":
             query = (
-                Q(is_verified=False)
+                Q(status=TaskStatusChoices.CREATED)
                 & Q(assigned_to__isnull=True)
                 & ~Q(
                     applications__applicant__in=[request.user],
                 )
             )
-        if flag == "appliedjobs":
+        if flag == "applied":
+            query = Q(applications__applicant__in=[request.user]) & Q(
+                status=TaskStatusChoices.CREATED,
+            )
+
+        if flag == "ongoing":
             query = Q(assigned_to=request.user)
+        if flag == "completed":
+            query = Q(assigned_to=request.user) & Q(status=TaskStatusChoices.VERIFIED)
 
         tasks = self.get_tasks(query)
         paginated_response = self.get_paginated_response(page, page_size, tasks)

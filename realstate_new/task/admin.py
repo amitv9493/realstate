@@ -1,6 +1,8 @@
 from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericStackedInline
 from django.utils.translation import gettext_lazy as _
 
+from realstate_new.master.models import Property
 from realstate_new.task.models.sign_task import SignTask
 
 from .models import LockBoxTaskBS
@@ -10,6 +12,11 @@ from .models import ProfessionalServiceTask
 from .models import RunnerTask
 from .models import ShowingTask
 from .models import ThirdPartyCall
+
+
+class PropertyInline(GenericStackedInline):
+    model = Property
+    extra = 1
 
 
 class BaseTaskAdmin(admin.ModelAdmin):
@@ -30,7 +37,7 @@ class BaseTaskAdmin(admin.ModelAdmin):
         "application_type",
         "asap",
     )
-    search_fields = ("property", "client_name", "client_email")
+    search_fields = ("client_name", "client_email")
     date_hierarchy = "task_time"
     readonly_fields = ("created_at", "updated_at", "created_by")
 
@@ -39,8 +46,6 @@ class BaseTaskAdmin(admin.ModelAdmin):
             _("Task Information"),
             {
                 "fields": (
-                    "title",
-                    "property",
                     "task_time",
                     "application_type",
                     "apply_deadline",
@@ -69,12 +74,6 @@ class BaseTaskAdmin(admin.ModelAdmin):
             _("Additional Information"),
             {
                 "fields": (
-                    "lockbox_type",
-                    "vacant",
-                    "pets",
-                    "concierge",
-                    "alarm_code",
-                    "gate_code",
                     "notes",
                     "audio_file",
                 ),
@@ -104,6 +103,8 @@ class BaseTaskAdmin(admin.ModelAdmin):
 
 @admin.register(ShowingTask)
 class ShowingTaskAdmin(BaseTaskAdmin):
+    inlines = [PropertyInline]
+
     fieldsets = (
         *BaseTaskAdmin.fieldsets,
         (
@@ -115,6 +116,8 @@ class ShowingTaskAdmin(BaseTaskAdmin):
 
 @admin.register(OpenHouseTask)
 class OpenHouseTaskAdmin(BaseTaskAdmin):
+    inlines = [PropertyInline]
+
     fieldsets = (
         *BaseTaskAdmin.fieldsets,
         (
@@ -134,7 +137,6 @@ class LockboxTaskIRAdmin(BaseTaskAdmin):
                 "fields": (
                     "task_type",
                     "lockbox_code",
-                    "instructions",
                     "include_sign",
                     "installation_or_remove_address",
                 ),
@@ -153,7 +155,6 @@ class LockboxTaskBSAdmin(BaseTaskAdmin):
                 "fields": (
                     "task_type",
                     "lockbox_code",
-                    "instructions",
                     "pickup_address",
                     "include_sign",
                 ),

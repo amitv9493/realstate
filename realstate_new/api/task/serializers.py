@@ -6,7 +6,6 @@ from rest_framework import serializers
 from realstate_new.api.property.serializers import PropertySerializer
 from realstate_new.api.user.serializers import UserSerializer
 from realstate_new.master.models.property import Property
-from realstate_new.task.models import LockBox
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
 from realstate_new.task.models import OpenHouseTask
@@ -26,12 +25,6 @@ JOB_DASHBOARD_COMMON_FIELDS = [
     "assigned_to",
     "property",
     "status",
-    "asap",
-    "vacant",
-    "pets",
-    "concierge",
-    "alarm_code",
-    "gate_code",
     *EXTRA_FIELD,
 ]
 
@@ -42,6 +35,13 @@ PROPERTY_FIELDS = [
     "city",
     "latitude",
     "longitude",
+    "asap",
+    "vacant",
+    "pets",
+    "concierge",
+    "alarm_code",
+    "gate_code",
+    "lockbox_type",
 ]
 
 ONGOING_FIELDS = {
@@ -69,10 +69,6 @@ class TaskSerializer(TrackingModelSerializer):
     application_status = serializers.SerializerMethodField()
 
     type_of_task = serializers.CharField(read_only=True)
-    property = PropertySerializer(
-        fields=PROPERTY_FIELDS,
-        required=False,
-    )
 
     class Meta:
         extra_kwargs = {
@@ -86,31 +82,28 @@ class TaskSerializer(TrackingModelSerializer):
             return application.status
         return None
 
-    def create(self, validated_data: Any) -> Any:
-        property_address = validated_data.pop("property", None)
-        if property_address:
-            property_instance = Property.objects.create(
-                **property_address,
-            )
-            validated_data["property"] = property_instance
-        return super().create(validated_data)
-
     @staticmethod
     def get_property_fields():
         return PROPERTY_FIELDS
 
 
 class ShowingTaskSerializer(TaskSerializer):
+    property_address = PropertySerializer(
+        fields=PROPERTY_FIELDS,
+        required=True,
+        many=True,
+    )
+
     class Meta(TaskSerializer.Meta):
         model = ShowingTask
         fields = "__all__"
 
-
-class LockBoxSerializer(TaskSerializer):
-    class Meta(TaskSerializer.Meta):
-        model = LockBox
-        fields = "__all__"
-        exclude_fields = ["id", "lockbox_task"]
+    def create(self, validated_data: Any) -> Any:
+        property_addresses = validated_data.pop("property_address", None)
+        instance = super().create(validated_data)
+        for address in property_addresses:
+            Property.objects.create(**address, task=instance)
+        return instance
 
 
 class LockBoxBSSerializer(TaskSerializer):
@@ -126,17 +119,21 @@ class LockBoxBSSerializer(TaskSerializer):
 
     def create(self, validated_data: Any) -> Any:
         pickup_address = validated_data.pop("pickup_address", None)
+        instance = super().create(validated_data)
         if pickup_address:
-            pickup_address_rec = Property.objects.create(**pickup_address)
-            validated_data["pickup_address"] = pickup_address_rec
-
-        return super().create(validated_data)
+            pickup_address_rec = Property.objects.create(
+                **pickup_address,
+                task=instance,
+            )
+            instance.pickup_address = pickup_address_rec
+            instance.save(update_fields=["pickup_address"])
+        return instance
 
 
 class LockBoxIRSerializer(TaskSerializer):
-    pickup_address = PropertySerializer(required=False, fields=PROPERTY_FIELDS)
+    pickup_address = PropertySerializer(required=True, fields=PROPERTY_FIELDS)
     installation_or_remove_address = PropertySerializer(
-        required=False,
+        required=True,
         fields=PROPERTY_FIELDS,
     )
 
@@ -146,24 +143,41 @@ class LockBoxIRSerializer(TaskSerializer):
         exclude_fields = ("property",)
 
     def create(self, validated_data: Any) -> Any:
-        installation_or_remove_address = validated_data.get(
+        installation_or_remove_address = validated_data.pop(
             "installation_or_remove_address",
+            None,
         )
-        pickup_address = validated_data.get("pickup_address")
-        if installation_or_remove_address:
-            validated_data["installation_or_remove_address"] = Property.objects.create(
-                **installation_or_remove_address,
-            )
-        if pickup_address:
-            validated_data["pickup_address"] = Property.objects.create(**pickup_address)
+        pickup_address = validated_data.pop("pickup_address", None)
 
-        return super().create(validated_data)
+        instance = super().create(validated_data)
+        ir_addr = Property.objects.create(
+            **installation_or_remove_address,
+            task=instance,
+        )
+        pickup_addr = Property.objects.create(**pickup_address, task=instance)
+        instance.pickup_address = pickup_addr
+        instance.installation_or_remove_address = ir_addr
+        instance.save(
+            update_fields=["installation_or_remove_address", "pickup_address"],
+        )
+
+        return instance
 
 
 class OpenHouseTaskSerializer(TaskSerializer):
+    property_address = PropertySerializer(fields=PROPERTY_FIELDS, required=True)
+
     class Meta(TaskSerializer.Meta):
         model = OpenHouseTask
         fields = "__all__"
+
+    def create(self, validated_data: Any) -> Any:
+        property_address = validated_data.pop("property_address")
+        instance = super().create(validated_data)
+        property_rec = Property.objects.create(**property_address, task=instance)
+        instance.property_address = property_rec
+        instance.save(update_fields=["property_address"])
+        return instance
 
 
 class ProfessionalTaskSerializer(TaskSerializer):
@@ -173,9 +187,19 @@ class ProfessionalTaskSerializer(TaskSerializer):
 
 
 class RunnerTaskSerializer(TaskSerializer):
+    property_address = PropertySerializer(fields=PROPERTY_FIELDS, required=True)
+
     class Meta(TaskSerializer.Meta):
         model = RunnerTask
         fields = "__all__"
+
+    def create(self, validated_data: Any) -> Any:
+        property_address = validated_data.pop("property_address")
+        instance = super().create(validated_data)
+        property_rec = Property.objects.create(**property_address, task=instance)
+        instance.property_address = property_rec
+        instance.save(update_fields=["property_address"])
+        return instance
 
 
 class SignTaskSerializer(TaskSerializer):
@@ -207,19 +231,31 @@ class SignTaskSerializer(TaskSerializer):
         remove_address = validated_data.pop("remove_address", None)
         dropoff_address = validated_data.pop("dropoff_address", None)
 
+        instance = super().create(validated_data)
         if validated_data["task_type"] == "INSTALL":
-            validated_data["install_address"] = Property.objects.create(
+            install_address_rec = Property.objects.create(
                 **install_address,
+                task=instance,
             )
-            validated_data["pickup_address"] = Property.objects.create(**pickup_address)
+            pickup_address_rec = Property.objects.create(
+                **pickup_address,
+                task=instance,
+            )
+            instance.pickup_address = pickup_address_rec
+            instance.install_address = install_address_rec
 
         elif validated_data["task_type"] == "REMOVE":
-            validated_data["remove_address"] = Property.objects.create(**remove_address)
-            validated_data["dropoff_address"] = Property.objects.create(
-                **dropoff_address,
+            remove_address_rec = Property.objects.create(
+                **remove_address,
+                task=instance,
             )
-
-        return super().create(validated_data)
+            dropoff_address_rec = Property.objects.create(
+                **dropoff_address,
+                task=instance,
+            )
+            instance.dropoff_address = dropoff_address_rec
+            instance.remove_address = remove_address_rec
+        return instance
 
     def to_representation(self, instance: Any) -> dict[str, Any]:
         rep = super(TrackingModelSerializer, self).to_representation(instance)

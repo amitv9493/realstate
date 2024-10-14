@@ -11,13 +11,6 @@ class PropertyType(models.TextChoices):
     OTHER = "OTHER", "Other"
 
 
-class PropertyStatus(models.TextChoices):
-    AVAILABLE = "AVAIABLRE", "Available"
-    UC = "UNDER CONTRACT", "Under Contract"
-    SOLD = "SOLD", "Sold"
-    OTHER = "OTHER", "Other"
-
-
 JOB_TYPE_MAPPINGS = {
     "LockBoxBS": tasks.LockBoxTaskBS,
     "LockBoxIR": tasks.LockBoxTaskIR,

@@ -1,4 +1,3 @@
-from .lockbox_task import LockBox
 from .lockbox_task import LockBoxTaskBS
 from .lockbox_task import LockBoxTaskIR
 from .openhouse import OpenHouseTask
@@ -9,7 +8,6 @@ from .sign_task import SignTask
 from .third_party_call import ThirdPartyCall
 
 __all__ = [
-    "LockBox",
     "LockBoxTaskBS",
     "LockBoxTaskIR",
     "OpenHouseTask",

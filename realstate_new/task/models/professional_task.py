@@ -5,6 +5,7 @@ from .choices import ProfessionalServiceType
 
 
 class ProfessionalServiceTask(BaseTask):
+    property_address = models.OneToOneField("master.Property", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     company_name = models.CharField(max_length=100)
     phone = models.CharField(max_length=20)
