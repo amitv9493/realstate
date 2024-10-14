@@ -75,3 +75,8 @@ def job_reminder(self, reminder_time):
     msg = "Successfully processed %d tasks." % count
     logger.info(msg)
     return msg
+
+
+@shared_task(bind=True)
+def test_task(self):
+    return 1

@@ -33,4 +33,8 @@ app.conf.beat_schedule = {
         "schedule": timedelta(minutes=5).total_seconds(),
         "args": [timedelta(hours=1).total_seconds()],
     },
+    "test-celerybeat": {
+        "task": "realstate_new.task.celery_tasks.test_task",
+        "schedule": timedelta(seconds=5).total_seconds(),
+    },
 }
