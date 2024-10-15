@@ -52,13 +52,16 @@ class TaskFilter(django_filters.FilterSet):
 select_related = {
     "LockBoxBS": ["pickup_address", "installation_or_remove_address"],
     "LockBoxIR": ["pickup_address"],
-    "Showing": ["property"],
-    "OpenHouse": ["property"],
+    "Showing": [],
+    "OpenHouse": ["property_address"],
     "Runner": ["pickup_address", "dropoff_address"],
     "Sign": [
-        "property",
+        "pickup_address",
+        "dropoff_address",
+        "install_address",
+        "remove_address",
     ],
-    "Professional": ["property"],
+    "Professional": ["property_address"],
 }
 
 

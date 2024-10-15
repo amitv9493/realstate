@@ -105,6 +105,14 @@ class ShowingTaskSerializer(TaskSerializer):
             Property.objects.create(**address, task=instance)
         return instance
 
+    def to_representation(self, instance: Any) -> dict[str, Any]:
+        data = super().to_representation(instance)
+        data["property_address"] = PropertySerializer(
+            instance.property_address.all(),
+            many=True,
+        ).data
+        return data
+
 
 class LockBoxBSSerializer(TaskSerializer):
     pickup_address = PropertySerializer(fields=PROPERTY_FIELDS)
