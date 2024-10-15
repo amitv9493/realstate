@@ -29,11 +29,11 @@ class RunnerTask(BaseTask):
     )
 
     # Need to discuss
-    # TODO:MEET DELIVERY OR VENDOR ONLY
-    #  TODO:vendor_name = models.CharField(max_length=50, blank=True, default="")
-    #  TODO:vendor_phone = models.CharField(max_length=50, blank=True, default="")
-    #  TODO:vendor_company_name = models.CharField(max_length=50, blank=True, default="")
-    #  TODO:vendor_notes = models.TextField(blank=True, default="")
+    # MEET DELIVERY OR VENDOR ONLY
+    vendor_name = models.CharField(max_length=50, blank=True, default="")
+    vendor_phone = models.CharField(max_length=50, blank=True, default="")
+    vendor_company_name = models.CharField(max_length=50, blank=True, default="")
+    vendor_notes = models.TextField(blank=True, default="")
 
     @property
     def type_of_task(self):
