@@ -122,7 +122,7 @@ class OpenHouseTaskAdmin(BaseTaskAdmin):
         *BaseTaskAdmin.fieldsets,
         (
             _("Open House Details"),
-            {"fields": ("access_information", "open_house_instructions")},
+            {"fields": ("access_information",)},
         ),
     )
 
@@ -173,7 +173,6 @@ class SignTaskAdmin(BaseTaskAdmin):
                 "fields": (
                     "task_type",
                     "sign_type",
-                    "instructions",
                     "dropoff_address",
                 ),
             },
@@ -188,10 +187,7 @@ class RunnerTaskAdmin(BaseTaskAdmin):
         (
             _("Runner Details"),
             {
-                "fields": (
-                    "task_type",
-                    "instructions",
-                ),
+                "fields": ("task_type",),
             },
         ),
         (
