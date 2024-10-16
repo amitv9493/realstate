@@ -28,23 +28,31 @@ class JobApplicationSerializer(DynamicSerializer):
         except IntegrityError:
             msg = "Application Already Exists."
             raise serializers.ValidationError(msg, code="duplicate") from None
-        if job_instance.job_type == "CLAIM" and job_instance.assigned_to is None:
-            instance.status = "CLAIMED"
-            job_instance.assigned_to = user
-            instance.save(update_fields=["status"])
-            job_instance.save(update_fields=["assigned_to"])
+
+        if job_instance.application_type == "CLAIM":
+            if job_instance.assigned_to is None:
+                instance.status = "CLAIMED"
+                job_instance.assigned_to = user
+                instance.save(update_fields=["status"])
+                job_instance.save(update_fields=["assigned_to"])
+            else:
+                msg = "already claimed."
+                raise serializers.ValidationError(msg)
 
         return instance
 
     def validate(self, attrs):
         instance = self.get_instance(attrs["job_type"], attrs["task_id"])
-        if instance.assigned_to:
+        if instance and instance.assigned_to:
             msg = "This job as been assigned to someone already."
             raise serializers.ValidationError(msg, code="AlreadyAssigned")
         return super().validate(attrs)
 
     def get_instance(self, job_type, task_id):
-        return JOB_TYPE_MAPPINGS[job_type].objects.get(id=task_id)
+        try:
+            return JOB_TYPE_MAPPINGS[job_type].objects.get(id=task_id)
+        except JOB_TYPE_MAPPINGS[job_type].DoesNotExist:
+            return None
 
     def to_representation(self, instance):
         res = super().to_representation(instance)
