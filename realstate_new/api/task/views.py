@@ -150,7 +150,7 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
             )
         if flag == "applied":
             query = Q(applications__applicant__in=[request.user]) & Q(
-                status=TaskStatusChoices.CREATED,
+                status__in=[TaskStatusChoices.CREATED, TaskStatusChoices.ASSIGNED],
             )
 
         if flag == "ongoing":
