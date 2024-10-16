@@ -124,7 +124,7 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
     @silk_profile(name="Latest Task")
     def get(self, request, *args, **kwargs):
         params = request.query_params
-
+        query_params_list = ["ongoing", "latest", "applied", "completed"]
         # pagination
         page = params.get("page", 1)
         page = int(page) if page else 1
@@ -139,7 +139,13 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
                 },
                 code="required",
             )
-
+        if flag not in query_params_list:
+            raise ValidationError(
+                {
+                    "flag": "Invalid Flag",
+                },
+                code="BadRequest",
+            )
         if flag == "latest":
             query = (
                 Q(status=TaskStatusChoices.CREATED)
