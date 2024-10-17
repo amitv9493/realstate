@@ -78,3 +78,23 @@ class BaseTask(TrackingModel):
 
     class Meta:
         abstract = True
+
+    def save(self, *args, **kwargs):
+        if self.assigned_to and not self._state.adding:
+            self.change_assigned_user_application_status()
+            self.reject_all_other_applications()
+        return super().save(*args, **kwargs)
+
+    def change_assigned_user_application_status(self):
+        try:
+            user_application = self.applications.all().get(applicant=self.assigned_to)
+        except JobApplication.DoesNotExist as e:
+            msg = "application does not exists"
+            raise ValueError(msg) from e
+        if user_application:
+            user_application.status = "ACCEPTED"
+            user_application.save()
+
+    def reject_all_other_applications(self):
+        qs = self.applications.all().exclude(applicant=self.assigned_to)
+        qs.update(status="REJECTED")

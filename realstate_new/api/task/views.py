@@ -153,6 +153,7 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
                 & ~Q(
                     applications__applicant__in=[request.user],
                 )
+                & ~Q(created_by=request.user)
             )
         if flag == "applied":
             query = Q(applications__applicant__in=[request.user]) & Q(
