@@ -41,6 +41,7 @@ class TaskFilter(django_filters.FilterSet):
             "task_time_lte",
             "task_time",
             "asap",
+            "status",
         ]
 
     def filter_asap(self, queryset, name, value):
