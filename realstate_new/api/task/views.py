@@ -91,6 +91,7 @@ class JobCreaterDashboardView(APIView, TaskListMixin):
 
     @silk_profile(name="Ongoing Task")
     def get(self, request, *args, **kwargs):
+        params_list = ["completed", "created", "ongoing"]
         params = request.query_params
         flag = params.get("flag", "").lower()
         if not flag:
@@ -100,13 +101,21 @@ class JobCreaterDashboardView(APIView, TaskListMixin):
                 },
                 code="required",
             )
+        if flag not in params_list:
+            raise ValidationError(
+                {
+                    "flag": "flag is invallid",
+                },
+            )
         base_query = Q(created_by=request.user)
         if flag == "ongoing":
-            base_query &= Q(is_verified=False)
+            base_query &= Q(is_verified=False, assigned_to__isnull=False)
 
         if flag == "completed":
             base_query &= Q(is_verified=True)
 
+        if flag == "created":
+            base_query &= Q(status=TaskStatusChoices.CREATED, assigned_to__isnull=True)
         tasks = self.get_tasks(base_query)
 
         # pagination related data
