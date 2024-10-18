@@ -20,6 +20,7 @@ from realstate_new.task.models import ProfessionalServiceTask
 from realstate_new.task.models import ShowingTask
 from realstate_new.task.models import SignTask
 from realstate_new.task.models.choices import TaskStatusChoices
+from realstate_new.task.models.runner_task import RunnerTask
 from realstate_new.users.models import User
 
 from .filters import filter_tasks
@@ -238,7 +239,7 @@ class ProfessionalTaskViewSet(TaskViewSet):
 
 class RunnerTaskViewSet(TaskViewSet):
     serializer_class = RunnerTaskSerializer
-    queryset = ProfessionalServiceTask.objects.all()
+    queryset = RunnerTask.objects.all()
 
 
 class SignTaskViewSet(TaskViewSet):
