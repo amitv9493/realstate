@@ -25,6 +25,7 @@ JOB_DASHBOARD_COMMON_FIELDS = [
     "assigned_to",
     "property",
     "status",
+    "notes",
     *EXTRA_FIELD,
 ]
 
