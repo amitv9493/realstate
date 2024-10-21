@@ -4,6 +4,7 @@ import hmac
 import os
 import time
 from collections import defaultdict
+from urllib.parse import quote
 
 from django.conf import settings
 from django.http import Http404
@@ -52,6 +53,9 @@ def get_content_type(file_path):
 
 def protected_media_view(request, file_path):
     token = request.GET.get("token")
+    if "media/" in file_path:
+        file_path = file_path.split("media/")[1]
+    decoded_file_path = quote(file_path)
     expires_at = request.GET.get("expires")
 
     if not token or not expires_at:
@@ -65,7 +69,7 @@ def protected_media_view(request, file_path):
     if expires_at < int(time.time()):
         return HttpResponseForbidden("Access Denied: URL has expired.")
 
-    if not verify_token(file_path, expires_at, token):
+    if not verify_token(decoded_file_path, expires_at, token):
         return HttpResponseForbidden("Access Denied: Invalid token.")
 
     file_full_path = os.path.join(settings.MEDIA_ROOT, file_path)  # noqa: PTH118

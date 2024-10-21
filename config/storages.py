@@ -23,8 +23,6 @@ class ExpiringURLFileStorage(FileSystemStorage):
         file_url = super().url(name)
         token_url = file_url.split("media/")[1]
         expires_at = int(time.time()) + expiry_time
-
-        # Generate the access token and expiry timestamp
         token = self.generate_token(token_url, expires_at)
 
         # Append the token and expiry timestamp to the URL as query parameters
