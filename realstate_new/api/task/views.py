@@ -34,6 +34,7 @@ from .serializers import RunnerTaskSerializer
 from .serializers import ShowingTaskSerializer
 from .serializers import SignTaskSerializer
 from .serializers import TaskActionSerializer
+from .serializers import VerificationDocumentSerializer
 
 
 class TaskListMixin:
@@ -348,3 +349,16 @@ class TaskActionView(APIView):
             event=event,
             users=users,
         )
+
+
+class TaskVerificationImageView(APIView):
+    def get(self, request, task_type, task_id, *args, **kwargs):
+        try:
+            task_instance = JOB_TYPE_MAPPINGS[task_type].objects.get(id=task_id)
+        except Exception:  # noqa: BLE001
+            return Response({"error": "invalid task or task_id"}, 400)
+        data = VerificationDocumentSerializer(
+            task_instance.verification_images.all(),
+            many=True,
+        ).data
+        return Response(data, 200)

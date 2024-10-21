@@ -13,6 +13,7 @@ from realstate_new.task.models import ProfessionalServiceTask
 from realstate_new.task.models import RunnerTask
 from realstate_new.task.models import ShowingTask
 from realstate_new.task.models import SignTask
+from realstate_new.task.models import VerificationDocument
 from realstate_new.task.models.choices import TaskStatusChoices
 from realstate_new.utils.serializers import TrackingModelSerializer
 
@@ -366,3 +367,9 @@ class TaskActionSerializer(serializers.Serializer):
                 msg = "image_list is a required field when marking task completed"
                 raise serializers.ValidationError({"image_list": msg}, code="required")
         return super().validate(attrs)
+
+
+class VerificationDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VerificationDocument
+        fields = ["image", "created_at"]

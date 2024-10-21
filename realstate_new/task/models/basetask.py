@@ -13,6 +13,7 @@ from realstate_new.utils.base_models import TrackingModel
 from .choices import BrokerageType
 from .choices import JobType
 from .choices import TaskStatusChoices
+from .verification_image import VerificationDocument
 
 
 class BaseTask(TrackingModel):
@@ -74,6 +75,7 @@ class BaseTask(TrackingModel):
         content_type_field="content_type",
         object_id_field="task_id",
     )
+    verification_images = GenericRelation(VerificationDocument)
 
     def __str__(self):
         return f"{self.client_name}-{self.payment_amount}"
