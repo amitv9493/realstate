@@ -3,6 +3,7 @@ from itertools import chain
 from typing import Any
 
 from django.db.models import Q
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 from rest_framework.serializers import ValidationError
@@ -281,6 +282,8 @@ class TaskActionView(APIView):
         }.get(task_action)
 
     def handle_started(self, task_instance, validated_data):
+        self.is_request_user_allowed(task_instance)
+        self.is_job_assigned(task_instance)
         self.create_notifications(
             task_instance,
             event=TaskStatusChoices.STARTED,
@@ -303,6 +306,8 @@ class TaskActionView(APIView):
         )
 
     def handle_mark_completed(self, task_instance, validated_data):
+        self.is_request_user_allowed(task_instance)
+        self.is_job_assigned(task_instance)
         task_instance.marked_completed_by_assignee = True
         images = validated_data["image_list"]
         image_objects = [
@@ -316,6 +321,8 @@ class TaskActionView(APIView):
         )
 
     def handle_verify(self, task_instance, validated_data):
+        self.is_request_user_allowed(task_instance)
+        self.is_job_assigned(task_instance)
         task_instance.is_verified = True
         task_instance.save(update_fields=["is_verified"])
         self.create_notifications(task_instance, event=TaskStatusChoices.VERIFIED)
@@ -334,6 +341,8 @@ class TaskActionView(APIView):
         )
 
     def handle_assigner_cancelled(self, task_instance, validated_data):
+        self.is_request_user_allowed(task_instance)
+        self.is_job_assigned(task_instance)
         task_instance.assigned_to = None
         task_instance.save(update_fields=["assigned_to"])
         self.create_notifications(
@@ -349,6 +358,17 @@ class TaskActionView(APIView):
             event=event,
             users=users,
         )
+
+    def is_job_assigned(self, task_instance):
+        if not task_instance.assigned_to:
+            msg = "Job has no assignee"
+            raise ValidationError(msg)
+        return True
+
+    def is_request_user_allowed(self, task_instance):
+        if self.request.user != task_instance.assigned_to:
+            raise PermissionDenied
+        return True
 
 
 class TaskVerificationImageView(APIView):
