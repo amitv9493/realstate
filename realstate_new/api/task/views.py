@@ -343,12 +343,12 @@ class TaskActionView(APIView):
     def handle_assigner_cancelled(self, task_instance, validated_data):
         self.is_request_user_allowed(task_instance)
         self.is_job_assigned(task_instance)
-        task_instance.assigned_to = None
-        task_instance.save(update_fields=["assigned_to"])
         self.create_notifications(
             task_instance,
             event=TaskStatusChoices.ASSIGNER_CANCELLED,
         )
+        task_instance.assigned_to = None
+        task_instance.save(update_fields=["assigned_to"])
 
     def create_notifications(self, task_instance, event, users: list | None = None):
         if not users:

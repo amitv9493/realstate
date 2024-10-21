@@ -80,7 +80,6 @@ class Notification(models.Model):
             # Check if the notification is for job assigner.
             if self.user == ctx_obj.assigned_to:
                 notification_body = n_body2
-
                 device_ids = list(
                     ctx_obj.assigned_to.fcmdevices.all().values_list(
                         "registration_id",
