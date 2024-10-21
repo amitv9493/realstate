@@ -19,6 +19,7 @@ from realstate_new.task.models import OpenHouseTask
 from realstate_new.task.models import ProfessionalServiceTask
 from realstate_new.task.models import ShowingTask
 from realstate_new.task.models import SignTask
+from realstate_new.task.models import VerificationDocument
 from realstate_new.task.models.choices import TaskStatusChoices
 from realstate_new.task.models.runner_task import RunnerTask
 from realstate_new.users.models import User
@@ -251,7 +252,10 @@ class TaskActionView(APIView):
     serializer_class = TaskActionSerializer
 
     def post(self, request, task_type, task_id, task_action, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(
+            data=request.data,
+            context={"task_action": task_action},
+        )
 
         if serializer.is_valid(raise_exception=True):  # noqa: RET503
             data = serializer.validated_data
@@ -299,6 +303,11 @@ class TaskActionView(APIView):
 
     def handle_mark_completed(self, task_instance, validated_data):
         task_instance.marked_completed_by_assignee = True
+        images = validated_data["image_list"]
+        image_objects = [
+            VerificationDocument(content_object=task_instance, image=image) for image in images
+        ]
+        VerificationDocument.objects.bulk_create(image_objects)
         task_instance.save(update_fields=["marked_completed_by_assignee"])
         self.create_notifications(
             task_instance,

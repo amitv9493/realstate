@@ -13,6 +13,7 @@ from realstate_new.task.models import ProfessionalServiceTask
 from realstate_new.task.models import RunnerTask
 from realstate_new.task.models import ShowingTask
 from realstate_new.task.models import SignTask
+from realstate_new.task.models.choices import TaskStatusChoices
 from realstate_new.utils.serializers import TrackingModelSerializer
 
 EXTRA_FIELD = ["type_of_task"]
@@ -350,7 +351,18 @@ class LatestTaskSerializer(serializers.Serializer):
 
 
 class TaskActionSerializer(serializers.Serializer):
+    class ImageSeralizer(serializers.Serializer):
+        image = serializers.ImageField()
+
+    image_list = serializers.ListField(child=serializers.ImageField(), required=False)
     assigned_to = serializers.PrimaryKeyRelatedField(
         queryset=get_user_model().objects.all(),
         required=False,
     )
+
+    def validate(self, attrs: Any) -> Any:
+        if self.context.get("task_action", "").upper() == TaskStatusChoices.MARK_COMPLETED:
+            if not attrs.get("image_list", None):
+                msg = "image_list is a required field when marking task completed"
+                raise serializers.ValidationError({"image_list": msg}, code="required")
+        return super().validate(attrs)

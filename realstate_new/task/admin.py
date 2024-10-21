@@ -12,6 +12,7 @@ from .models import ProfessionalServiceTask
 from .models import RunnerTask
 from .models import ShowingTask
 from .models import ThirdPartyCall
+from .models import VerificationDocument
 
 
 class PropertyInline(GenericStackedInline):
@@ -234,3 +235,10 @@ class ThirdPartyCallAdmin(admin.ModelAdmin):
         "date_created",
     )
     ordering = ("-date_created",)
+
+
+@admin.register(VerificationDocument)
+class VerificationDocumentAdmin(admin.ModelAdmin):
+    list_display = ("id", "content_type", "object_id", "image", "created_at")
+    list_filter = ("content_type", "created_at")
+    date_hierarchy = "created_at"

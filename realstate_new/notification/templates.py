@@ -48,7 +48,7 @@ class NotificationTemplates:
         ),
         body2=(
             "You have marked the job {type_of_task} as completed."
-            "Awaiting confirmation from the job creator.",
+            "Awaiting confirmation from the job creator."
         ),
     )
     VERIFIED = NotificationTemplate(
