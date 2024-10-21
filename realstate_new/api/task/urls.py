@@ -11,6 +11,7 @@ from .views import RunnerTaskViewSet
 from .views import ShowingTaskViewSet
 from .views import SignTaskViewSet
 from .views import TaskActionView
+from .views import TaskVerificationImageView
 
 router = routers.SimpleRouter()
 router.register("showingtask", ShowingTaskViewSet, "showing-task")
@@ -28,6 +29,10 @@ urlpatterns = [
     path(
         "<str:task_type>/<int:task_id>/<str:task_action>",
         TaskActionView.as_view(),
+    ),
+    path(
+        "<str:task_type>/<int:task_id>/verificationdocs/",
+        TaskVerificationImageView.as_view(),
     ),
     *router.urls,
 ]
