@@ -321,7 +321,6 @@ class TaskActionView(APIView):
         )
 
     def handle_verify(self, task_instance, validated_data):
-        self.is_request_user_allowed(task_instance)
         self.is_job_assigned(task_instance)
         task_instance.is_verified = True
         task_instance.save(update_fields=["is_verified"])
