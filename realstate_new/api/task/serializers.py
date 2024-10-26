@@ -3,9 +3,9 @@ from typing import Any
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from realstate_new.api.property.serializers import LockBoxSerializer
 from realstate_new.api.property.serializers import PropertySerializer
 from realstate_new.api.user.serializers import UserSerializer
-from realstate_new.master.models.property import Property
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
 from realstate_new.task.models import OpenHouseTask
@@ -45,6 +45,7 @@ PROPERTY_FIELDS = [
     "alarm_code",
     "gate_code",
     "lockbox_type",
+    "lockbox",
 ]
 
 ONGOING_FIELDS = {
@@ -89,6 +90,29 @@ class TaskSerializer(TrackingModelSerializer):
     def get_property_fields():
         return PROPERTY_FIELDS
 
+    @property
+    def request(self):
+        return self.context.get("request", None)
+
+    def save_property_instance(
+        self,
+        task,
+        request,
+        *,
+        property_validated_data: dict,
+        many=False,
+    ):
+        if many:
+            return [
+                PropertySerializer(context={"request": request}).create(
+                    validated_data=address | {"task": task},
+                )
+                for address in property_validated_data
+            ]
+        return PropertySerializer(context={"request": request}).create(
+            validated_data=property_validated_data | {"task": task},
+        )
+
 
 class ShowingTaskSerializer(TaskSerializer):
     property_address = PropertySerializer(
@@ -102,23 +126,23 @@ class ShowingTaskSerializer(TaskSerializer):
         fields = "__all__"
 
     def create(self, validated_data: Any) -> Any:
-        property_addresses = validated_data.pop("property_address", None)
+        property_addresses = validated_data.pop("property_address", [])
         instance = super().create(validated_data)
-        for address in property_addresses:
-            Property.objects.create(**address, task=instance)
-        return instance
 
-    def to_representation(self, instance: Any) -> dict[str, Any]:
-        data = super().to_representation(instance)
-        data["property_address"] = PropertySerializer(
-            instance.property_address.all(),
+        properties = self.save_property_instance(
+            task=instance,
+            request=self.request,
+            property_validated_data=property_addresses,
             many=True,
-        ).data
-        return data
+        )
+
+        instance.property_address.set(properties)
+        return instance
 
 
 class LockBoxBSSerializer(TaskSerializer):
     pickup_address = PropertySerializer(fields=PROPERTY_FIELDS)
+    lockbox = LockBoxSerializer(required=False)
 
     class Meta(TaskSerializer.Meta):
         model = LockBoxTaskBS
@@ -130,19 +154,29 @@ class LockBoxBSSerializer(TaskSerializer):
 
     def create(self, validated_data: Any) -> Any:
         pickup_address = validated_data.pop("pickup_address", None)
+        lockbox = validated_data.pop("lockbox", None)
         instance = super().create(validated_data)
+        lockbox_instance = LockBoxSerializer().create(validated_data=lockbox) if lockbox else None
+        update_fields = []
+        instance.lockbox = lockbox_instance
+        update_fields.append("lockbox")
         if pickup_address:
-            pickup_address_rec = Property.objects.create(
-                **pickup_address,
+            p_instance = self.save_property_instance(
                 task=instance,
+                request=self.request,
+                property_validated_data=pickup_address,
             )
-            instance.pickup_address = pickup_address_rec
-            instance.save(update_fields=["pickup_address"])
+
+            instance.pickup_address = p_instance
+            update_fields.append("pickup_address")
+        instance.save(update_fields=update_fields)
         return instance
 
 
 class LockBoxIRSerializer(TaskSerializer):
     pickup_address = PropertySerializer(required=True, fields=PROPERTY_FIELDS)
+    lockbox = LockBoxSerializer(required=False)
+
     installation_or_remove_address = PropertySerializer(
         required=True,
         fields=PROPERTY_FIELDS,
@@ -159,17 +193,28 @@ class LockBoxIRSerializer(TaskSerializer):
             None,
         )
         pickup_address = validated_data.pop("pickup_address", None)
-
+        lockbox = validated_data.pop("lockbox", None)
         instance = super().create(validated_data)
-        ir_addr = Property.objects.create(
-            **installation_or_remove_address,
+        lockbox_instance = LockBoxSerializer().create(validated_data=lockbox) if lockbox else None
+        instance.lockbox = lockbox_instance
+        ir_addr = self.save_property_instance(
             task=instance,
+            request=self.request,
+            property_validated_data=installation_or_remove_address,
         )
-        pickup_addr = Property.objects.create(**pickup_address, task=instance)
+        pickup_addr = self.save_property_instance(
+            task=instance,
+            request=self.request,
+            property_validated_data=pickup_address,
+        )
         instance.pickup_address = pickup_addr
         instance.installation_or_remove_address = ir_addr
         instance.save(
-            update_fields=["installation_or_remove_address", "pickup_address"],
+            update_fields=[
+                "installation_or_remove_address",
+                "pickup_address",
+                "lockbox",
+            ],
         )
 
         return instance
@@ -185,7 +230,12 @@ class OpenHouseTaskSerializer(TaskSerializer):
     def create(self, validated_data: Any) -> Any:
         property_address = validated_data.pop("property_address")
         instance = super().create(validated_data)
-        property_rec = Property.objects.create(**property_address, task=instance)
+
+        property_rec = self.save_property_instance(
+            task=instance,
+            request=self.request,
+            property_validated_data=property_address,
+        )
         instance.property_address = property_rec
         instance.save(update_fields=["property_address"])
         return instance
@@ -207,7 +257,11 @@ class RunnerTaskSerializer(TaskSerializer):
     def create(self, validated_data: Any) -> Any:
         property_address = validated_data.pop("property_address")
         instance = super().create(validated_data)
-        property_rec = Property.objects.create(**property_address, task=instance)
+        property_rec = self.save_property_instance(
+            task=instance,
+            request=self.request,
+            property_validated_data=property_address,
+        )
         instance.property_address = property_rec
         instance.save(update_fields=["property_address"])
         return instance
@@ -244,25 +298,29 @@ class SignTaskSerializer(TaskSerializer):
 
         instance = super().create(validated_data)
         if validated_data["task_type"] == "INSTALL":
-            install_address_rec = Property.objects.create(
-                **install_address,
+            install_address_rec = self.save_property_instance(
                 task=instance,
+                request=self.request,
+                property_validated_data=install_address,
             )
-            pickup_address_rec = Property.objects.create(
-                **pickup_address,
+            pickup_address_rec = self.save_property_instance(
                 task=instance,
+                request=self.request,
+                property_validated_data=pickup_address,
             )
             instance.pickup_address = pickup_address_rec
             instance.install_address = install_address_rec
 
         elif validated_data["task_type"] == "REMOVE":
-            remove_address_rec = Property.objects.create(
-                **remove_address,
+            remove_address_rec = self.save_property_instance(
                 task=instance,
+                request=self.request,
+                property_validated_data=remove_address,
             )
-            dropoff_address_rec = Property.objects.create(
-                **dropoff_address,
+            dropoff_address_rec = self.save_property_instance(
                 task=instance,
+                request=self.request,
+                property_validated_data=dropoff_address,
             )
             instance.dropoff_address = dropoff_address_rec
             instance.remove_address = remove_address_rec

@@ -14,3 +14,7 @@ class LockBoxType(models.TextChoices):
     KEYPAD_ENTRY = "KEYPAD_ENTRY", "KEYPAD ENTRY"
     CONTRACTOR = "CONTRACTOR", "CONTRACTOR"
     OTHER = "OTHER", "OTHER"
+
+
+class ProfessionalServiceSkillChoices(models.TextChoices):
+    PH = "PHOTO", "Photography"

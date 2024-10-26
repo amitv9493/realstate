@@ -2,6 +2,8 @@ from typing import Any
 
 from django.contrib import admin
 
+from .models import LockBox
+from .models import ProfessioanlVendorInquiry
 from .models import Property
 
 
@@ -19,3 +21,27 @@ class PropertyAdmin(admin.ModelAdmin):
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         obj.created_by = request.user
         return super().save_model(request, obj, form, change)
+
+
+@admin.register(LockBox)
+class LockBoxAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ProfessioanlVendorInquiry)
+class ProfessioanlVendorInquiryAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "created_at",
+        "updated_at",
+        "created_by",
+        "client_phone",
+        "client_email",
+        "preferred_name",
+        "preferred_method_of_contact",
+        "service_skill",
+        "mile_radius_preference",
+        "additional_notes",
+    )
+    list_filter = ("created_at", "updated_at", "created_by")
+    date_hierarchy = "created_at"
