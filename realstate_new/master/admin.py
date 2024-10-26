@@ -2,6 +2,9 @@ from typing import Any
 
 from django.contrib import admin
 
+from realstate_new.utils.admin import CustomModelAdmin
+
+from .models import Feedback
 from .models import LockBox
 from .models import ProfessioanlVendorInquiry
 from .models import Property
@@ -45,3 +48,9 @@ class ProfessioanlVendorInquiryAdmin(admin.ModelAdmin):
     )
     list_filter = ("created_at", "updated_at", "created_by")
     date_hierarchy = "created_at"
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(CustomModelAdmin):
+    list_display = ["created_by", "feedback_type", "created_at"]
+    list_filter = list_display

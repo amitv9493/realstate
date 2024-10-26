@@ -18,3 +18,9 @@ class LockBoxType(models.TextChoices):
 
 class ProfessionalServiceSkillChoices(models.TextChoices):
     PH = "PHOTO", "Photography"
+
+
+class FeedbackType(models.TextChoices):
+    BUG = "BUG", "Bug Report"
+    SUGGESTION = "SUGGESTION", "Suggestion"
+    GENERAL = "GENERAL", "General Feedback"
