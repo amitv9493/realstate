@@ -1,6 +1,6 @@
 import django_filters
 
-from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
+from realstate_new.task.models import JOB_TYPE_MAPPINGS
 from realstate_new.task.models import ShowingTask
 
 

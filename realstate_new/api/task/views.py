@@ -11,9 +11,9 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from silk.profiling.profiler import silk_profile
 
-from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
 from realstate_new.notification.models import Notification
 from realstate_new.notification.models import NotificationChoices
+from realstate_new.task.models import JOB_TYPE_MAPPINGS
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
 from realstate_new.task.models import OpenHouseTask

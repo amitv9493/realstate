@@ -1,1 +1,4 @@
-from .property import Property  # noqa: F401
+from .lockbox import LockBox
+from .property import Property
+
+__all__ = ["LockBox", "Property"]

@@ -9,6 +9,7 @@ from .third_party_call import ThirdPartyCall
 from .verification_image import VerificationDocument
 
 __all__ = [
+    "JOB_TYPE_MAPPINGS",
     "LockBoxTaskBS",
     "LockBoxTaskIR",
     "OpenHouseTask",
@@ -19,3 +20,14 @@ __all__ = [
     "ThirdPartyCall",
     "VerificationDocument",
 ]
+
+
+JOB_TYPE_MAPPINGS = {
+    "LockBoxBS": LockBoxTaskBS,
+    "LockBoxIR": LockBoxTaskIR,
+    "Showing": ShowingTask,
+    "OpenHouse": OpenHouseTask,
+    "Runner": RunnerTask,
+    "Sign": SignTask,
+    "Professional": ProfessionalServiceTask,
+}

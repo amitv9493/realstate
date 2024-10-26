@@ -16,3 +16,8 @@
    - COMPLETED
    - CREATER_CANCELLED
    - ASSIGNER_CANCELLED
+
+### Pending Tasks
+   - make Lockbox one-to-one field and add text field for the location and other.
+   - Add Feedback model
+   - match with the sent UI and make sure that every field is there in the backend.

@@ -2,7 +2,7 @@ from django.db import IntegrityError
 from rest_framework import serializers
 
 from realstate_new.application.models import JobApplication
-from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
+from realstate_new.task.models import JOB_TYPE_MAPPINGS
 from realstate_new.utils.serializers import DynamicModelSerializer
 from realstate_new.utils.serializers import DynamicSerializer
 

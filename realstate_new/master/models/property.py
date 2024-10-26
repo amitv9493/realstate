@@ -4,12 +4,8 @@ from django.db import models
 
 from realstate_new.utils.base_models import TrackingModel
 
-
-class LockBoxType(models.TextChoices):
-    SUPRA = "SUPRA", "SUPRA"
-    KEYPAD_ENTRY = "KEYPAD_ENTRY", "KEYPAD ENTRY"
-    CONTRACTOR = "CONTRACTOR", "CONTRACTOR"
-    OTHER = "OTHER", "OTHER"
+from .lockbox import LockBox
+from .types import LockBoxType
 
 
 class Property(TrackingModel):
@@ -34,6 +30,12 @@ class Property(TrackingModel):
         max_length=50,
         choices=LockBoxType.choices,
         default=LockBoxType.OTHER,
+        blank=True,
+    )
+    lockbox = models.OneToOneField(
+        LockBox,
+        on_delete=models.CASCADE,
+        null=True,
         blank=True,
     )
 

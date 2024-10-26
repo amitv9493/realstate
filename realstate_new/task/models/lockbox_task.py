@@ -12,6 +12,20 @@ class LockBoxTask(BaseTask):
         blank=True,
         default="",
     )  # remove this field in future
+    lockbox_type = models.CharField(
+        max_length=50,
+        choices=LockBoxType.choices,
+        default=LockBoxType.OTHER,
+        blank=True,
+    )
+    lockbox = models.OneToOneField(
+        "master.LockBox",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
+
+    # Address related fields.
 
     # if task_type is BUY SELL
     pickup_address = models.OneToOneField(
@@ -38,12 +52,6 @@ class LockBoxTask(BaseTask):
     remove_sign = models.BooleanField(
         "Include Sign",
         null=True,
-        blank=True,
-    )
-    lockbox_type = models.CharField(
-        max_length=50,
-        choices=LockBoxType.choices,
-        default=LockBoxType.OTHER,
         blank=True,
     )
 

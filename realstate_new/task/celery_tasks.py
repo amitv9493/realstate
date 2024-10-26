@@ -4,9 +4,9 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.utils.timezone import now
 
-from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
 from realstate_new.notification.models import Notification
 from realstate_new.notification.models import NotificationChoices
+from realstate_new.task.models import JOB_TYPE_MAPPINGS
 
 logger = get_task_logger(__name__)
 

@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 
 from realstate_new.api.user.serializers import UserSerializer
 from realstate_new.application.models import JobApplication
-from realstate_new.master.models.types import JOB_TYPE_MAPPINGS
+from realstate_new.task.models import JOB_TYPE_MAPPINGS
 from realstate_new.utils.pagination import CustomPageNumberPagination
 
 from .serializers import JobApplicationSerializer

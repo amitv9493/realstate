@@ -1,7 +1,5 @@
 from django.db import models
 
-from realstate_new.task import models as tasks
-
 
 class PropertyType(models.TextChoices):
     SFH = "SFH", "Single Family Home"
@@ -11,12 +9,8 @@ class PropertyType(models.TextChoices):
     OTHER = "OTHER", "Other"
 
 
-JOB_TYPE_MAPPINGS = {
-    "LockBoxBS": tasks.LockBoxTaskBS,
-    "LockBoxIR": tasks.LockBoxTaskIR,
-    "Showing": tasks.ShowingTask,
-    "OpenHouse": tasks.OpenHouseTask,
-    "Runner": tasks.RunnerTask,
-    "Sign": tasks.SignTask,
-    "Professional": tasks.ProfessionalServiceTask,
-}
+class LockBoxType(models.TextChoices):
+    SUPRA = "SUPRA", "SUPRA"
+    KEYPAD_ENTRY = "KEYPAD_ENTRY", "KEYPAD ENTRY"
+    CONTRACTOR = "CONTRACTOR", "CONTRACTOR"
+    OTHER = "OTHER", "OTHER"
