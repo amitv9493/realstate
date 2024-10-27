@@ -28,7 +28,7 @@ class AppliedUsersListView(APIView, CustomPageNumberPagination):
         applicants = list(
             JobApplication.objects.filter(
                 content_type=content_type,
-                task_id=task_id,
+                object_id=task_id,
             ).values_list(
                 "applicant__id",
                 flat=True,
@@ -43,6 +43,10 @@ class AppliedUsersListView(APIView, CustomPageNumberPagination):
             fields=(
                 "id",
                 "email",
+                "license_number",
+                "first_name",
+                "last_name",
+                "jobs_completed",
             ),
         )
         return self.get_paginated_response(serializer.data)

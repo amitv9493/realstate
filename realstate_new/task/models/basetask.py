@@ -1,6 +1,6 @@
 import contextlib
 
-from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -39,7 +39,7 @@ class BaseTask(TrackingModel):
     apply_deadline = models.DateTimeField(null=True, blank=True)
 
     assigned_to = models.ForeignKey(
-        get_user_model(),
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -70,11 +70,7 @@ class BaseTask(TrackingModel):
     )
     # GenericRelations
     notifications = GenericRelation(Notification)
-    applications = GenericRelation(
-        JobApplication,
-        content_type_field="content_type",
-        object_id_field="task_id",
-    )
+    applications = GenericRelation(JobApplication)
     verification_images = GenericRelation(VerificationDocument)
 
     def __str__(self):

@@ -8,7 +8,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "content_type",
-        "task_id",
+        "object_id",
         "status",
         "applicant",
         "created_at",

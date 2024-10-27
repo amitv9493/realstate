@@ -10,6 +10,7 @@ from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
 
+from realstate_new.task.models import JOB_TYPE_MAPPINGS
 from realstate_new.utils import TrackingModel
 
 JOB_TYPES = (
@@ -165,6 +166,12 @@ class User(AbstractUser):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+    def get_jobs_completed_qs(self):
+        """
+        Returns a queryset jobs completed by a this user.
+        """
+        return [job.objects.filter(assigned_to=self) for job in JOB_TYPE_MAPPINGS.values()]
 
     def get_basic_info(self):
         "Returns users basic info"

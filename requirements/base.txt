@@ -36,3 +36,4 @@ django-filter==24.3
 celery-redbeat==2.2.0
 paypal-payouts-sdk==1.0.0
 paypalhttp==1.0.1
+braintree-4.30.0

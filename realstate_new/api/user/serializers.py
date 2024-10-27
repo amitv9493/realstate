@@ -13,6 +13,7 @@ class UserSerializer(DynamicModelSerializer):
     job_preferences = fields.MultipleChoiceField(choices=JOB_TYPES)
     days_of_week_preferences = fields.MultipleChoiceField(choices=DAYS_OF_WEEK)
     rating = serializers.SerializerMethodField()
+    jobs_completed = serializers.SerializerMethodField()
 
     class Meta:
         model = get_user_model()
@@ -30,6 +31,12 @@ class UserSerializer(DynamicModelSerializer):
 
     def get_rating(self, obj):
         return obj
+
+    def get_jobs_completed(self, obj):
+        count = 0
+        for i in obj.get_jobs_completed_qs():
+            count += i.count()
+        return count
 
 
 class UserMeSerializer(UserSerializer):

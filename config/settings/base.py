@@ -3,10 +3,7 @@
 
 from datetime import timedelta  # noqa: I001
 from pathlib import Path
-from paypalpayoutssdk.core import PayPalHttpClient, SandboxEnvironment
-
 import environ
-import paypalrestsdk
 from firebase_admin import credentials
 from firebase_admin import initialize_app
 
@@ -395,14 +392,6 @@ SPECTACULAR_SETTINGS = {
 }
 
 
-paypalrestsdk.configure(
-    {
-        "mode": "sandbox",  # sandbox or live
-        "client_id": env("PAYPAL_CLIENT_ID"),
-        "client_secret": env("PAYPAL_CLIENT_SECRET"),
-    },
-)
-
 APPEND_SLASH = True
 PASSWORD_RESET_TIMEOUT = timedelta(days=5).total_seconds()  # seconds
 
@@ -417,12 +406,6 @@ SIMPLE_JWT = {
 FORGET_PASSWORD_OTP_TIMEOUT = timedelta(minutes=10).total_seconds()
 redbeat_redis_url = "redis://redis:6379/1"
 
-
-environment = SandboxEnvironment(
-    client_id=env("PAYPAL_CLIENT_ID"),
-    client_secret=env("PAYPAL_CLIENT_SECRET"),
-)
-CLIENT = PayPalHttpClient(environment)
 
 STORAGES = {
     "default": {
