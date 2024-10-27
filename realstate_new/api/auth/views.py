@@ -177,7 +177,7 @@ class ChangePasswordView(APIView):
     serializer_class = ChangePasswordSerializer
 
     def post(self, request):
-        serializer = self.serializer_calss(
+        serializer = self.serializer_class(
             data=request.data,
             context={"user": request.user},
         )

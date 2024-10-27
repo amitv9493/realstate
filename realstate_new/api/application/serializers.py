@@ -12,7 +12,7 @@ class JobApplicationSerializer(DynamicSerializer):
         choices=list(JOB_TYPE_MAPPINGS.keys()),
         write_only=True,
     )
-    task_id = serializers.IntegerField()
+    task_id = serializers.IntegerField(write_only=True)
     status = serializers.CharField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
 
@@ -20,6 +20,9 @@ class JobApplicationSerializer(DynamicSerializer):
         user = self.context["request"].user
         data = validated_data
         job_instance = self.get_instance(data["job_type"], data["task_id"])
+        if not job_instance:
+            msg = "Task does not exists"
+            raise serializers.ValidationError(msg)
         try:
             instance = JobApplication.objects.create(
                 content_object=job_instance,

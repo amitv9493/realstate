@@ -3,7 +3,6 @@ from itertools import chain
 from typing import Any
 
 from django.db.models import Q
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 from rest_framework.serializers import ValidationError
@@ -24,6 +23,7 @@ from realstate_new.task.models import VerificationDocument
 from realstate_new.task.models.choices import TaskStatusChoices
 from realstate_new.task.models.runner_task import RunnerTask
 from realstate_new.users.models import User
+from realstate_new.utils.permissions import AssigneeObjectPermission
 
 from .filters import filter_tasks
 from .serializers import LockBoxBSSerializer
@@ -252,6 +252,7 @@ class SignTaskViewSet(TaskViewSet):
 
 class TaskActionView(APIView):
     serializer_class = TaskActionSerializer
+    permission_classes = [AssigneeObjectPermission]
 
     def post(self, request, task_type, task_id, task_action, *args, **kwargs):
         serializer = self.serializer_class(
@@ -260,14 +261,26 @@ class TaskActionView(APIView):
         )
 
         if serializer.is_valid(raise_exception=True):  # noqa: RET503
+            task_action = getattr(TaskStatusChoices, task_action.upper())
+            request.task_action = task_action
             data = serializer.validated_data
-            task_instance = JOB_TYPE_MAPPINGS[task_type].objects.get(id=task_id)
+            task_instance = self.get_object(task_id, task_type)
 
-            task_type = getattr(TaskStatusChoices, task_action.upper())
             action_handler = self.get_action_handler(task_type)
             action_handler(task_instance, data)
 
             return Response({"status": True}, 200)
+
+    def get_object(self, task_id, task_type):
+        try:
+            model = JOB_TYPE_MAPPINGS[task_type]
+            task_instance = model.objects.get(id=task_id)
+            self.check_object_permissions(self.request, task_instance)
+        except model.DoesNotExist as e:
+            msg = "task does not exists"
+            raise ValidationError(msg) from e
+        else:
+            return task_instance
 
     def get_action_handler(self, task_action):
         """Map task action to the appropriate handler method."""
@@ -282,7 +295,6 @@ class TaskActionView(APIView):
         }.get(task_action)
 
     def handle_started(self, task_instance, validated_data):
-        self.is_request_user_allowed(task_instance)
         self.is_job_assigned(task_instance)
         self.create_notifications(
             task_instance,
@@ -290,6 +302,10 @@ class TaskActionView(APIView):
         )
 
     def handle_assigned(self, task_instance, validated_data):
+        if task_instance.assigned_to:
+            msg = "task has already been assigned."
+            raise ValidationError(msg)
+
         task_instance.assigned_to = validated_data["assigned_to"]
         task_instance.save(update_fields=["assigned_to"])
         self.create_notifications(
@@ -298,6 +314,8 @@ class TaskActionView(APIView):
         )
 
     def handle_reassigned(self, task_instance, validated_data):
+        # TODO:
+        # remove this in future. This is superfulous
         task_instance.assigned_to = validated_data["assigned_to"]
         task_instance.save(update_fields=["assigned_to"])
         self.create_notifications(
@@ -306,7 +324,6 @@ class TaskActionView(APIView):
         )
 
     def handle_mark_completed(self, task_instance, validated_data):
-        self.is_request_user_allowed(task_instance)
         self.is_job_assigned(task_instance)
         task_instance.marked_completed_by_assignee = True
         images = validated_data["image_list"]
@@ -340,7 +357,6 @@ class TaskActionView(APIView):
         )
 
     def handle_assigner_cancelled(self, task_instance, validated_data):
-        self.is_request_user_allowed(task_instance)
         self.is_job_assigned(task_instance)
         self.create_notifications(
             task_instance,
@@ -359,14 +375,20 @@ class TaskActionView(APIView):
         )
 
     def is_job_assigned(self, task_instance):
+        """Check if the job  has assignee.
+
+        Args:
+            task_instance (BaseTask): Any task model created inherting the BaseTask.
+
+        Raises:
+            ValidationError: _description_
+
+        Returns:
+            bool: returns True if assigned else raise validation error.
+        """
         if not task_instance.assigned_to:
             msg = "Job has no assignee"
             raise ValidationError(msg)
-        return True
-
-    def is_request_user_allowed(self, task_instance):
-        if self.request.user != task_instance.assigned_to:
-            raise PermissionDenied
         return True
 
 

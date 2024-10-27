@@ -19,8 +19,9 @@ class ArelloView(APIView):
 
             if len(errors := data.get("errors", [])):
                 error_list = [error["error"] for error in errors]
+                error_msg = None
                 if "InvalidJurisdiction" in error_list:
                     error_msg = "Invalid Jurisdiction"
 
-                return Response({"msg": error_msg})
+                return Response({"msg": errors if error_msg else errors})
             return Response({"msg": "Invalid License Number."}, 400)
