@@ -6,6 +6,7 @@ from pathlib import Path
 import environ
 from firebase_admin import credentials
 from firebase_admin import initialize_app
+import braintree
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / "realstate_new"
@@ -415,3 +416,13 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+
+BRAINTREE_GATEWAY = braintree.BraintreeGateway(
+    braintree.Configuration(
+        braintree.Environment.Sandbox,
+        merchant_id=env("braintree_merchant_id"),
+        public_key=env("braintree_public_key"),
+        private_key=env("braintree_private_key"),
+        timeout=10,
+    ),
+)

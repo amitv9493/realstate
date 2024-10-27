@@ -1,5 +1,4 @@
 # ruff: noqa: E501
-import braintree
 
 from .base import *  # noqa: F403
 from .base import INSTALLED_APPS
@@ -64,14 +63,3 @@ TIME_ZONE = "Asia/Kolkata"
 EMAIL_HOST = "mailpit"  # env("EMAIL_HOST", default="mailpit")
 EMAIL_PORT = 1025  # env("EMAIL_PORT", default=1025)
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-
-BRAINTREE_GATEWAY = braintree.BraintreeGateway(
-    braintree.Configuration(
-        braintree.Environment.Sandbox,
-        merchant_id="qss7m6fj9msrj2jg",
-        public_key="2kxszy8m9zn2yq6k",
-        private_key="de15c5a6626e51576896176a863bdebc",
-        timeout=10,
-    ),
-)
