@@ -38,7 +38,7 @@ class NotificationTemplates:
     STARTED = NotificationTemplate(
         title="Job Started",
         body="Your job {type_of_task} has been started by {agent_name} at {now}.",
-        body2="",
+        body2="You have started the task {type_of_task}",
     )
     MARK_COMPLETED = NotificationTemplate(
         title="Job Marked Completed",

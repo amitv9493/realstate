@@ -1,6 +1,5 @@
 import logging
 
-import braintree
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -36,7 +35,10 @@ class VerifiyPaymentView(APIView):
                 {
                     "amount": amt,
                     "payment_method_nonce": nonce,
-                    "options": {"submit_for_settlement": True},
+                    "options": {
+                        "submit_for_settlement": True,
+                        "three_d_secure": {"required": False},
+                    },
                 },
             )
 
@@ -74,5 +76,5 @@ class VerifiyPaymentView(APIView):
 
             return Response({"success": False, "errors": errors})
 
-        except braintree.exceptions.BraintreeError as e:
+        except Exception as e:  # noqa: BLE001
             return Response({"success": False, "error": str(e)}, status=500)
