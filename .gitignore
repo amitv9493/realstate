@@ -89,10 +89,6 @@ ENV/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-# .gitignore
-logs/*
-!logs/.gitkeep
-# Runtime data
 pids
 *.pid
 *.seed
