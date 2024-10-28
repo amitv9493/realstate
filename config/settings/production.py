@@ -143,7 +143,7 @@ LOGGING = {
         "file": {
             "level": "WARNING",
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "/app/logs/django.log",
+            "filename": f"{BASE_DIR}/logs/django.log",
             "maxBytes": 10485760,
             "backupCount": 10,
             "formatter": "file",
