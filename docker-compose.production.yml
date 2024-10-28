@@ -3,20 +3,17 @@ volumes:
   production_postgres_data_backups: {}
   production_traefik: {}
   production_django_media: {}
-
   production_redis_data: {}
-
-
 
 services:
   django: &django
     build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
-
     image: realstate_new_production_django
     volumes:
       - production_django_media:/app/realstate_new/media
+      - /var/log/realstate_new/django:/app/logs
     user: django
     depends_on:
       - postgres
@@ -25,7 +22,7 @@ services:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
     environment:
-          - DJANGO_SETTINGS_MODULE=config.settings.production
+      - DJANGO_SETTINGS_MODULE=config.settings.production
     command: /start
 
   postgres:
@@ -36,6 +33,7 @@ services:
     volumes:
       - production_postgres_data:/var/lib/postgresql/data
       - production_postgres_data_backups:/backups
+      - /var/log/realstate_new/postgres:/var/log/postgresql
     env_file:
       - ./.envs/.production/.postgres
 
@@ -48,6 +46,7 @@ services:
       - django
     volumes:
       - production_traefik:/etc/traefik/acme
+      - /var/log/realstate_new/traefik:/var/log/traefik
     ports:
       - '0.0.0.0:80:80'
       - '0.0.0.0:443:443'
@@ -55,24 +54,32 @@ services:
 
   redis:
     image: docker.io/redis:6
-
     volumes:
       - production_redis_data:/data
-
+      - /var/log/realstate_new/redis:/var/log/redis
 
   celeryworker:
     <<: *django
     image: realstate_new_production_celeryworker
+    volumes:
+      - production_django_media:/app/realstate_new/media
+      - /var/log/realstate_new/celery/worker:/app/logs/celery
     command: /start-celeryworker
 
   celerybeat:
     <<: *django
     image: realstate_new_production_celerybeat
+    volumes:
+      - production_django_media:/app/realstate_new/media
+      - /var/log/realstate_new/celery/beat:/app/logs/celery
     command: /start-celerybeat
 
   flower:
     <<: *django
     image: realstate_new_production_flower
+    volumes:
+      - production_django_media:/app/realstate_new/media
+      - /var/log/realstate_new/flower:/app/logs/flower
     command: /start-flower
 
   nginx:
@@ -84,3 +91,4 @@ services:
       - django
     volumes:
       - production_django_media:/usr/share/nginx/media:ro
+      - /var/log/realstate_new/nginx:/var/log/nginx

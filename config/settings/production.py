@@ -121,6 +121,13 @@ LOGGING = {
         "verbose": {
             "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
         },
+        "file": {
+            "format": "%(asctime)s [%(levelname)s] %(name)s:%(lineno)d %(message)s\n%(exc_info)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "style": "%",
+            # Add exc_info to include tracebacks for exceptions
+            "format_exc": "%(exc_text)s",
+        },
     },
     "handlers": {
         "mail_admins": {
@@ -133,17 +140,26 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
+        "file": {
+            "level": "WARNING",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "/app/logs/django.log",
+            "maxBytes": 10485760,
+            "backupCount": 10,
+            "formatter": "file",
+            "encoding": "utf-8",
+        },
     },
-    "root": {"level": "INFO", "handlers": ["console"]},
+    "root": {"level": "INFO", "handlers": ["console", "file"]},
     "loggers": {
         "django.request": {
-            "handlers": ["mail_admins"],
+            "handlers": ["mail_admins", "file"],
             "level": "ERROR",
             "propagate": True,
         },
         "django.security.DisallowedHost": {
             "level": "ERROR",
-            "handlers": ["console", "mail_admins"],
+            "handlers": ["console", "mail_admins", "file"],
             "propagate": True,
         },
     },
@@ -165,3 +181,13 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = env("SMTP_HOST_USER")
 EMAIL_HOST_PASSWORD = env("SMTP_PASSWORD")
 EMAIL_USE_TLS = True
+
+# CELERY
+# Celery worker
+CELERYD_LOG_FILE = "/app/logs/celery/worker.log"
+
+# Celery beat
+CELERYBEAT_LOG_FILE = "/app/logs/celery/beat.log"
+
+# Flower
+FLOWER_LOG_FILE = "/app/logs/flower/flower.log"
