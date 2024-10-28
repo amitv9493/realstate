@@ -92,6 +92,9 @@ RUN mkdir -p ${APP_HOME}/realstate_new/media \
   && chown -R django:django ${APP_HOME}/realstate_new/media \
   && chmod -R 755 ${APP_HOME}/realstate_new/media
 
+RUN mkdir -p ${APP_HOME}/logs \
+  && chown -R django:django ${APP_HOME}/logs \
+  && chmod -R 755 ${APP_HOME}/logs
 
 RUN DATABASE_URL="" \
   CELERY_BROKER_URL="" \
