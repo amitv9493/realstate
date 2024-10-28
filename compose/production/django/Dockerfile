@@ -85,9 +85,7 @@ COPY --chown=django:django . ${APP_HOME}
 
 # make django owner of the WORKDIR directory as well.
 RUN chown -R django:django ${APP_HOME}
-RUN mkdir -p /app/logs && \
-  chown -R django:django /app/logs && \
-  chmod 755 /app/logs
+
 USER django
 
 RUN mkdir -p ${APP_HOME}/realstate_new/media \
