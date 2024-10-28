@@ -266,7 +266,7 @@ class TaskActionView(APIView):
             data = serializer.validated_data
             task_instance = self.get_object(task_id, task_type)
 
-            action_handler = self.get_action_handler(task_type)
+            action_handler = self.get_action_handler(task_action)
             action_handler(task_instance, data)
 
             return Response({"status": True}, 200)
