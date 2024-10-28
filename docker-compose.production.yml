@@ -1,10 +1,3 @@
-volumes:
-  production_postgres_data: {}
-  production_postgres_data_backups: {}
-  production_traefik: {}
-  production_django_media: {}
-  production_redis_data: {}
-
 services:
   django: &django
     build:
@@ -13,7 +6,7 @@ services:
     image: realstate_new_production_django
     volumes:
       - production_django_media:/app/realstate_new/media
-      - /var/log/realstate_new/django:/app/logs
+      - ./logs:/app/logs  # Changed to relative path for easier permissions management
     user: django
     depends_on:
       - postgres
@@ -25,45 +18,12 @@ services:
       - DJANGO_SETTINGS_MODULE=config.settings.production
     command: /start
 
-  postgres:
-    build:
-      context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
-    image: realstate_new_production_postgres
-    volumes:
-      - production_postgres_data:/var/lib/postgresql/data
-      - production_postgres_data_backups:/backups
-      - /var/log/realstate_new/postgres:/var/log/postgresql
-    env_file:
-      - ./.envs/.production/.postgres
-
-  traefik:
-    build:
-      context: .
-      dockerfile: ./compose/production/traefik/Dockerfile
-    image: realstate_new_production_traefik
-    depends_on:
-      - django
-    volumes:
-      - production_traefik:/etc/traefik/acme
-      - /var/log/realstate_new/traefik:/var/log/traefik
-    ports:
-      - '0.0.0.0:80:80'
-      - '0.0.0.0:443:443'
-      - '0.0.0.0:5555:5555'
-
-  redis:
-    image: docker.io/redis:6
-    volumes:
-      - production_redis_data:/data
-      - /var/log/realstate_new/redis:/var/log/redis
-
   celeryworker:
     <<: *django
     image: realstate_new_production_celeryworker
     volumes:
       - production_django_media:/app/realstate_new/media
-      - /var/log/realstate_new/celery/worker:/app/logs/celery
+      - ./logs:/app/logs  # Changed to relative path
     command: /start-celeryworker
 
   celerybeat:
@@ -71,7 +31,7 @@ services:
     image: realstate_new_production_celerybeat
     volumes:
       - production_django_media:/app/realstate_new/media
-      - /var/log/realstate_new/celery/beat:/app/logs/celery
+      - ./logs:/app/logs  # Changed to relative path
     command: /start-celerybeat
 
   flower:
@@ -79,16 +39,5 @@ services:
     image: realstate_new_production_flower
     volumes:
       - production_django_media:/app/realstate_new/media
-      - /var/log/realstate_new/flower:/app/logs/flower
+      - ./logs:/app/logs  # Changed to relative path
     command: /start-flower
-
-  nginx:
-    build:
-      context: .
-      dockerfile: ./compose/production/nginx/Dockerfile
-    image: realstate_new_production_nginx
-    depends_on:
-      - django
-    volumes:
-      - production_django_media:/usr/share/nginx/media:ro
-      - /var/log/realstate_new/nginx:/var/log/nginx

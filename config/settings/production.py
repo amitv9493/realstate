@@ -148,6 +148,7 @@ LOGGING = {
             "backupCount": 10,
             "formatter": "file",
             "encoding": "utf-8",
+            "mode": "a",
         },
     },
     "root": {"level": "INFO", "handlers": ["console", "file"]},
