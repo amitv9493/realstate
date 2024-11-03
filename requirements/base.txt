@@ -37,3 +37,4 @@ celery-redbeat==2.2.0
 paypal-payouts-sdk==1.0.0
 paypalhttp==1.0.1
 braintree
+hyperwallet-sdk

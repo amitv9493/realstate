@@ -19,6 +19,7 @@ __all__ = [
     "SignTask",
     "ThirdPartyCall",
     "VerificationDocument",
+    "get_job",
 ]
 
 
@@ -31,3 +32,7 @@ JOB_TYPE_MAPPINGS = {
     "Sign": SignTask,
     "Professional": ProfessionalServiceTask,
 }
+
+
+def get_job(job_model: str, task_id: int):
+    return JOB_TYPE_MAPPINGS[job_model].objects.get(id=task_id)

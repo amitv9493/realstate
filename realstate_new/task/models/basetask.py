@@ -72,6 +72,7 @@ class BaseTask(TrackingModel):
     notifications = GenericRelation(Notification)
     applications = GenericRelation(JobApplication)
     verification_images = GenericRelation(VerificationDocument)
+    payment_verified = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.client_name}-{self.payment_amount}"

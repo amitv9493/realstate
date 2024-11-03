@@ -19,6 +19,8 @@ class TrackingModel(models.Model):
 
 
 class GenericModel(models.Model):
+    """A model that implements Django's Content Type framework."""
+
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")

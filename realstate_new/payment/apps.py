@@ -6,6 +6,6 @@ class PaymentConfig(AppConfig):
     name = "realstate_new.payment"
 
     def ready(self) -> None:
-        from .celery_tasks import start_create_payment  # noqa: F401
+        from .celery_tasks import celery_create_payment  # noqa: F401
 
         return super().ready()

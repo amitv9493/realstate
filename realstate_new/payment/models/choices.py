@@ -6,7 +6,7 @@ class PaymentTypeChoics(TextChoices):
     PAYOUT = "PAYOUT", "PAYOUT"
 
 
-class PayymentStatusChoices(TextChoices):
+class PaymentStatusChoices(TextChoices):
     SUCCESS = "SUCCESS", "SUCCESS"
     FAILURE = "FAILURE", "FAILURE"
     INITIATED = "INITIATED", "INITIATED"

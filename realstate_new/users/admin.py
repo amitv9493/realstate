@@ -10,6 +10,7 @@ from .models import User
 class CustomUserAdmin(UserAdmin):
     list_display = [
         "id",
+        "uuid",
         "full_name",
         "email",
         "license_number",

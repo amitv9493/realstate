@@ -25,7 +25,6 @@ JOB_DASHBOARD_COMMON_FIELDS = [
     "payment_amount",
     "created_by",
     "assigned_to",
-    "property",
     "status",
     "notes",
     *EXTRA_FIELD,
@@ -49,17 +48,23 @@ PROPERTY_FIELDS = [
 ]
 
 ONGOING_FIELDS = {
-    "SHOWING": [*JOB_DASHBOARD_COMMON_FIELDS],
+    "SHOWING": [*JOB_DASHBOARD_COMMON_FIELDS, "property_address"],
     "SIGN": [*JOB_DASHBOARD_COMMON_FIELDS, "task_type"],
-    "RUNNER": [*JOB_DASHBOARD_COMMON_FIELDS, "task_type"],
+    "RUNNER": [*JOB_DASHBOARD_COMMON_FIELDS, "task_type", "property_address"],
     "PROFESSIONAL": [*JOB_DASHBOARD_COMMON_FIELDS, "service_type"],
-    "OPENHOUSE": [*JOB_DASHBOARD_COMMON_FIELDS],
-    "LOCKBOXBS": [*JOB_DASHBOARD_COMMON_FIELDS, "pickup_address", "task_type"],
+    "OPENHOUSE": [*JOB_DASHBOARD_COMMON_FIELDS, "property_address"],
+    "LOCKBOXBS": [
+        *JOB_DASHBOARD_COMMON_FIELDS,
+        "pickup_address",
+        "task_type",
+        "lockbox",
+    ],
     "LOCKBOXIR": [
         *JOB_DASHBOARD_COMMON_FIELDS,
         "pickup_address",
         "installation_or_remove_address",
         "task_type",
+        "lockbox",
     ],
 }
 LATEST_TASK_FIELDS = [*JOB_DASHBOARD_COMMON_FIELDS, "application_status"]

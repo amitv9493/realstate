@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
@@ -152,6 +154,9 @@ class User(AbstractUser):
         blank=True,
     )
     ratings = GenericRelation(Rating)
+
+    hyperwallet_token = models.TextField(default="")
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
 
     @property
     def total_reviews(self):

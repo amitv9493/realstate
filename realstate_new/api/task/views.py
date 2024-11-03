@@ -12,6 +12,7 @@ from silk.profiling.profiler import silk_profile
 
 from realstate_new.notification.models import Notification
 from realstate_new.notification.models import NotificationChoices
+from realstate_new.payment.celery_tasks import celery_create_payment
 from realstate_new.task.models import JOB_TYPE_MAPPINGS
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
@@ -113,13 +114,24 @@ class JobCreaterDashboardView(APIView, TaskListMixin):
             )
         base_query = Q(created_by=request.user)
         if flag == "ongoing":
-            base_query &= Q(is_verified=False, assigned_to__isnull=False)
+            base_query &= Q(
+                is_verified=False,
+                assigned_to__isnull=False,
+                payment_verified=True,
+            )
 
         if flag == "completed":
             base_query &= Q(is_verified=True)
 
         if flag == "created":
             base_query &= Q(status=TaskStatusChoices.CREATED, assigned_to__isnull=True)
+        if flag == "payment-pending":
+            base_query &= Q(
+                status=TaskStatusChoices.CREATED,
+                assigned_to__isnull=True,
+                payment_verified=False,
+            )
+
         tasks = self.get_tasks(base_query)
 
         # pagination related data
@@ -167,6 +179,7 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
                     applications__applicant__in=[request.user],
                 )
                 & ~Q(created_by=request.user)
+                & Q(payment_verified=True)
             )
         if flag == "applied":
             query = Q(applications__applicant__in=[request.user]) & Q(
@@ -341,6 +354,8 @@ class TaskActionView(APIView):
         self.is_job_assigned(task_instance)
         task_instance.is_verified = True
         task_instance.save(update_fields=["is_verified"])
+
+        celery_create_payment.delay(task_instance)
         self.create_notifications(task_instance, event=TaskStatusChoices.VERIFIED)
 
     def handle_creater_cancelled(self, task_instance, validated_data):

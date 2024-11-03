@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import ClientTokenView
+from .views import TestPayment
 from .views import VerifiyPaymentView
 
 urlpatterns = [
@@ -8,5 +9,9 @@ urlpatterns = [
     path(
         "verify/",
         VerifiyPaymentView.as_view(),
+    ),
+    path(
+        "test",
+        TestPayment.as_view(),
     ),
 ]
