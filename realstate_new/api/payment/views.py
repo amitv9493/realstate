@@ -229,6 +229,7 @@ def webhook(request):
         txn.status = TranscationStatus.SUCCESS
     if event.type == "payment_intent.processing":
         txn.status = TranscationStatus.PROCESSING
-
+    if event.type == "payment_intent.created":
+        print("webhook test done", payment_intent_id)  # noqa: T201
     txn.save(update_fields=["status"])
     return HttpResponse("", 200)
