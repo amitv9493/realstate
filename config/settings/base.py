@@ -7,6 +7,7 @@ import environ
 from firebase_admin import credentials
 from firebase_admin import initialize_app
 import braintree
+import stripe
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / "realstate_new"
@@ -15,6 +16,7 @@ FIREBASE_ADMIN_CERT = Path(BASE_DIR / "config" / "settings" / "servicekey.json")
 env = environ.Env()
 cred = credentials.Certificate(FIREBASE_ADMIN_CERT)
 initialize_app(cred)
+stripe.api_key = env("STRIPE_API_KEY")
 
 
 READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=True)
