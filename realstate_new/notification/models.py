@@ -59,60 +59,62 @@ class Notification(models.Model):
     def save(self, *args, **kwargs):
         if self._state.adding:
             ctx_obj = self.content_object
-
-            task_time = timezone.localtime(ctx_obj.task_time).strftime("%I:%M %p")
-            time = timezone.localtime(timezone.now()).strftime("%I:%M %p")
-
-            n_title, n_body, n_body2 = get_notification_template(
-                event_type=self.event,
-                type_of_task=ctx_obj.type_of_task,
-                agent_name=(ctx_obj.assigned_to.get_full_name() if ctx_obj.assigned_to else None),
-                now=time,
-                task_time=task_time,
-            )
-            # Check if the notification is for job creater.
-            if self.user == ctx_obj.created_by:
-                notification_body = n_body
-                device_ids = list(
-                    ctx_obj.created_by.fcmdevices.all().values_list(
-                        "registration_id",
-                        flat=True,
-                    ),
-                )
-                email_reciver = [self.user.email]
-
-            # Check if the notification is for job assigner.
-            if self.user == ctx_obj.assigned_to:
-                notification_body = n_body2
-                device_ids = list(
-                    ctx_obj.assigned_to.fcmdevices.all().values_list(
-                        "registration_id",
-                        flat=True,
-                    ),
-                )
-                email_reciver = [self.user.email]
-
-            self.description = notification_body
-
-            celery_send_fcm_notification.delay(
-                title=n_title,
-                body=notification_body,
-                data={},
-                device_ids=device_ids,
-            )
-
-            if self.event in TaskStatusChoices._member_names_:
-                self.content_object.status = self.event
-                self.content_object.save(update_fields=["status"])
-
-            send_email.delay(
-                recipient_list=email_reciver,
-                subject=n_title,
-                body=notification_body,
-                context={
-                    "title": n_title,
-                    "body": notification_body,
-                },
-                template_path="emails/base.html",
-            )
+            self.handle_task_objects(ctx_obj=ctx_obj)
         super().save(*args, **kwargs)
+
+    def handle_task_objects(self, ctx_obj):
+        task_time = timezone.localtime(ctx_obj.task_time).strftime("%I:%M %p")
+        time = timezone.localtime(timezone.now()).strftime("%I:%M %p")
+
+        n_title, n_body, n_body2 = get_notification_template(
+            event_type=self.event,
+            type_of_task=ctx_obj.type_of_task,
+            agent_name=(ctx_obj.assigned_to.get_full_name() if ctx_obj.assigned_to else None),
+            now=time,
+            task_time=task_time,
+        )
+        # Check if the notification is for job creater.
+        if self.user == ctx_obj.created_by:
+            notification_body = n_body
+            device_ids = list(
+                ctx_obj.created_by.fcmdevices.all().values_list(
+                    "registration_id",
+                    flat=True,
+                ),
+            )
+            email_reciver = [self.user.email]
+
+        # Check if the notification is for job assigner.
+        if self.user == ctx_obj.assigned_to:
+            notification_body = n_body2
+            device_ids = list(
+                ctx_obj.assigned_to.fcmdevices.all().values_list(
+                    "registration_id",
+                    flat=True,
+                ),
+            )
+            email_reciver = [self.user.email]
+
+        self.description = notification_body
+
+        celery_send_fcm_notification.delay(
+            title=n_title,
+            body=notification_body,
+            data={},
+            device_ids=device_ids,
+        )
+
+        if self.event in TaskStatusChoices._member_names_:
+            self.content_object.status = self.event
+            self.content_object.save(update_fields=["status"])
+
+        send_email.delay(
+            recipient_list=email_reciver,
+            subject=n_title,
+            body=notification_body,
+            context={
+                "title": n_title,
+                "body": notification_body,
+            },
+            template_path="emails/base.html",
+        )

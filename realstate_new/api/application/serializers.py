@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from realstate_new.application.models import JobApplication
 from realstate_new.task.models import JOB_TYPE_MAPPINGS
+from realstate_new.task.models.choices import TaskStatusChoices
 from realstate_new.utils.serializers import DynamicModelSerializer
 from realstate_new.utils.serializers import DynamicSerializer
 
@@ -35,9 +36,11 @@ class JobApplicationSerializer(DynamicSerializer):
         if job_instance.application_type == "CLAIM":
             if job_instance.assigned_to is None:
                 instance.status = "CLAIMED"
-                job_instance.assigned_to = user
                 instance.save(update_fields=["status"])
-                job_instance.save(update_fields=["assigned_to"])
+
+                job_instance.assigned_to = user
+                job_instance.status = TaskStatusChoices.ASSIGNED
+                job_instance.save(update_fields=["assigned_to", "status"])
             else:
                 msg = "already claimed."
                 raise serializers.ValidationError(msg)

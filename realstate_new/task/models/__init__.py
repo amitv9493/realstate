@@ -1,3 +1,4 @@
+from .basetask import BaseTask
 from .lockbox_task import LockBoxTaskBS
 from .lockbox_task import LockBoxTaskIR
 from .openhouse import OpenHouseTask
@@ -9,6 +10,7 @@ from .third_party_call import ThirdPartyCall
 from .verification_image import VerificationDocument
 
 __all__ = [
+    "BaseTask",
     "JOB_TYPE_MAPPINGS",
     "LockBoxTaskBS",
     "LockBoxTaskIR",

@@ -205,14 +205,6 @@ class TaskViewSet(ModelViewSet):
             remove_fields=["application_status"],
         )
 
-    def perform_create(self, serializer) -> None:
-        instance = serializer.save()
-        Notification.objects.create(
-            event=TaskStatusChoices.CREATED,
-            content_object=instance,
-            user=self.request.user,
-        )
-
     def perform_update(self, serializer):
         instance = serializer.save()
         Notification.objects.create_notifications(

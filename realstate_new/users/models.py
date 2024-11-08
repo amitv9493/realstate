@@ -1,5 +1,6 @@
-import uuid
+import logging
 
+import stripe
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
@@ -15,6 +16,7 @@ from multiselectfield import MultiSelectField
 from realstate_new.task.models import JOB_TYPE_MAPPINGS
 from realstate_new.utils import TrackingModel
 
+_logger = logging.getLogger(__name__)
 JOB_TYPES = (
     ("SHOWING", "Showing"),
     ("OPEN_HOUSE", "Open House"),
@@ -156,7 +158,7 @@ class User(AbstractUser):
     ratings = GenericRelation(Rating)
 
     hyperwallet_token = models.TextField(default="")
-    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    stripe_customer_id = models.TextField(default="")
 
     @property
     def total_reviews(self):
@@ -238,6 +240,21 @@ class User(AbstractUser):
             "suffix": self.suffix,
             "brokerage_name": self.brokerage_name,
         }
+
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            try:
+                customer = stripe.Customer.create(
+                    name=f"{self.get_full_name()}",
+                    email=self.email,
+                )
+            except Exception:
+                msg = f"unable to create stripe customer for user {self.email}"
+                _logger.exception(msg)
+            else:
+                self.stripe_customer_id = customer.id
+
+        super().save(*args, **kwargs)
 
 
 class ProfessionalDetail(TrackingModel):
