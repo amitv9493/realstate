@@ -1,9 +1,13 @@
 from django.urls import path
 
+from .views import AccountStatusView
 from .views import ClientTokenView
+from .views import ConnectAccountCreateView
 from .views import StripeCreatePaymentIntentView
 from .views import TestPayment
 from .views import VerifiyPaymentView
+from .views import get_refresh_link
+from .views import get_return_link
 from .views import webhook
 
 urlpatterns = [
@@ -17,11 +21,31 @@ urlpatterns = [
         TestPayment.as_view(),
     ),
     path(
-        "create-payment",
+        "stripe/create/paymentintent",
         StripeCreatePaymentIntentView.as_view(),
     ),
     path(
-        "webhook",
+        "stripe/intent/webhook",
         webhook,
+    ),
+    path(
+        "stripe/create-account",
+        ConnectAccountCreateView.as_view(),
+        name="create-account",
+    ),
+    path(
+        "stripe/refresh/<str:account_id>",
+        get_refresh_link,
+        name="refresh-link",
+    ),
+    path(
+        "stripe/return/<str:account_id>",
+        get_return_link,
+        name="return-link",
+    ),
+    path(
+        "stripe/account/status",
+        AccountStatusView.as_view(),
+        name="account-status",
     ),
 ]

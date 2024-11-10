@@ -2,6 +2,7 @@ from collections import OrderedDict
 from itertools import chain
 from typing import Any
 
+import stripe
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
@@ -12,7 +13,9 @@ from silk.profiling.profiler import silk_profile
 
 from realstate_new.notification.models import Notification
 from realstate_new.notification.models import NotificationChoices
-from realstate_new.payment.celery_tasks import celery_create_payment
+from realstate_new.payment.models.stripe import StripeTranscation
+from realstate_new.payment.models.stripe import TranscationStatus
+from realstate_new.payment.models.stripe import TxnType
 from realstate_new.task.models import JOB_TYPE_MAPPINGS
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
@@ -21,6 +24,7 @@ from realstate_new.task.models import ProfessionalServiceTask
 from realstate_new.task.models import ShowingTask
 from realstate_new.task.models import SignTask
 from realstate_new.task.models import VerificationDocument
+from realstate_new.task.models.basetask import BaseTask
 from realstate_new.task.models.choices import TaskStatusChoices
 from realstate_new.task.models.runner_task import RunnerTask
 from realstate_new.users.models import User
@@ -342,12 +346,24 @@ class TaskActionView(APIView):
             event=TaskStatusChoices.MARK_COMPLETED,
         )
 
-    def handle_verify(self, task_instance, validated_data):
+    def handle_verify(self, task_instance: BaseTask, validated_data):
         self.is_job_assigned(task_instance)
         task_instance.is_verified = True
         task_instance.save(update_fields=["is_verified"])
+        transfer = stripe.Transfer.create(
+            amount=int(task_instance.payment_amt_for_payout * 100),
+            currency="usd",
+            destination=task_instance.assigned_to.stripe_account_id,
+        )
+        StripeTranscation.objects.create(
+            user=task_instance.assigned_to,
+            amt=task_instance.payment_amt_for_payout,
+            status=TranscationStatus.SUCCESS,
+            txn_type=TxnType.PAYOUT,
+            identifier=transfer.id,
+            content_object=task_instance,
+        )
 
-        celery_create_payment.delay(task_instance)
         self.create_notifications(task_instance, event=TaskStatusChoices.VERIFIED)
 
     def handle_creater_cancelled(self, task_instance, validated_data):

@@ -84,6 +84,6 @@ services:
   stripe-cli:
     image: stripe/stripe-cli
     container_name: stripe-cli
-    command: "listen --api-key $${STRIPE_API_KEY} --forward-to django:8000/api/payment/webhook"
+    command: "listen --api-key $${STRIPE_API_KEY} --forward-to django:8000/api/payment/stripe/intent/webhook"
     env_file:
       - ./.env

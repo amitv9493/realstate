@@ -1,12 +1,18 @@
 import json
 import logging
+from typing import TYPE_CHECKING
 
 import stripe
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import serializers
+from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 
 from realstate_new.payment.models import StripeTranscation
@@ -19,6 +25,9 @@ from realstate_new.task.models import get_job
 
 from .hyperwallet import HyperwalletPayoutHandler
 from .serializers import PaymentVerificationSerializer
+
+if TYPE_CHECKING:
+    from realstate_new.task.models.basetask import BaseTask
 
 _logger = logging.getLogger(__name__)
 gateway = settings.BRAINTREE_GATEWAY
@@ -124,13 +133,12 @@ class TestPayment(APIView):
 
 class StripeCreatePaymentIntentView(APIView):
     class PaymentSerialier(serializers.Serializer):
-        amt = serializers.IntegerField()
         task_id = serializers.IntegerField()
         task_type = serializers.ChoiceField(choices=list(JOB_TYPE_MAPPINGS.keys()))
         payment_method_id = serializers.CharField(max_length=255, required=False)
         should_save_payment_method = serializers.BooleanField(
             required=False,
-            default=False,
+            default=True,
         )
 
     serializer_class = PaymentSerialier
@@ -139,35 +147,45 @@ class StripeCreatePaymentIntentView(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):  # noqa: RET503
             data = serializer.validated_data
-            task = get_job(data["task_type"], data["task_id"])
             try:
+                task: BaseTask = get_job(data["task_type"], data["task_id"])
+
                 intent_id, client_secret = self.create_intent_simple(
-                    serialized_data=data,
+                    amt=task.payment_amt_for_task_creater,
                 )
+            except ObjectDoesNotExist as e:
+                msg = {"task": "task does not exists"}
+                raise ValidationError(msg) from e
+
             except Exception as e:  # noqa: BLE001
                 return Response({"error": str(e)}, 400)
             else:
                 StripeTranscation.objects.create(
                     user=request.user,
-                    amt=data["amt"],
+                    amt=task.payment_amt_for_task_creater,
                     status=TranscationStatus.INITIATED,
                     txn_type=TxnType.PAYIN,
                     identifier=intent_id,
                     content_object=task,
                 )
-                return Response(client_secret, 200)
+                data = {
+                    "amt": task.payment_amount,
+                    "client_secret": client_secret,
+                    "platform_fees": task.platform_fees,
+                    "stripe_fees": round(task.stripe_fees, 2),
+                    "total_amt": task.payment_amt_for_task_creater,
+                }
+                return Response(data, 200)
 
-    def create_intent_simple(self, serialized_data):
-        data = serialized_data
+    def create_intent_simple(self, amt):
         params = {
-            "amount": data["amt"],
+            "amount": int(amt * 100),
             "currency": "usd",
             "automatic_payment_methods": {
                 "enabled": True,
             },
         }
-        if data["should_save_payment_method"]:
-            params["setup_future_usage"] = "off_session"
+        params["setup_future_usage"] = "off_session"
         intent = stripe.PaymentIntent.create(**params)
         return (
             intent.id,
@@ -211,6 +229,24 @@ class StripeCreatePaymentIntentView(APIView):
 
 
 @csrf_exempt
+def test_webhook(request):
+    event = None
+    payload = request.body
+    try:
+        event = stripe.Event.construct_from(json.loads(payload), stripe.api_key)
+    except ValueError:
+        # Invalid payload
+        return HttpResponse(status=400)
+
+    payment_intent = event.data.object
+    if event.type == "payment_intent.succeeded":
+        _logger.info(event.type)
+        _logger.info(payment_intent)
+
+    return HttpResponse("", 200)
+
+
+@csrf_exempt
 def webhook(request):
     event = None
     payload = request.body
@@ -225,11 +261,125 @@ def webhook(request):
 
     if event.type == "payment_intent.payment_failed":
         txn.status = TranscationStatus.FAILED
+
     if event.type == "payment_intent.succeeded":
         txn.status = TranscationStatus.SUCCESS
+
     if event.type == "payment_intent.processing":
         txn.status = TranscationStatus.PROCESSING
+
     if event.type == "payment_intent.created":
         print("webhook test done", payment_intent_id)  # noqa: T201
     txn.save(update_fields=["status"])
     return HttpResponse("", 200)
+
+
+class StripeConnectAccount:
+    def post(self, request, *args, **kwargs):
+        try:
+            account = stripe.Account.create(
+                controller={
+                    "stripe_dashboard": {
+                        "type": "express",
+                    },
+                    "fees": {"payer": "application"},
+                    "losses": {"payments": "application"},
+                },
+            )
+
+            return Response({"account": account.id})
+        except Exception as e:  # noqa: BLE001
+            return Response({"error": str(e)}, 500)
+
+
+class ConnectAccountCreateView(APIView):
+    def post(self, request, *args, **kwargs):
+        if acc_id := request.user.stripe_account_id:
+            return Response(
+                {
+                    "message": "Connect account already exists",
+                    "account": acc_id,
+                },
+            )
+        try:
+            # Create Standard Connect account
+            account = stripe.Account.create(
+                type="standard",
+                email=request.user.email,
+                capabilities={
+                    "card_payments": {"requested": True},
+                    "transfers": {"requested": True},
+                },
+                business_type="individual",
+            )
+            account = stripe.Account.create()
+
+            # Generate account link for onboarding
+
+            refresh_link = request.build_absolute_uri(
+                reverse("api:refresh-link", kwargs={"account_id": account.id}),
+            )
+            return_link = request.build_absolute_uri(
+                reverse("api:return-link", kwargs={"account_id": account.id}),
+            )
+            account_link = stripe.AccountLink.create(
+                account=account.id,
+                refresh_url=refresh_link,
+                return_url=return_link,
+                type="account_onboarding",
+            )
+        except Exception as e:  # noqa: BLE001
+            return Response({"error": str(e)}, 500)
+        else:
+            request.user.stripe_account_id = account.id
+            request.user.save(update_fields=["stripe_account_id"])
+            return Response(
+                {
+                    "account": account.id,
+                    "account_link": account_link.url,
+                    "refresh_link": refresh_link,
+                },
+            )
+
+
+class AccountStatusView(APIView):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            stripe_account_id = user.stripe_account_id
+            stripe_account = stripe.Account.retrieve(stripe_account_id)
+            # Update local record
+            user.is_details_submitted = stripe_account.details_submitted
+            user.is_charges_enabled = stripe_account.charges_enabled
+            user.is_payouts_enabled = stripe_account.payouts_enabled
+            user.save()
+            data = {
+                "is_details_submitted": user.is_details_submitted,
+                "is_charges_enabled": user.is_charges_enabled,
+                "is_payouts_enabled": user.is_payouts_enabled,
+                "stripe_account_id": user.stripe_account_id,
+            }
+            return Response(data, 200)
+
+        except stripe.error.StripeError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def get_refresh_link(request, account_id):
+    try:
+        account_link = stripe.AccountLink.create(
+            account=account_id,
+            refresh_url=request.build_absolute_uri(
+                reverse("api:refresh-link", kwargs={"account_id": account_id}),
+            ),
+            return_url="https://www.google.com",
+            type="account_onboarding",
+        )
+        return HttpResponseRedirect(account_link.url)
+
+    except Exception as e:  # noqa: BLE001
+        return HttpResponse(str(e), 400)
+
+
+def get_return_link(request, account_id):
+    return HttpResponse("thanks for onboarding with us.", 200)

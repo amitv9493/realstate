@@ -428,3 +428,8 @@ BRAINTREE_GATEWAY = braintree.BraintreeGateway(
         timeout=10,
     ),
 )
+
+STRIPE_FEE_PERCENT = 2.9
+STRIPE_FIXED_FEE = 0.3  # dollar
+PLATFORM_FEES_PERCENT = 10
+STRIPE_INSTANCE_PAYOUT_FEE_PERCENT = 1  # of total volume

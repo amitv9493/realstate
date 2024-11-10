@@ -19,7 +19,7 @@ class TxnType(models.TextChoices):
 
 class StripeTranscation(GenericModel):
     user = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True)
-    amt = models.PositiveIntegerField()
+    amt = models.DecimalField(max_digits=5, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=255, choices=TranscationStatus.choices)
@@ -33,7 +33,7 @@ class StripeTranscation(GenericModel):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self.status == TranscationStatus.SUCCESS and self.txn_type == TxnType.PAYIN:
-            self.content_object.payment_verified = False
+            self.content_object.payment_verified = True
             self.content_object.save(update_fields=["payment_verified"])
             Notification.objects.create(
                 event=TaskStatusChoices.CREATED,

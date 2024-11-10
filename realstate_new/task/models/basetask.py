@@ -29,7 +29,7 @@ class BaseTask(TrackingModel):
     asap = models.BooleanField(_("As Soon As Possible"), default=False)
     notes = models.TextField(blank=True, default="")
 
-    payment_amount = models.PositiveIntegerField()
+    payment_amount = models.DecimalField(max_digits=6, decimal_places=2)
     is_verified = models.BooleanField(default=False)
     application_type = models.CharField(
         max_length=5,
@@ -72,7 +72,7 @@ class BaseTask(TrackingModel):
     notifications = GenericRelation(Notification)
     applications = GenericRelation(JobApplication)
     verification_images = GenericRelation(VerificationDocument)
-    payment_verified = models.BooleanField(default=True)
+    payment_verified = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.client_name}-{self.payment_amount}"
@@ -101,3 +101,27 @@ class BaseTask(TrackingModel):
         qs = self.applications.all().exclude(applicant=self.assigned_to)
         if qs:
             qs.update(status="REJECTED")
+
+    @property
+    def stripe_fees(self):
+        return (
+            (self.payment_amount * settings.STRIPE_FEE_PERCENT) / 100
+        ) + settings.STRIPE_FIXED_FEE
+
+    @property
+    def platform_fees(self):
+        return (self.payment_amount * settings.PLATFORM_FEES_PERCENT) / 100
+
+    @property
+    def payment_amt_for_task_creater(self):
+        return round(self.stripe_fees + self.platform_fees + self.payment_amount, 2)
+
+    @property
+    def payment_amt_for_payout(self):
+        return round(self.payment_amount - self.platform_fees, 2)
+
+    @property
+    def payment_for_instance_payout(self):
+        instant_charges = (self.payment_amount * 1) / 100
+        amt = self.payment_amount - instant_charges - self.platform_fees
+        return round(amt, 2)
