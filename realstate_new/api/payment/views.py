@@ -293,14 +293,31 @@ class StripeConnectAccount:
 
 
 class ConnectAccountCreateView(APIView):
+    def refresh_link(self, acc_id):
+        return self.request.build_absolute_uri(
+            reverse("api:refresh-link", kwargs={"account_id": acc_id}),
+        )
+
+    def return_link(self, acc_id):
+        return self.request.build_absolute_uri(
+            reverse("api:return-link", kwargs={"account_id": acc_id}),
+        )
+
     def post(self, request, *args, **kwargs):
         if acc_id := request.user.stripe_account_id:
+            account_link = stripe.AccountLink.create(
+                account=acc_id,
+                refresh_url=self.refresh_link(acc_id),
+                return_url=self.return_link(acc_id),
+                type="account_onboarding",
+            )
             return Response(
                 {
-                    "message": "Connect account already exists",
+                    "account_link": account_link.url,
                     "account": acc_id,
                 },
             )
+
         try:
             # Create Standard Connect account
             account = stripe.Account.create(
@@ -312,20 +329,13 @@ class ConnectAccountCreateView(APIView):
                 },
                 business_type="individual",
             )
-            account = stripe.Account.create()
 
             # Generate account link for onboarding
 
-            refresh_link = request.build_absolute_uri(
-                reverse("api:refresh-link", kwargs={"account_id": account.id}),
-            )
-            return_link = request.build_absolute_uri(
-                reverse("api:return-link", kwargs={"account_id": account.id}),
-            )
             account_link = stripe.AccountLink.create(
                 account=account.id,
-                refresh_url=refresh_link,
-                return_url=return_link,
+                refresh_url=self.refresh_link(account.id),
+                return_url=self.return_link(account.id),
                 type="account_onboarding",
             )
         except Exception as e:  # noqa: BLE001
@@ -337,7 +347,6 @@ class ConnectAccountCreateView(APIView):
                 {
                     "account": account.id,
                     "account_link": account_link.url,
-                    "refresh_link": refresh_link,
                 },
             )
 
