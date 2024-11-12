@@ -197,7 +197,6 @@ class User(AbstractUser):
             "date_joined": self.date_joined,
             "phone": self.phone,
             "phone_country_code": self.phone_country_code,
-            "profile_picture": self.profile_picture.url,
         }
 
     def get_preferences(self):
