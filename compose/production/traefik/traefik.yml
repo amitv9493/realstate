@@ -72,7 +72,8 @@ http:
     django-media:
       loadBalancer:
         servers:
-          - url: http://django:5000  # Point this to the Django app
+          - url: http://nginx:80
+
 
 providers:
   file:
