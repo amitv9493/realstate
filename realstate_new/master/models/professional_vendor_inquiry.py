@@ -3,8 +3,6 @@ from django.db import models
 
 from realstate_new.utils.base_models import TrackingModel
 
-from .types import ProfessionalServiceSkillChoices
-
 
 class ProfessioanlVendorInquiry(TrackingModel):
     # client phone and email will be fetched from the current user.
@@ -29,11 +27,7 @@ class ProfessioanlVendorInquiry(TrackingModel):
         ],
         default="EMAIL",
     )
-    service_skill = models.CharField(
-        max_length=50,
-        choices=ProfessionalServiceSkillChoices.choices,
-        default=ProfessionalServiceSkillChoices.PH,
-    )
+    service_skill = models.CharField(max_length=50)
     mile_radius_preference = models.CharField(
         "Area Covered",
         max_length=50,
