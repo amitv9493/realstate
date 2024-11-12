@@ -321,10 +321,14 @@ class ConnectAccountCreateView(APIView):
         try:
             # Create Standard Connect account
             account = stripe.Account.create(
-                controller={
-                    "losses": {"payments": "application"},
-                    "fees": {"payer": "application"},
-                    "stripe_dashboard": {"type": "express"},
+                type="express",
+                email=request.user.email,
+                country="US",
+                business_type="individual",
+                business_profile="",
+                capabilities={
+                    "card_payments": {"requested": True},
+                    "transfers": {"requested": True},
                 },
             )
 
