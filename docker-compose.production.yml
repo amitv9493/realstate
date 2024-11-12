@@ -38,6 +38,7 @@ services:
       - ./.envs/.production/.postgres
     ports:
       - '5432:5432'
+    command: ["postgres", "-c", "listen_addresses='*'"]
 
   traefik:
     build:
