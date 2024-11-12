@@ -25,7 +25,7 @@ class UserView(APIView):
         )
         if serializer.is_valid(raise_exception=True):  # noqa: RET503
             serializer.save()
-            return Response({"msg": serializer.validated_data, "status": True}, 200)
+            return Response({"status": True}, 200)
 
 
 class UserMeView(APIView):

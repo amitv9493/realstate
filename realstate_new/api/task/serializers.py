@@ -17,7 +17,7 @@ from realstate_new.task.models import VerificationDocument
 from realstate_new.task.models.choices import TaskStatusChoices
 from realstate_new.utils.serializers import TrackingModelSerializer
 
-EXTRA_FIELD = ["type_of_task"]
+EXTRA_FIELD = ["type_of_task", "payment_verified"]
 JOB_DASHBOARD_COMMON_FIELDS = [
     "id",
     "application_type",
