@@ -36,6 +36,8 @@ services:
       - /var/log/realstate_new/postgres:/var/log/postgresql
     env_file:
       - ./.envs/.production/.postgres
+    ports:
+      - '5432:5432'
 
   traefik:
     build:
