@@ -1,11 +1,13 @@
 from typing import Any
 
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 
 from realstate_new.api.property.serializers import LockBoxSerializer
 from realstate_new.api.property.serializers import PropertySerializer
 from realstate_new.api.user.serializers import UserSerializer
+from realstate_new.payment.models.stripe import StripeTranscation
 from realstate_new.task.models import LockBoxTaskBS
 from realstate_new.task.models import LockBoxTaskIR
 from realstate_new.task.models import OpenHouseTask
@@ -17,7 +19,7 @@ from realstate_new.task.models import VerificationDocument
 from realstate_new.task.models.choices import TaskStatusChoices
 from realstate_new.utils.serializers import TrackingModelSerializer
 
-EXTRA_FIELD = ["type_of_task", "payment_verified"]
+EXTRA_FIELD = ["type_of_task", "payment_verified", "txn_ids"]
 JOB_DASHBOARD_COMMON_FIELDS = [
     "id",
     "application_type",
@@ -78,11 +80,23 @@ class TaskSerializer(TrackingModelSerializer):
     application_status = serializers.SerializerMethodField()
 
     type_of_task = serializers.CharField(read_only=True)
+    txn_ids = serializers.SerializerMethodField()
 
     class Meta:
         extra_kwargs = {
             "created_by": {"read_only": True},
         }
+
+    def get_txn_ids(self, obj):
+        return list(
+            StripeTranscation.objects.filter(
+                content_type=ContentType.objects.get_for_model(obj.__class__),
+                object_id=obj.id,
+                user=obj.created_by,
+                txn_type="PAYIN",
+            ).values_list("identifier", flat=True),
+        )
+        return []
 
     def get_application_status(self, obj):
         request = self.context.get("request")
