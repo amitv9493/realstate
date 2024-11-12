@@ -141,7 +141,7 @@ LOGGING = {
             "formatter": "verbose",
         },
         "file": {
-            "level": "WARNING",
+            "level": "ERROR",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": f"{BASE_DIR}/logs/django.log",
             "maxBytes": 10485760,
