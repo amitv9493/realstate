@@ -1,4 +1,5 @@
 from django.db.models.query import QuerySet
+from django.http import HttpResponse
 from firebase_admin import messaging
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
@@ -87,3 +88,9 @@ class TestNotification(APIView):
         messaging.send_each(messages)
 
         return Response("message sent:", status=200)
+
+
+def test_logs(request):
+    x = 5
+    x.upper()
+    return HttpResponse("error", 400)
