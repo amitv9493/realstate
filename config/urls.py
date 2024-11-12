@@ -9,12 +9,13 @@ from drf_spectacular.views import SpectacularSwaggerView
 
 from realstate_new.api.notification.views import hello
 from realstate_new.master.views import MetaDataView
-from realstate_new.master.views import protected_media_view
+
+# from realstate_new.master.views import protected_media_view  # noqa: ERA001
 
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("silk/", include("silk.urls", namespace="silk")),
-    path("media/<path:file_path>", protected_media_view, name="protected_media"),
+    # path("media/<path:file_path>", protected_media_view, name="protected_media"),  # noqa: ERA001
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
 if settings.DEBUG:
