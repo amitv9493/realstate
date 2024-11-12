@@ -410,15 +410,6 @@ FORGET_PASSWORD_OTP_TIMEOUT = timedelta(minutes=10).total_seconds()
 redbeat_redis_url = "redis://redis:6379/1"
 
 
-STORAGES = {
-    "default": {
-        "BACKEND": "config.storages.ExpiringURLFileStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
-
 BRAINTREE_GATEWAY = braintree.BraintreeGateway(
     braintree.Configuration(
         braintree.Environment.Sandbox,
