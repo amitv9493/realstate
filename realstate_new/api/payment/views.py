@@ -325,7 +325,6 @@ class ConnectAccountCreateView(APIView):
                 email=request.user.email,
                 country="US",
                 business_type="individual",
-                business_profile="",
                 capabilities={
                     "card_payments": {"requested": True},
                     "transfers": {"requested": True},
