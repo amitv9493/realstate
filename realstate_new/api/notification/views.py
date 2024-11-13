@@ -1,8 +1,12 @@
 from django.contrib.sites.shortcuts import get_current_site
+from django.http import HttpResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.viewsets import ModelViewSet
 
+from realstate_new.notification.celery_tasks import celery_send_fcm_notification
 from realstate_new.notification.models import Notification
+from realstate_new.users.models import FCMDevice
 
 from .serializers import NotificationSerializer
 
@@ -34,3 +38,15 @@ class NotificationViewSet(ModelViewSet):
         if is_read == "true":
             return qs.filter(user=user, is_read=True)
         return qs.filter(user=user, is_read=False) if is_read == "false" else qs.filter(user=user)
+
+
+@csrf_exempt
+def test_notification(request):
+    ids = list(set(FCMDevice.objects.values_list("registration_id", flat=True)))
+    celery_send_fcm_notification.delay(
+        title="test rudra device",
+        body="test new notifications",
+        device_ids=ids,
+        data={},
+    )
+    return HttpResponse("done", 200)
