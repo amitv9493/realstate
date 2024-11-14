@@ -81,6 +81,18 @@ class CustomUserAdmin(UserAdmin):
                 ),
             },
         ),
+        (
+            "Stripe Details",
+            {
+                "fields": (
+                    "stripe_customer_id",
+                    "stripe_account_id",
+                    "is_details_submitted",
+                    "is_charges_enabled",
+                    "is_payouts_enabled",
+                ),
+            },
+        ),
     )
 
     fieldsets = UserAdmin.fieldsets + custom_fieldsets
