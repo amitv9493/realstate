@@ -1,4 +1,5 @@
 import contextlib
+from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
@@ -104,13 +105,13 @@ class BaseTask(TrackingModel):
 
     @property
     def stripe_fees(self):
-        return (
-            (self.payment_amount * settings.STRIPE_FEE_PERCENT) / 100
-        ) + settings.STRIPE_FIXED_FEE
+        return ((self.payment_amount * Decimal(settings.STRIPE_FEE_PERCENT)) / 100) + Decimal(
+            settings.STRIPE_FIXED_FEE,
+        )
 
     @property
     def platform_fees(self):
-        return (self.payment_amount * settings.PLATFORM_FEES_PERCENT) / 100
+        return (self.payment_amount * Decimal(settings.PLATFORM_FEES_PERCENT)) / 100
 
     @property
     def payment_amt_for_task_creater(self):
@@ -118,7 +119,7 @@ class BaseTask(TrackingModel):
 
     @property
     def payment_amt_for_payout(self):
-        return round(self.payment_amount - self.platform_fees, 2)
+        return self.payment_amount - Decimal(self.platform_fees)
 
     @property
     def payment_for_instance_payout(self):
