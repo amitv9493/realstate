@@ -193,9 +193,21 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
             )
 
         if flag == "ongoing":
-            query = Q(assigned_to=request.user)
+            query = Q(
+                assigned_to=request.user,
+                status__in=[
+                    TaskStatusChoices.ASSIGNED,
+                    TaskStatusChoices.STARTED,
+                    TaskStatusChoices.REASSIGNED,
+                ],
+            )
         if flag == "completed":
-            query = Q(assigned_to=request.user) & Q(status=TaskStatusChoices.VERIFIED)
+            query = Q(assigned_to=request.user) & Q(
+                status__in=[
+                    TaskStatusChoices.MARK_COMPLETED,
+                    TaskStatusChoices.VERIFIED,
+                ],
+            )
 
         tasks = self.get_tasks(query)
         paginated_response = self.get_paginated_response(page, page_size, tasks)
