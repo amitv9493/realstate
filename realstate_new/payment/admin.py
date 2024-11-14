@@ -15,4 +15,4 @@ class PayPalPayementHistoryAdmin(admin.ModelAdmin):
 
 @admin.register(StripeTranscation)
 class StripeTranscationAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["content_type", "amt", "identifier"]

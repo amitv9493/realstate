@@ -148,7 +148,10 @@ class StripeCreatePaymentIntentView(APIView):
         if serializer.is_valid(raise_exception=True):  # noqa: RET503
             data = serializer.validated_data
             try:
-                task: BaseTask = get_job(data["task_type"], data["task_id"])
+                task: BaseTask = get_job(
+                    job_model=data["task_type"],
+                    task_id=data["task_id"],
+                )
 
                 intent_id, client_secret = self.create_intent_simple(
                     amt=task.payment_amt_for_task_creater,
