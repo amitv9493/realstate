@@ -14,7 +14,6 @@ from realstate_new.master.views import MetaDataView
 
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
-    path("silk/", include("silk.urls", namespace="silk")),
     # path("media/<path:file_path>", protected_media_view, name="protected_media"),  # noqa: ERA001
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]

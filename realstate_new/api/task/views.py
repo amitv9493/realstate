@@ -10,7 +10,6 @@ from rest_framework.serializers import BaseSerializer
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from silk.profiling.profiler import silk_profile
 
 from realstate_new.notification.models import Notification
 from realstate_new.notification.models import NotificationChoices
@@ -103,7 +102,6 @@ class JobCreaterDashboardView(APIView, TaskListMixin):
 
     serializer_class = None
 
-    @silk_profile(name="Ongoing Task")
     def get(self, request, *args, **kwargs):
         params_list = ["completed", "created", "ongoing", "payment-pending"]
         params = request.query_params
@@ -155,7 +153,6 @@ class JobCreaterDashboardView(APIView, TaskListMixin):
 
 
 class JobSeekerDashboardView(APIView, TaskListMixin):
-    @silk_profile(name="Latest Task")
     def get(self, request, *args, **kwargs):
         params = request.query_params
         query_params_list = ["ongoing", "latest", "applied", "completed"]
