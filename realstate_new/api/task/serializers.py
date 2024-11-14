@@ -16,6 +16,7 @@ from realstate_new.task.models import RunnerTask
 from realstate_new.task.models import ShowingTask
 from realstate_new.task.models import SignTask
 from realstate_new.task.models import VerificationDocument
+from realstate_new.task.models.choices import SignTaskType
 from realstate_new.task.models.choices import TaskStatusChoices
 from realstate_new.task.models.open_for_vendor_task import OpenForVendorTask
 from realstate_new.task.models.open_for_vendor_task import VendorType
@@ -312,6 +313,22 @@ class SignTaskSerializer(TaskSerializer):
         model = SignTask
         fields = "__all__"
         exclude_fields = ["property"]
+
+    def validate(self, attrs: Any) -> Any:
+        task_type = attrs["task_type"]
+        if task_type == SignTaskType.install:
+            if not all([attrs.get("install_address"), attrs.get("pickup_address")]):
+                msg = (
+                    "when task_type is install. the install_address and pickup_address is required."
+                )
+                raise serializers.ValidationError(msg, code="address")
+
+        if task_type == SignTaskType.remove:
+            if not all([attrs.get("remove_address"), attrs.get("dropoff_address")]):
+                msg = """when task_type is install or remove,
+                        the remove_address and dropoff_address are required."""
+                raise serializers.ValidationError(msg, code="address")
+        return super().validate(attrs)
 
     def create(self, validated_data: Any) -> Any:
         install_address = validated_data.pop("install_address", None)
