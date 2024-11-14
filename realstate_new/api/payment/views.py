@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import stripe
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -164,12 +165,16 @@ class StripeCreatePaymentIntentView(APIView):
                 return Response({"error": str(e)}, 400)
             else:
                 StripeTranscation.objects.create(
+                    content_type=ContentType.objects.get_for_model(
+                        task,
+                        for_concrete_model=False,
+                    ),
+                    object_id=task.id,
                     user=request.user,
                     amt=task.payment_amt_for_task_creater,
                     status=TranscationStatus.INITIATED,
                     txn_type=TxnType.PAYIN,
                     identifier=intent_id,
-                    content_object=task,
                 )
                 data = {
                     "amt": task.payment_amount,

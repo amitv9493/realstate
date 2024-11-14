@@ -55,6 +55,14 @@ class LockBoxTask(BaseTask):
         blank=True,
     )
 
+    @property
+    def type_of_task(self):
+        if self.task_type in {"INSTALL", "REMOVE"}:
+            return "LockBoxIR"
+        if self.task_type in {"BUY", "SELL"}:
+            return "LockBoxBS"
+        return ""
+
 
 class LockBoxTaskIR(LockBoxTask):
     class LockBoxTaskIRManager(models.Manager):
