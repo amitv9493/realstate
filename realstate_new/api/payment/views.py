@@ -257,6 +257,8 @@ def webhook(request):
         return HttpResponse(status=400)
 
     payment_intent_id = event.data.object.id
+    msg = f"processing the payment intent with this identifier: {payment_intent_id}"
+    _logger.info(msg)
     txn = StripeTranscation.objects.get(identifier=payment_intent_id)
 
     if event.type == "payment_intent.payment_failed":
