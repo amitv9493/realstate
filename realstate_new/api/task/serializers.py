@@ -376,7 +376,10 @@ class OpenForVendorTaskSerializer(TaskSerializer):
 
     def to_representation(self, instance: Any) -> dict[str, Any]:
         data = super().to_representation(instance)
-        data["open_for_vendor"] = str(instance.open_for_vendor)
+        data["open_for_vendor"] = VendorTypeSerializer(
+            instance.open_for_vendor.all(),
+            many=True,
+        ).data
         return data
 
     class Meta(TaskSerializer.Meta):

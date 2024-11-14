@@ -16,11 +16,7 @@ class VendorType(models.Model):
 class OpenForVendorTask(BaseTask):
     property_address = GenericRelation(Property)
 
-    open_for_vendor = models.ForeignKey(
-        VendorType,
-        on_delete=models.SET_NULL,
-        null=True,
-    )
+    open_for_vendor = models.ManyToManyField(VendorType, null=True, blank=True)
     vendor_name = models.CharField(max_length=50, default="", blank=True)
     vendor_phone = models.CharField(max_length=50, default="", blank=True)
     duration = models.DurationField(null=True, blank=True)
