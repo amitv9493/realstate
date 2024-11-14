@@ -11,10 +11,11 @@ from .third_party_call import ThirdPartyCall
 from .verification_image import VerificationDocument
 
 __all__ = [
-    "BaseTask",
     "JOB_TYPE_MAPPINGS",
+    "BaseTask",
     "LockBoxTaskBS",
     "LockBoxTaskIR",
+    "OpenForVendorTask",
     "OpenHouseTask",
     "ProfessionalServiceTask",
     "RunnerTask",

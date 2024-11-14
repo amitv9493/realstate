@@ -71,6 +71,7 @@ ONGOING_FIELDS = {
         "task_type",
         "lockbox",
     ],
+    "OPENFORVENDOR": [*JOB_DASHBOARD_COMMON_FIELDS, "property-address"],
 }
 LATEST_TASK_FIELDS = [*JOB_DASHBOARD_COMMON_FIELDS, "application_status"]
 
@@ -430,6 +431,12 @@ class OngoingTaskSerializer(serializers.Serializer):
     LockBoxBS = LockBoxIRSerializer(
         many=True,
         fields=ONGOING_FIELDS["LOCKBOXIR"],
+        required=False,
+    )
+
+    OpenForVendor = OpenForVendorTaskSerializer(
+        many=True,
+        fields=ONGOING_FIELDS["OPENFORVENDOR"],
         required=False,
     )
 

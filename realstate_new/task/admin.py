@@ -7,6 +7,7 @@ from realstate_new.task.models.sign_task import SignTask
 
 from .models import LockBoxTaskBS
 from .models import LockBoxTaskIR
+from .models import OpenForVendorTask
 from .models import OpenHouseTask
 from .models import ProfessionalServiceTask
 from .models import RunnerTask
@@ -242,3 +243,8 @@ class VerificationDocumentAdmin(admin.ModelAdmin):
     list_display = ("id", "content_type", "object_id", "image", "created_at")
     list_filter = ("content_type", "created_at")
     date_hierarchy = "created_at"
+
+
+@admin.register(OpenForVendorTask)
+class OpenForVendorTaskAdmin(BaseTaskAdmin):
+    pass

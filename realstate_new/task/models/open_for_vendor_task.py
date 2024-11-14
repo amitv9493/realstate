@@ -24,3 +24,7 @@ class OpenForVendorTask(BaseTask):
     vendor_name = models.CharField(max_length=50, default="", blank=True)
     vendor_phone = models.CharField(max_length=50, default="", blank=True)
     duration = models.DurationField(null=True, blank=True)
+
+    @property
+    def type_of_task(self):
+        return "OpenForVendor"

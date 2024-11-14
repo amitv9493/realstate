@@ -63,6 +63,7 @@ select_related = {
         "remove_address",
     ],
     "Professional": ["property_address"],
+    "OpenForVendor": [],
 }
 
 

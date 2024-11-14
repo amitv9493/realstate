@@ -105,7 +105,7 @@ class JobCreaterDashboardView(APIView, TaskListMixin):
 
     @silk_profile(name="Ongoing Task")
     def get(self, request, *args, **kwargs):
-        params_list = ["completed", "created", "ongoing"]
+        params_list = ["completed", "created", "ongoing", "payment-pending"]
         params = request.query_params
         flag = params.get("flag", "").lower()
         if not flag:
