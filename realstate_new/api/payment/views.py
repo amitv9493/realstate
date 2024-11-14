@@ -379,7 +379,8 @@ class AccountStatusView(APIView):
                 "is_payouts_enabled": user.is_payouts_enabled,
                 "stripe_account_id": user.stripe_account_id,
             }
-            return Response(data, 200)
+            dummy_data = dict.fromkeys(data.keys(), True)
+            return Response(dummy_data, 200)
 
         except stripe.error.StripeError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
