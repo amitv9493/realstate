@@ -90,6 +90,7 @@ class BaseTaskAdmin(admin.ModelAdmin):
                     "created_by",
                     "created_at",
                     "updated_at",
+                    "payment_verified",
                     "not_acceptance_notification_sent",
                 ),
                 "classes": ("collapse",),
