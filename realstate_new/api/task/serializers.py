@@ -17,6 +17,9 @@ from realstate_new.task.models import ShowingTask
 from realstate_new.task.models import SignTask
 from realstate_new.task.models import VerificationDocument
 from realstate_new.task.models.choices import TaskStatusChoices
+from realstate_new.task.models.open_for_vendor_task import OpenForVendorTask
+from realstate_new.task.models.open_for_vendor_task import VendorType
+from realstate_new.utils.serializers import DynamicModelSerializer
 from realstate_new.utils.serializers import TrackingModelSerializer
 
 EXTRA_FIELD = ["type_of_task", "payment_verified", "txn_ids"]
@@ -355,6 +358,42 @@ class SignTaskSerializer(TaskSerializer):
             rep.pop("install_address", None)
             rep.pop("pickup_address", None)
         return rep
+
+
+class VendorTypeSerializer(DynamicModelSerializer):
+    class Meta:
+        model = VendorType
+        fields = "__all__"
+
+
+class OpenForVendorTaskSerializer(TaskSerializer):
+    property_address = PropertySerializer(
+        fields=PROPERTY_FIELDS,
+        required=True,
+        many=True,
+    )
+
+    def to_representation(self, instance: Any) -> dict[str, Any]:
+        data = super().to_representation(instance)
+        data["open_for_vendor"] = str(instance.open_for_vendor)
+        return data
+
+    class Meta(TaskSerializer.Meta):
+        model = OpenForVendorTask
+        fields = "__all__"
+
+    def create(self, validated_data: Any) -> Any:
+        property_address = validated_data.pop("property_address")
+        instance = super().create(validated_data)
+
+        properties = self.save_property_instance(
+            task=instance,
+            request=self.request,
+            property_validated_data=property_address,
+            many=True,
+        )
+        instance.property_address.set(properties)
+        return instance
 
 
 class OngoingTaskSerializer(serializers.Serializer):

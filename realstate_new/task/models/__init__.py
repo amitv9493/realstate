@@ -1,6 +1,7 @@
 from .basetask import BaseTask
 from .lockbox_task import LockBoxTaskBS
 from .lockbox_task import LockBoxTaskIR
+from .open_for_vendor_task import OpenForVendorTask
 from .openhouse import OpenHouseTask
 from .professional_task import ProfessionalServiceTask
 from .runner_task import RunnerTask
@@ -33,6 +34,7 @@ JOB_TYPE_MAPPINGS = {
     "Runner": RunnerTask,
     "Sign": SignTask,
     "Professional": ProfessionalServiceTask,
+    "OpenForVendor": OpenForVendorTask,
 }
 
 

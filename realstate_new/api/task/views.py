@@ -4,6 +4,7 @@ from typing import Any
 
 import stripe
 from django.db.models import Q
+from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 from rest_framework.serializers import ValidationError
@@ -26,6 +27,8 @@ from realstate_new.task.models import SignTask
 from realstate_new.task.models import VerificationDocument
 from realstate_new.task.models.basetask import BaseTask
 from realstate_new.task.models.choices import TaskStatusChoices
+from realstate_new.task.models.open_for_vendor_task import OpenForVendorTask
+from realstate_new.task.models.open_for_vendor_task import VendorType
 from realstate_new.task.models.runner_task import RunnerTask
 from realstate_new.users.models import User
 from realstate_new.utils.permissions import AssigneeObjectPermission
@@ -34,12 +37,14 @@ from .filters import filter_tasks
 from .serializers import LockBoxBSSerializer
 from .serializers import LockBoxIRSerializer
 from .serializers import OngoingTaskSerializer
+from .serializers import OpenForVendorTaskSerializer
 from .serializers import OpenHouseTaskSerializer
 from .serializers import ProfessionalTaskSerializer
 from .serializers import RunnerTaskSerializer
 from .serializers import ShowingTaskSerializer
 from .serializers import SignTaskSerializer
 from .serializers import TaskActionSerializer
+from .serializers import VendorTypeSerializer
 from .serializers import VerificationDocumentSerializer
 
 
@@ -257,6 +262,16 @@ class RunnerTaskViewSet(TaskViewSet):
 class SignTaskViewSet(TaskViewSet):
     serializer_class = SignTaskSerializer
     queryset = SignTask.objects.all()
+
+
+class OpenForVendorTaskViewSet(TaskViewSet):
+    serializer_class = OpenForVendorTaskSerializer
+    queryset = OpenForVendorTask.objects.all()
+
+
+class OpenForVendorTypeView(ListCreateAPIView):
+    queryset = VendorType.objects.all()
+    serializer_class = VendorTypeSerializer
 
 
 class TaskActionView(APIView):

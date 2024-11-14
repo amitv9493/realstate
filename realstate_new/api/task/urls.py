@@ -5,6 +5,8 @@ from .views import JobCreaterDashboardView
 from .views import JobSeekerDashboardView
 from .views import LockBoxTaskBSViewSet
 from .views import LockBoxTaskIRViewSet
+from .views import OpenForVendorTaskViewSet
+from .views import OpenForVendorTypeView
 from .views import OpenHouseTaskViewSet
 from .views import ProfessionalTaskViewSet
 from .views import RunnerTaskViewSet
@@ -21,6 +23,7 @@ router.register("openhouse", OpenHouseTaskViewSet, "openhouse-task")
 router.register("professionalservicetask", ProfessionalTaskViewSet, "professional-task")
 router.register("runnertask", RunnerTaskViewSet, "runner-task")
 router.register("signtask", SignTaskViewSet, "sign-task")
+router.register("openforvendortask", OpenForVendorTaskViewSet, "openforvendor-task")
 
 
 urlpatterns = [
@@ -33,6 +36,10 @@ urlpatterns = [
     path(
         "<str:task_type>/<int:task_id>/verificationdocs/",
         TaskVerificationImageView.as_view(),
+    ),
+    path(
+        "vendortypes",
+        OpenForVendorTypeView.as_view(),
     ),
     *router.urls,
 ]
