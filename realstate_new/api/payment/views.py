@@ -426,4 +426,7 @@ def account_update_webhook(request):
                 "is_payouts_enabled",
             ],
         )
+        msg = f"Successfully processed the event for account_id: \
+                {acc_id} username:{request.user.username}"
+        _logger.info(msg)
     return HttpResponse("", 200)
