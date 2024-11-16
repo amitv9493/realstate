@@ -34,9 +34,6 @@ services:
       - realstate_new_local_postgres_data_backups:/backups
     env_file:
       - ./.envs/.local/.postgres
-    ports:
-      - "5433:5432"
-
   mailpit:
     image: docker.io/axllent/mailpit:latest
     container_name: realstate_new_local_mailpit
@@ -84,6 +81,19 @@ services:
   stripe-cli:
     image: stripe/stripe-cli
     container_name: stripe-cli
-    command: "listen --api-key $${STRIPE_API_KEY} --forward-to django:8000/api/payment/stripe/intent/webhook"
+    command: "listen --api-key $${STRIPE_API_KEY} --forward-to django:8000/api/payment/stripe/account-update/webhook"
     env_file:
-      - ./.env
+      - ./.envs/.local/.stripe
+
+  pgbouncer:
+    container_name: pgbouncer
+    image: bitnami/pgbouncer:latest
+    env_file:
+      - ./.envs/.local/.pgbouncer
+      - ./.envs/.local/.postgres
+    ports:
+      - "5433:5432"
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-h', 'localhost']

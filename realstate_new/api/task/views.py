@@ -372,23 +372,25 @@ class TaskActionView(APIView):
 
     def handle_verify(self, task_instance: BaseTask, validated_data):
         self.is_job_assigned(task_instance)
-        task_instance.is_verified = True
-        task_instance.save(update_fields=["is_verified"])
-        transfer = stripe.Transfer.create(
-            amount=int(task_instance.payment_amt_for_payout * 100),
-            currency="usd",
-            destination=task_instance.assigned_to.stripe_account_id,
-        )
-        StripeTranscation.objects.create(
-            user=task_instance.assigned_to,
-            amt=task_instance.payment_amt_for_payout,
-            status=TranscationStatus.SUCCESS,
-            txn_type=TxnType.PAYOUT,
-            identifier=transfer.id,
-            content_object=task_instance,
-        )
 
-        self.create_notifications(task_instance, event=TaskStatusChoices.VERIFIED)
+        if not task_instance.is_verified:
+            task_instance.is_verified = True
+            task_instance.save(update_fields=["is_verified"])
+            transfer = stripe.Transfer.create(
+                amount=int(task_instance.payment_amt_for_payout * 100),
+                currency="usd",
+                destination=task_instance.assigned_to.stripe_account_id,
+            )
+            StripeTranscation.objects.create(
+                user=task_instance.assigned_to,
+                amt=task_instance.payment_amt_for_payout,
+                status=TranscationStatus.SUCCESS,
+                txn_type=TxnType.PAYOUT,
+                identifier=transfer.id,
+                content_object=task_instance,
+            )
+
+            self.create_notifications(task_instance, event=TaskStatusChoices.VERIFIED)
 
     def handle_creater_cancelled(self, task_instance, validated_data):
         task_instance.is_cancelled = True

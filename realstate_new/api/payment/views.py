@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import stripe
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
@@ -365,25 +366,19 @@ class ConnectAccountCreateView(APIView):
 class AccountStatusView(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
-        try:
-            stripe_account_id = user.stripe_account_id
-            stripe_account = stripe.Account.retrieve(stripe_account_id)
-            # Update local record
-            user.is_details_submitted = stripe_account.details_submitted
-            user.is_charges_enabled = stripe_account.charges_enabled
-            user.is_payouts_enabled = stripe_account.payouts_enabled
-            user.save()
+
+        if user.stripe_account_id:
             data = {
                 "is_details_submitted": user.is_details_submitted,
                 "is_charges_enabled": user.is_charges_enabled,
                 "is_payouts_enabled": user.is_payouts_enabled,
                 "stripe_account_id": user.stripe_account_id,
             }
-            dummy_data = dict.fromkeys(data.keys(), True)
-            return Response(dummy_data, 200)
-
-        except stripe.error.StripeError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data, status.HTTP_200_OK)
+        return Response(
+            {"error": "Stripe accoount hasnt been created yet."},
+            status.HTTP_400_BAD_REQUEST,
+        )
 
 
 def get_refresh_link(request, account_id):
@@ -404,3 +399,31 @@ def get_refresh_link(request, account_id):
 
 def get_return_link(request, account_id):
     return HttpResponse("thanks for onboarding with us.", 200)
+
+
+@csrf_exempt
+def account_update_webhook(request):
+    event = None
+    payload = request.body
+    try:
+        event = stripe.Event.construct_from(json.loads(payload), stripe.api_key)
+    except ValueError:
+        return HttpResponse(status=400)
+
+    if event.type == "account.updated":
+        acc_id = event.account
+        try:
+            user = get_user_model().objects.get(stripe_account_id=acc_id)
+        except get_user_model().DoesNotExist:
+            return HttpResponse("", 200)
+        user.is_details_submitted = event.data.object["details_submitted"]
+        user.is_charges_enabled = event.data.object["charges_enabled"]
+        user.is_payouts_enabled = event.data.object["payouts_enabled"]
+        user.save(
+            update_fields=[
+                "is_details_submitted",
+                "is_charges_enabled",
+                "is_payouts_enabled",
+            ],
+        )
+    return HttpResponse("", 200)

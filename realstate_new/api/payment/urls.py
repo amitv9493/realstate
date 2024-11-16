@@ -6,6 +6,7 @@ from .views import ConnectAccountCreateView
 from .views import StripeCreatePaymentIntentView
 from .views import TestPayment
 from .views import VerifiyPaymentView
+from .views import account_update_webhook
 from .views import get_refresh_link
 from .views import get_return_link
 from .views import webhook
@@ -27,6 +28,10 @@ urlpatterns = [
     path(
         "stripe/intent/webhook",
         webhook,
+    ),
+    path(
+        "stripe/account-update/webhook",
+        account_update_webhook,
     ),
     path(
         "stripe/create-account",
