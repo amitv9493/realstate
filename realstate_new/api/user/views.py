@@ -49,7 +49,7 @@ class UserMeView(APIView):
                 elif detail == "preferences":
                     data["preferences"] = user.preferences
                 elif detail == "license":
-                    data["license"] = user.all_license_info
+                    data["license"] = user.license_info
         else:
             msg = (
                 "please provide `details` query params. Options are 'basic' 'license' 'preferences'"
