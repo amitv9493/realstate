@@ -224,12 +224,14 @@ class TaskViewSet(ModelViewSet):
         )
 
     def perform_update(self, serializer):
+        file_exists = serializer.instance.audio_file
         instance = serializer.save()
-        Notification.objects.create_notifications(
-            task=instance,
-            event=NotificationChoices.DETAILS_UPDATED,
-            users=[instance.created_by, instance.assigned_to],
-        )
+        if file_exists:
+            Notification.objects.create_notifications(
+                task=instance,
+                event=NotificationChoices.DETAILS_UPDATED,
+                users=[instance.created_by, instance.assigned_to],
+            )
 
         return super().perform_update(serializer)
 

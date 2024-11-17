@@ -185,7 +185,8 @@ class User(AbstractUser):
         """
         return [job.objects.filter(assigned_to=self) for job in JOB_TYPE_MAPPINGS.values()]
 
-    def get_basic_info(self):
+    @property
+    def basic_info(self):
         "Returns users basic info"
         return {
             "last_login": self.last_login,
@@ -197,10 +198,11 @@ class User(AbstractUser):
             "date_joined": self.date_joined,
             "phone": self.phone,
             "phone_country_code": self.phone_country_code,
-            "profile_picture": self.profile_picture.url if self.profile_picture else "",
+            "profile_picture": self.profile_picture,
         }
 
-    def get_preferences(self):
+    @property
+    def preferences(self):
         "Returns all uesr preferences related to a job."
         return {
             "email_notification": self.email_notification,
@@ -214,7 +216,8 @@ class User(AbstractUser):
             "mile_radius_preference": self.mile_radius_preference,
         }
 
-    def get_all_license_info(self):
+    @property
+    def license_info(self):
         """Returns all license related info"""
         return {
             "license_number": self.license_number,
@@ -233,7 +236,8 @@ class User(AbstractUser):
             "country": self.country,
         }
 
-    def get_required_license_info(self):
+    @property
+    def required_license_info(self):
         "Returns only necessary license info."
         return {
             "license_number": self.license_number,

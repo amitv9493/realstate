@@ -14,7 +14,8 @@ from .templates import get_notification_template
 class NotificationManager(models.Manager):
     def create_notifications(self, task, event, users: list, **kwargs):
         for user in users:
-            self.create(event=event, user=user, content_object=task, **kwargs)
+            if user:
+                self.create(event=event, user=user, content_object=task, **kwargs)
         return True
 
 

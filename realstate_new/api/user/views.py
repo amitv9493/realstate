@@ -40,11 +40,16 @@ class UserMeView(APIView):
             details = details.split(",")
             for detail in details:
                 if detail == "basic":
-                    data["basic"] = user.get_basic_info()
+                    data["basic"] = user.basic_info
+
+                    data["basic"]["profile_picture"] = request.build_absolute_uri(
+                        user.basic_info["profile_picture"],
+                    )
+
                 elif detail == "preferences":
-                    data["preferences"] = user.get_preferences()
+                    data["preferences"] = user.preferences
                 elif detail == "license":
-                    data["license"] = user.get_all_license_info()
+                    data["license"] = user.all_license_info
         else:
             msg = (
                 "please provide `details` query params. Options are 'basic' 'license' 'preferences'"
