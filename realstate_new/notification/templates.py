@@ -57,7 +57,7 @@ class NotificationTemplates:
             "You have confirmed the completion of '{type_of_task}."
             "Thank you for using our service!"
         ),
-        body2="",
+        body2="The task {type_of_task} has been verified. The payment has been processed.",
     )
     DETAILS_UPDATED = NotificationTemplate(
         title="Job Details Updated",

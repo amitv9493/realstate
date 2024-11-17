@@ -51,9 +51,9 @@ class UserMeView(APIView):
                 elif detail == "license":
                     data["license"] = user.license_info
         else:
-            msg = (
-                "please provide `details` query params. Options are 'basic' 'license' 'preferences'"
-            )
+            msg = "please provide `details` query params.\
+                    Options are 'basic' 'license' 'preferences'"
+
             raise ValidationError(msg)
         return Response(data, 200)
 
