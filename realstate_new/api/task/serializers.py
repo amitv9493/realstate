@@ -72,7 +72,7 @@ ONGOING_FIELDS = {
         "task_type",
         "lockbox",
     ],
-    "OPENFORVENDOR": [*JOB_DASHBOARD_COMMON_FIELDS, "property-address"],
+    "OPENFORVENDOR": [*JOB_DASHBOARD_COMMON_FIELDS, "property_address"],
 }
 LATEST_TASK_FIELDS = [*JOB_DASHBOARD_COMMON_FIELDS, "application_status"]
 
