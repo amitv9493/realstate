@@ -105,13 +105,16 @@ class BaseTask(TrackingModel):
 
     @property
     def stripe_fees(self):
-        return ((self.payment_amount * Decimal(settings.STRIPE_FEE_PERCENT)) / 100) + Decimal(
+        payable_amt = self.payment_amount if self.payment_amount else 5
+        return ((payable_amt * Decimal(settings.STRIPE_FEE_PERCENT)) / 100) + Decimal(
             settings.STRIPE_FIXED_FEE,
         )
 
     @property
     def platform_fees(self):
-        return (self.payment_amount * Decimal(settings.PLATFORM_FEES_PERCENT)) / 100
+        if self.payment_amount:
+            return (self.payment_amount * Decimal(settings.PLATFORM_FEES_PERCENT)) / 100
+        return Decimal(5.0)
 
     @property
     def payment_amt_for_task_creater(self):
@@ -119,10 +122,14 @@ class BaseTask(TrackingModel):
 
     @property
     def payment_amt_for_payout(self):
-        return self.payment_amount - Decimal(self.platform_fees)
+        if self.payment_amount:
+            return self.payment_amount - Decimal(self.platform_fees)
+        return Decimal(0)
 
     @property
     def payment_for_instance_payout(self):
-        instant_charges = (self.payment_amount * 1) / 100
-        amt = self.payment_amount - instant_charges - self.platform_fees
-        return round(amt, 2)
+        if self.payment_amount:
+            instant_charges = (self.payment_amount * 1) / 100
+            amt = self.payment_amount - instant_charges - self.platform_fees
+            return round(amt, 2)
+        return Decimal(0)
