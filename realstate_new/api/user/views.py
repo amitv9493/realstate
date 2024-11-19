@@ -41,11 +41,12 @@ class UserMeView(APIView):
             for detail in details:
                 if detail == "basic":
                     data["basic"] = user.basic_info
-
-                    data["basic"]["profile_picture"] = request.build_absolute_uri(
-                        user.basic_info["profile_picture"].url,
-                    )
-
+                    if profile_picture := user.basic_info["profile_picture"]:
+                        data["basic"]["profile_picture"] = request.build_absolute_uri(
+                            profile_picture.url,
+                        )
+                    else:
+                        data["basic"]["profile_picture"] = ""
                 elif detail == "preferences":
                     data["preferences"] = user.preferences
                 elif detail == "license":
