@@ -294,18 +294,15 @@ class GoogleAUthVerifiedData(serializers.Serializer):
         last_name = validated_data["given_name"]
         email = validated_data["email"]
         username = email.split("@")[0]
-        try:
-            user = User.objects.get(
-                email=email,
-            )
-        except User.DoesNotExist:
-            user = User.objects.create(
+        user_qs = User.objects.filter(email=email)
+        if not user_qs.exists():
+            return User.objects.create(
                 username=username,
                 email=email,
                 first_name=first_name,
                 last_name=last_name,
             )
-        return user
+        return user_qs[0]
 
 
 class PasswordResetAfterVerificationSerializer(serializers.Serializer):
