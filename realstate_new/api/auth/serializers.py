@@ -294,8 +294,9 @@ class GoogleAUthVerifiedData(serializers.Serializer):
         last_name = validated_data["given_name"]
         email = validated_data["email"]
         username = email.split("@")[0]
-        user_qs = User.objects.filter(email=email)
-        if not user_qs.exists():
+
+        user = User.objects.filter(email=email)
+        if not user.exists():
             return User.objects.create(
                 username=username,
                 email=email,
