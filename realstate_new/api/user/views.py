@@ -43,7 +43,7 @@ class UserMeView(APIView):
                     data["basic"] = user.basic_info
 
                     data["basic"]["profile_picture"] = request.build_absolute_uri(
-                        user.basic_info["profile_picture"],
+                        user.basic_info["profile_picture"].url,
                     )
 
                 elif detail == "preferences":
