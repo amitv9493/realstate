@@ -295,11 +295,11 @@ class GoogleAUthVerifiedData(serializers.Serializer):
         email = validated_data["email"]
         username = email.split("@")[0]
         try:
-            user = get_user_model().objects.get(
+            user = User.objects.get(
                 email=email,
             )
-        except get_user_model().DoesNotExist:
-            user = get_user_model().objects.create(
+        except User.DoesNotExist:
+            user = User.objects.create(
                 username=username,
                 email=email,
                 first_name=first_name,
