@@ -160,9 +160,9 @@ class User(AbstractUser):
     hyperwallet_token = models.TextField(default="")
     stripe_customer_id = models.TextField(default="")
     stripe_account_id = models.TextField(default="")
-    is_details_submitted = models.BooleanField(default=None, null=True)
-    is_charges_enabled = models.BooleanField(default=None, null=True)
-    is_payouts_enabled = models.BooleanField(default=None, null=True)
+    is_details_submitted = models.BooleanField(default=False)
+    is_charges_enabled = models.BooleanField(default=False)
+    is_payouts_enabled = models.BooleanField(default=False)
 
     @property
     def total_reviews(self):
