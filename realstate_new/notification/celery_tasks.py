@@ -1,19 +1,10 @@
 from celery import shared_task
 from firebase_admin import messaging
-from firebase_admin.exceptions import UnknownError
 
 from .templates import NotificationMetaData
 
 
-@shared_task(
-    bind=True,
-    autoretry_for=(
-        Exception,
-        UnknownError,
-    ),
-    retry_backoff=True,
-    retry_kwargs={"max_retries": 5},
-)
+@shared_task(bind=True)
 def celery_send_fcm_notification(
     self,
     device_ids: list,
