@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -9,6 +11,8 @@ from realstate_new.utils import send_email
 
 from .celery_tasks import celery_send_fcm_notification
 from .templates import get_notification_template
+
+_logger = logging.getLogger(__name__)
 
 
 class NotificationManager(models.Manager):
@@ -83,6 +87,8 @@ class Notification(models.Model):
                     flat=True,
                 ),
             )
+            log_msg = f"task:{self.object_id}\ntype:created_by\ndeviceIds{device_ids}"
+            _logger.info(log_msg)
             email_reciver = [self.user.email]
 
         # Check if the notification is for job assigner.
@@ -94,6 +100,9 @@ class Notification(models.Model):
                     flat=True,
                 ),
             )
+            log_msg = f"task:{self.object_id}\ntype:created_by\ndeviceIds{device_ids}"
+            _logger.info(log_msg)
+
             email_reciver = [self.user.email]
 
         self.description = notification_body
