@@ -87,7 +87,7 @@ class Notification(models.Model):
                     flat=True,
                 ),
             )
-            log_msg = f"task:{self.object_id}\ntype:created_by\ndeviceIds{device_ids}"
+            log_msg = f"task:{self.object_id} type:created_by deviceIds{device_ids}"
             _logger.info(log_msg)
             email_reciver = [self.user.email]
 
@@ -100,7 +100,7 @@ class Notification(models.Model):
                     flat=True,
                 ),
             )
-            log_msg = f"task:{self.object_id}\ntype:created_by\ndeviceIds{device_ids}"
+            log_msg = f"task:{self.object_id} type:assigned_to deviceIds{device_ids}"
             _logger.info(log_msg)
 
             email_reciver = [self.user.email]
