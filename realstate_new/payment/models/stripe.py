@@ -19,7 +19,7 @@ class TxnType(models.TextChoices):
 
 class StripeTranscation(GenericModel):
     user = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True)
-    amt = models.DecimalField(max_digits=5, decimal_places=2)
+    amt = models.DecimalField(max_digits=6, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=255, choices=TranscationStatus.choices)
