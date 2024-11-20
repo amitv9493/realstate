@@ -49,7 +49,7 @@ class Notification(models.Model):
     description = models.TextField(blank=True, default="")
     extra_data = models.JSONField(default=dict)
     is_read = models.BooleanField(default=False)
-
+    is_sent = models.BooleanField(default=False)
     objects = NotificationManager()
 
     class Meta:
@@ -65,6 +65,7 @@ class Notification(models.Model):
         if self._state.adding:
             ctx_obj = self.content_object
             self.handle_task_objects(ctx_obj=ctx_obj)
+            self.is_sent = True
         super().save(*args, **kwargs)
 
     def handle_task_objects(self, ctx_obj):
@@ -79,7 +80,7 @@ class Notification(models.Model):
             task_time=task_time,
         )
         # Check if the notification is for job creater.
-        if self.user == ctx_obj.created_by:
+        if self.user == ctx_obj.created_by and not self.is_sent:
             notification_body = n_body
             device_ids = list(
                 ctx_obj.created_by.fcmdevices.all().values_list(
@@ -92,7 +93,7 @@ class Notification(models.Model):
             email_reciver = [self.user.email]
 
         # Check if the notification is for job assigner.
-        if self.user == ctx_obj.assigned_to:
+        if self.user == ctx_obj.assigned_to and not self.is_sent:
             notification_body = n_body2
             device_ids = list(
                 ctx_obj.assigned_to.fcmdevices.all().values_list(

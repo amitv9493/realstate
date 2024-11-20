@@ -11,6 +11,7 @@ class NotificationAdmin(admin.ModelAdmin):
         "event",
         "content_type",
         "is_read",
+        "is_sent",
     )
     list_filter = (
         "user",

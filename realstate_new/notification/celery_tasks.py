@@ -52,6 +52,7 @@ def send_notification(
             token=i,
         )
         messages.append(message)
+    print(len(messages))  # noqa: T201
     messaging.send_each(messages)
 
 
