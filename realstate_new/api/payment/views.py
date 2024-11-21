@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import F
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -430,3 +431,22 @@ def account_update_webhook(request):
                 {acc_id} username:{request.user.username}"
         _logger.info(msg)
     return HttpResponse("", 200)
+
+
+class TxnView(APIView):
+    def get(self, request, *args, **kwargs):
+        txns = (
+            StripeTranscation.objects.filter(user=self.request.user)
+            .order_by("-updated_at")
+            .annotate(task_type=F("content_type__model"), task_id=F("object_id"))
+            .values(
+                "task_id",
+                "amt",
+                "status",
+                "txn_type",
+                "identifier",
+                "task_type",
+                "updated_at",
+            )
+        )
+        return Response(txns)

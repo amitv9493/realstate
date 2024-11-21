@@ -5,6 +5,7 @@ from .views import ClientTokenView
 from .views import ConnectAccountCreateView
 from .views import StripeCreatePaymentIntentView
 from .views import TestPayment
+from .views import TxnView
 from .views import VerifiyPaymentView
 from .views import account_update_webhook
 from .views import get_refresh_link
@@ -52,5 +53,9 @@ urlpatterns = [
         "stripe/account/status",
         AccountStatusView.as_view(),
         name="account-status",
+    ),
+    path(
+        "stripe/txn",
+        TxnView.as_view(),
     ),
 ]
