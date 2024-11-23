@@ -3,6 +3,7 @@ from django.contrib.contenttypes.admin import GenericStackedInline
 from django.utils.translation import gettext_lazy as _
 
 from realstate_new.master.models import Property
+from realstate_new.task.models.open_for_vendor_task import VendorType
 from realstate_new.task.models.sign_task import SignTask
 
 from .models import LockBoxTaskBS
@@ -249,3 +250,8 @@ class VerificationDocumentAdmin(admin.ModelAdmin):
 @admin.register(OpenForVendorTask)
 class OpenForVendorTaskAdmin(BaseTaskAdmin):
     pass
+
+
+@admin.register(VendorType)
+class VendorTypeAdmin(admin.ModelAdmin):
+    list_display = ["id", "vendor"]
