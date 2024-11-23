@@ -62,12 +62,11 @@ class Notification(models.Model):
         return f"{self.get_event_display()} - {self.content_object} at {self.timestamp}"
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
         if not self.is_sent:
             ctx_obj = self.content_object
             self.handle_task_objects(ctx_obj=ctx_obj)
             self.is_sent = True
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def handle_task_objects(self, ctx_obj):
         task_time = timezone.localtime(ctx_obj.task_time).strftime("%I:%M %p")
