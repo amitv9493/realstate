@@ -73,7 +73,7 @@ class Notification(models.Model):
         time = timezone.localtime(timezone.now()).strftime("%I:%M %p")
         email_reciver = []
         device_ids = []
-
+        notification_for = ""
         n_title, n_body, n_body2 = get_notification_template(
             event_type=self.event,
             type_of_task=ctx_obj.type_of_task,
@@ -91,6 +91,7 @@ class Notification(models.Model):
                 ),
             )
             email_reciver = [self.user.email]
+            notification_for = "created_by"
 
         # Check if the notification is for job assigner.
         elif self.user == ctx_obj.assigned_to:
@@ -102,14 +103,18 @@ class Notification(models.Model):
                 ),
             )
             email_reciver = [self.user.email]
+            notification_for = "assigned to"
 
         self.description = notification_body
 
+        msg = f"sending notification for {notification_for}"
+        _logger.info(msg)
         celery_send_fcm_notification.delay(
             title=n_title,
             body=notification_body,
             tokens=device_ids,
         )
+
         send_email.delay(
             recipient_list=email_reciver,
             subject=n_title,
