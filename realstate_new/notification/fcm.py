@@ -52,7 +52,8 @@ class FCM:
 
         if resp.status_code == status.HTTP_200_OK:
             _logger.info("Message sent to Firebase for delivery")
-        if resp.status_code == status.HTTP_404_NOT_FOUND:
+
+        elif resp.status_code == status.HTTP_404_NOT_FOUND:
             _logger.info("FCM device is stale")
 
         else:
