@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from typing import TypedDict
 
 import google.auth.transport.requests
@@ -34,30 +35,27 @@ class FCM:
         return credentials.token
 
     def send_fcm_message(self, fcm_message):
-        """Send HTTP request to FCM with given message.
-
-        Args:
-        fcm_message: JSON object that will make up the body of the request.
-        """
         headers = {
             "Authorization": "Bearer " + self._get_access_token(),
             "Content-Type": "application/json; UTF-8",
         }
+        _logger.info(f"Sending FCM request: {json.dumps(fcm_message)}")  # noqa: G004
         resp = requests.post(
             self.FCM_URL,
             data=json.dumps(fcm_message),
             headers=headers,
             timeout=20,
         )
-
+        _logger.info(f"FCM Response: {resp.status_code} {resp.text}")  # noqa: G004
         if resp.status_code == status.HTTP_200_OK:
             _logger.info("Message sent to Firebase for delivery")
-
         elif resp.status_code == status.HTTP_404_NOT_FOUND:
-            _logger.info("FCM device is stale")
-
+            _logger.warning("FCM device is stale")
         else:
-            msg = f"Unable to send message to Firebase {resp.status_code} {resp.text}"
+            _logger.error(
+                f"Unable to send message: {resp.status_code}, {resp.text}",  # noqa: G004
+            )
+            msg = f"Unable to send message: {resp.status_code}, {resp.text}"
             raise ValueError(msg)
 
     def build_common_message(self, title, body, token):
@@ -113,6 +111,7 @@ def send_notification_to_multiple_user(title: str, body: str, tokens: list):
     for token in tokens:
         message = fcm.build_common_message(title, body, token)
         fcm.send_fcm_message(message)
+        time.sleep(0.1)
 
 
 def send_batch_notification(messages: list[Message]):
