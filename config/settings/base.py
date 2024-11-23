@@ -12,7 +12,7 @@ import stripe
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / "realstate_new"
 FIREBASE_ADMIN_CERT = Path(BASE_DIR / "config" / "settings" / "servicekey.json")
-
+FIREBASE_PROJECT_ID = "realstate-ff80a"
 env = environ.Env()
 cred = credentials.Certificate(FIREBASE_ADMIN_CERT)
 initialize_app(cred)

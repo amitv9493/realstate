@@ -112,7 +112,7 @@ class Notification(models.Model):
             title=n_title,
             body=notification_body,
             data={},
-            device_ids=device_ids,
+            tokens=device_ids,
         )
 
         if self.event in TaskStatusChoices._member_names_:

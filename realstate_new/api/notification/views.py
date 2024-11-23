@@ -43,10 +43,5 @@ class NotificationViewSet(ModelViewSet):
 @csrf_exempt
 def test_notification(request):
     ids = list(set(FCMDevice.objects.values_list("registration_id", flat=True)))
-    celery_send_fcm_notification.delay(
-        title="test rudra device",
-        body="test new notifications",
-        device_ids=ids,
-        data={},
-    )
-    return HttpResponse("done", 200)
+    celery_send_fcm_notification.delay(title="test", body="test", tokens=ids)
+    return HttpResponse("done")
