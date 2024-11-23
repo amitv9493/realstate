@@ -111,7 +111,6 @@ class Notification(models.Model):
         celery_send_fcm_notification.delay(
             title=n_title,
             body=notification_body,
-            data={},
             tokens=device_ids,
         )
 

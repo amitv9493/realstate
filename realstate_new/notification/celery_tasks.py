@@ -9,7 +9,6 @@ def celery_send_fcm_notification(
     tokens: list,
     title: None,
     body: None,
-    data: dict | None,
 ):
     """Send the notifications to given device ids
 
