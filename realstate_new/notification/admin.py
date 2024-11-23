@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from .fcm import FCM
 from .models import Notification
 
 
@@ -20,3 +21,14 @@ class NotificationAdmin(admin.ModelAdmin):
         "content_type",
         "is_read",
     )
+
+    @admin.action(description="Re-trigger Notification")
+    def retrigger_notification(self, request, queryset):
+        fcm = FCM()
+        for q in queryset:
+            message = fcm.build_common_message(
+                title=q.title,
+                nody=q.body,
+                token=q.regis,
+            )
+            fcm.send_fcm_message(message)

@@ -62,15 +62,18 @@ class Notification(models.Model):
         return f"{self.get_event_display()} - {self.content_object} at {self.timestamp}"
 
     def save(self, *args, **kwargs):
-        if self._state.adding:
+        super().save(*args, **kwargs)
+        if not self.is_sent:
             ctx_obj = self.content_object
             self.handle_task_objects(ctx_obj=ctx_obj)
             self.is_sent = True
-        super().save(*args, **kwargs)
+            super().save(*args, **kwargs)
 
     def handle_task_objects(self, ctx_obj):
         task_time = timezone.localtime(ctx_obj.task_time).strftime("%I:%M %p")
         time = timezone.localtime(timezone.now()).strftime("%I:%M %p")
+        email_reciver = []
+        device_ids = []
 
         n_title, n_body, n_body2 = get_notification_template(
             event_type=self.event,
@@ -80,7 +83,7 @@ class Notification(models.Model):
             task_time=task_time,
         )
         # Check if the notification is for job creater.
-        if self.user == ctx_obj.created_by and not self.is_sent:
+        if self.user == ctx_obj.created_by:
             notification_body = n_body
             device_ids = list(
                 ctx_obj.created_by.fcmdevices.all().values_list(
@@ -88,12 +91,10 @@ class Notification(models.Model):
                     flat=True,
                 ),
             )
-            log_msg = f"task:{self.object_id} type:created_by deviceIds{device_ids}"
-            _logger.info(log_msg)
             email_reciver = [self.user.email]
 
         # Check if the notification is for job assigner.
-        if self.user == ctx_obj.assigned_to and not self.is_sent:
+        elif self.user == ctx_obj.assigned_to:
             notification_body = n_body2
             device_ids = list(
                 ctx_obj.assigned_to.fcmdevices.all().values_list(
@@ -101,9 +102,6 @@ class Notification(models.Model):
                     flat=True,
                 ),
             )
-            log_msg = f"task:{self.object_id} type:assigned_to deviceIds{device_ids}"
-            _logger.info(log_msg)
-
             email_reciver = [self.user.email]
 
         self.description = notification_body
@@ -113,11 +111,6 @@ class Notification(models.Model):
             body=notification_body,
             tokens=device_ids,
         )
-
-        if self.event in TaskStatusChoices._member_names_:
-            self.content_object.status = self.event
-            self.content_object.save(update_fields=["status"])
-
         send_email.delay(
             recipient_list=email_reciver,
             subject=n_title,
@@ -128,3 +121,6 @@ class Notification(models.Model):
             },
             template_path="emails/base.html",
         )
+        if self.event in TaskStatusChoices._member_names_:
+            self.content_object.status = self.event
+            self.content_object.save(update_fields=["status"])

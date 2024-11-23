@@ -58,7 +58,7 @@ class FCM:
 
         else:
             msg = f"Unable to send message to Firebase {resp.status_code} {resp.text}"
-            _logger.critical(msg)
+            raise ValueError(msg)
 
     def build_common_message(self, title, body, token):
         """Construct common notifiation message.
