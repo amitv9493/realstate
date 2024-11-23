@@ -56,7 +56,7 @@ class FCM:
             _logger.info("FCM device is stale")
 
         else:
-            msg = f"Unable to send message to Firebase {resp.text}"
+            msg = f"Unable to send message to Firebase {resp.status_code} {resp.text}"
             _logger.critical(msg)
 
     def build_common_message(self, title, body, token):
