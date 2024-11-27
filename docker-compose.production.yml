@@ -95,3 +95,15 @@ services:
     volumes:
       - production_django_media:/usr/share/nginx/media:ro
       - /var/log/realstate_new/celery/nginx:/var/log/nginx
+
+  pgbouncer:
+      container_name: pgbouncer
+      image: bitnami/pgbouncer:latest
+      env_file:
+        - ./.envs/.production/.pgbouncer
+      ports:
+        - "5433:5432"
+      depends_on:
+        - postgres
+      healthcheck:
+        test: ['CMD', 'pg_isready', '-h', 'localhost']
