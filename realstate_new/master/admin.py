@@ -43,7 +43,7 @@ class ProfessioanlVendorInquiryAdmin(admin.ModelAdmin):
         "preferred_name",
         "preferred_method_of_contact",
         "service_skill",
-        "mile_radius_preference",
+        # "mile_radius_preference",
         "additional_notes",
     )
     list_filter = ("created_at", "updated_at", "created_by")

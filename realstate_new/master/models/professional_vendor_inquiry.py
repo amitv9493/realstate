@@ -28,7 +28,7 @@ class ProfessioanlVendorInquiry(TrackingModel):
         default="EMAIL",
     )
     service_skill = models.CharField(max_length=50)
-    mile_radius_preference = models.CharField(
+    area_covered = models.CharField(
         "Area Covered",
         max_length=50,
         default="",
