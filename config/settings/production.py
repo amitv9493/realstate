@@ -15,7 +15,7 @@ ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["65.20.90.117"])
 
 # DATABASES
 # ------------------------------------------------------------------------------
-DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
+DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=0)
 
 # CACHES
 # ------------------------------------------------------------------------------
