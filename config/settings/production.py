@@ -1,7 +1,6 @@
 # ruff: noqa: E501
 from .base import *  # noqa: F403
 from .base import BASE_DIR
-from .base import DATABASES
 from .base import INSTALLED_APPS
 from .base import SPECTACULAR_SETTINGS
 from .base import env
@@ -15,8 +14,7 @@ ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["65.20.90.117"])
 
 # DATABASES
 # ------------------------------------------------------------------------------
-DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=0)
-
+# Add database settings here.
 # CACHES
 # ------------------------------------------------------------------------------
 CACHES = {
