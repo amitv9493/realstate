@@ -101,7 +101,6 @@ class TaskSerializer(TrackingModelSerializer):
                 txn_type="PAYIN",
             ).values_list("identifier", flat=True),
         )
-        return []
 
     def get_application_status(self, obj):
         request = self.context.get("request")
@@ -350,6 +349,7 @@ class SignTaskSerializer(TaskSerializer):
             )
             instance.pickup_address = pickup_address_rec
             instance.install_address = install_address_rec
+            instance.save(update_fields=["pickup_address", "install_address"])
 
         elif validated_data["task_type"] == "REMOVE":
             remove_address_rec = self.save_property_instance(
@@ -364,10 +364,11 @@ class SignTaskSerializer(TaskSerializer):
             )
             instance.dropoff_address = dropoff_address_rec
             instance.remove_address = remove_address_rec
+            instance.save(update_fields=["dropoff_address", "remove_address"])
         return instance
 
     def to_representation(self, instance: Any) -> dict[str, Any]:
-        rep = super(TrackingModelSerializer, self).to_representation(instance)
+        rep = super().to_representation(instance)
         if instance.task_type == "INSTALL":
             rep.pop("remove_address", None)
             rep.pop("dropoff_address", None)
@@ -458,39 +459,6 @@ class OngoingTaskSerializer(serializers.Serializer):
         many=True,
         fields=ONGOING_FIELDS["OPENFORVENDOR"],
         required=False,
-    )
-
-
-class LatestTaskSerializer(serializers.Serializer):
-    showing_tasks = ShowingTaskSerializer(
-        many=True,
-        fields=[*LATEST_TASK_FIELDS],
-    )
-    sign_tasks = SignTaskSerializer(
-        many=True,
-        fields=[*LATEST_TASK_FIELDS, "task_type"],
-    )
-    runner_tasks = RunnerTaskSerializer(
-        many=True,
-        fields=[*LATEST_TASK_FIELDS, "task_type"],
-    )
-    professional_tasks = ProfessionalTaskSerializer(
-        many=True,
-        fields=[*LATEST_TASK_FIELDS, "service_type"],
-    )
-    openhouse_tasks = OpenHouseTaskSerializer(many=True, fields=LATEST_TASK_FIELDS)
-    lockbox_tasks_bs = LockBoxBSSerializer(
-        many=True,
-        fields=[*LATEST_TASK_FIELDS, "pickup_address", "task_type"],
-    )
-    lockbox_tasks_ir = LockBoxIRSerializer(
-        many=True,
-        fields=[
-            *LATEST_TASK_FIELDS,
-            "pickup_address",
-            "installation_or_remove_address",
-            "task_type",
-        ],
     )
 
 
