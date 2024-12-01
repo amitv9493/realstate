@@ -1,23 +1,12 @@
 from django.db import models
 
 from .basetask import BaseTask
-from .choices import LockBoxType
 from .choices import TaskTypeChoices
 
 
 class LockBoxTask(BaseTask):
     task_type = models.CharField(max_length=50, choices=TaskTypeChoices.choices)
-    lockbox_code = models.CharField(
-        max_length=50,
-        blank=True,
-        default="",
-    )  # remove this field in future
-    lockbox_type = models.CharField(
-        max_length=50,
-        choices=LockBoxType.choices,
-        default=LockBoxType.OTHER,
-        blank=True,
-    )
+
     lockbox = models.OneToOneField(
         "master.LockBox",
         on_delete=models.PROTECT,

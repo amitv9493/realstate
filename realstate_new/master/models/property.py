@@ -5,7 +5,6 @@ from django.db import models
 from realstate_new.utils.base_models import TrackingModel
 
 from .lockbox import LockBox
-from .types import LockBoxType
 
 
 class Property(TrackingModel):
@@ -26,12 +25,6 @@ class Property(TrackingModel):
     alarm_code = models.CharField(max_length=50, default="", blank=True)
     gate_code = models.CharField(max_length=50, default="", blank=True)
 
-    lockbox_type = models.CharField(
-        max_length=50,
-        choices=LockBoxType.choices,
-        default=LockBoxType.OTHER,
-        blank=True,
-    )
     lockbox = models.OneToOneField(
         LockBox,
         on_delete=models.CASCADE,

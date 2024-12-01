@@ -225,7 +225,7 @@ class TaskViewSet(ModelViewSet):
 
     def perform_update(self, serializer):
         file_exists = serializer.instance.audio_file
-        instance = serializer.save()
+        instance = serializer.instance
         if file_exists:
             Notification.objects.create_notifications(
                 task=instance,
