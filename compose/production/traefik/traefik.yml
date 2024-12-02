@@ -42,7 +42,7 @@ http:
         certResolver: letsencrypt
 
     flower-secure-router:
-      rule: 'Host(`engagepluse.com`)'
+      rule: 'Host(`engagepluse.com`) && PathPrefix(`/flower`)'
       entryPoints:
         - flower
       service: flower
