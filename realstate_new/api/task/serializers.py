@@ -52,7 +52,6 @@ PROPERTY_FIELDS = [
     "concierge",
     "alarm_code",
     "gate_code",
-    "lockbox_type",
     "lockbox",
     "delete",
 ]
@@ -179,9 +178,7 @@ class ShowingTaskSerializer(TaskSerializer):
                         raise PropertyNotFound(property_id=property_id) from None
 
                     if not is_delete:
-                        for k, v in address.items():
-                            setattr(property_instance, k, v)
-                        property_instance.save()
+                        PropertySerializer().update(property_instance, address)
 
                     else:
                         property_instance.delete()
@@ -344,7 +341,7 @@ class OpenHouseTaskSerializer(TaskSerializer):
         return instance
 
     def update(self, instance: Any, validated_data: Any) -> Any:
-        property_address = validated_data.get("property_address", None)
+        property_address = validated_data.pop("property_address", None)
         if property_address:
             PropertySerializer(context={"request": self.request}).update(
                 instance.property_address,
@@ -556,9 +553,7 @@ class OpenForVendorTaskSerializer(TaskSerializer):
                         raise PropertyNotFound(property_id=property_id) from None
 
                     if not is_delete:
-                        for k, v in address.items():
-                            setattr(property_instance, k, v)
-                        property_instance.save()
+                        PropertySerializer().update(property_instance, address)
 
                     else:
                         property_instance.delete()

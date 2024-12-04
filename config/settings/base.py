@@ -10,13 +10,17 @@ import stripe
 from firebase_admin import credentials
 from firebase_admin import initialize_app
 
+env = environ.Env()
+
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / "realstate_new"
+
 FIREBASE_ADMIN_CERT = Path(BASE_DIR / "config" / "settings" / "servicekey.json")
 FIREBASE_PROJECT_ID = "realstate-ff80a"
-env = environ.Env()
+
 cred = credentials.Certificate(FIREBASE_ADMIN_CERT)
 initialize_app(cred)
+
 stripe.api_key = env("STRIPE_API_KEY")
 
 
@@ -78,6 +82,7 @@ DJANGO_APPS = [
     "django.forms",
 ]
 THIRD_PARTY_APPS = [
+    "silk",
     "allauth",
     "allauth.account",
     "allauth.mfa",
@@ -88,7 +93,6 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "drf_standardized_errors",
     "django_filters",
-    "silk",
 ]
 
 LOCAL_APPS = [
