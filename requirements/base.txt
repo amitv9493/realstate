@@ -38,3 +38,4 @@ paypalhttp==1.0.1
 braintree
 hyperwallet-sdk
 stripe==11.2.0
+django-silk==5.2.0

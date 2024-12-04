@@ -1,13 +1,14 @@
 # ruff: noqa: ERA001, E501
 """Base settings to build other settings files upon."""
 
-from datetime import timedelta  # noqa: I001
+from datetime import timedelta
 from pathlib import Path
+
+import braintree
 import environ
+import stripe
 from firebase_admin import credentials
 from firebase_admin import initialize_app
-import braintree
-import stripe
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / "realstate_new"
@@ -87,6 +88,7 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "drf_standardized_errors",
     "django_filters",
+    "silk",
 ]
 
 LOCAL_APPS = [
@@ -148,6 +150,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
+    "silk.middleware.SilkyMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",

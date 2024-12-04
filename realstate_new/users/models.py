@@ -9,6 +9,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Avg
+from django.db.models import Index
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
@@ -163,6 +164,9 @@ class User(AbstractUser):
     is_details_submitted = models.BooleanField(default=False)
     is_charges_enabled = models.BooleanField(default=False)
     is_payouts_enabled = models.BooleanField(default=False)
+
+    class Meta:
+        indexes = [Index(fields=["email"], name="idx_email")]
 
     @property
     def total_reviews(self):
