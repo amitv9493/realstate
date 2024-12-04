@@ -54,8 +54,13 @@ class PropertySerializer(TrackingModelSerializer):
     def update(self, instance: Any, validated_data: Any) -> Any:
         lockbox = validated_data.pop("lockbox", None)
         if lockbox:
-            for k, v in lockbox.items():
-                setattr(instance.lockbox, k, v)
+            if instance.lockbox:
+                for k, v in lockbox.items():
+                    setattr(instance.lockbox, k, v)
+                instance.lockbox.save(update_fields=list(lockbox.keys()))
+            else:
+                lockbox_instance = LockBoxSerializer().create(lockbox)
+                instance.lockbox = lockbox_instance
+                instance.save(update_fields=["lockbox"])
 
-            instance.lockbox.save(update_fields=list(lockbox.keys()))
         return super().update(instance, validated_data)
