@@ -3,6 +3,7 @@ from itertools import chain
 from typing import Any
 
 import stripe
+from django.db.models import Prefetch
 from django.db.models import Q
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
@@ -11,6 +12,7 @@ from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from realstate_new.master.models.property import Property
 from realstate_new.notification.models import Notification
 from realstate_new.notification.models import NotificationChoices
 from realstate_new.payment.models.stripe import StripeTranscation
@@ -238,7 +240,16 @@ class TaskViewSet(ModelViewSet):
 
 class ShowingTaskViewSet(TaskViewSet):
     serializer_class = ShowingTaskSerializer
-    queryset = ShowingTask.objects.all()
+    queryset = (
+        ShowingTask.objects.select_related("assigned_to", "created_by")
+        .prefetch_related(
+            Prefetch(
+                "property_address",
+                queryset=Property.objects.select_related("lockbox"),
+            ),
+        )
+        .all()
+    )
 
 
 def get_user_preferences(user: User):
