@@ -29,17 +29,18 @@ JOB_CREATER_SPECIFIC_FIELDS = [
     "payment_verified",
     "txn_ids",
     "applications",
+    "payment_amount",
 ]
 TASK_COMMON_FIELDS = [
     "id",
     "application_type",
     "task_time",
-    "payment_amount",
     "created_by",
     "assigned_to",
     "status",
     "notes",
     "type_of_task",
+    "receivable_amount",
 ]
 
 PROPERTY_FIELDS = [
@@ -104,6 +105,12 @@ class TaskSerializer(TrackingModelSerializer):
     type_of_task = serializers.CharField(read_only=True)
     txn = TransactionIDSerializer(many=True, read_only=True)
     applications = JobApplicationModelSerializer(read_only=True, many=True)
+    receivable_amount = serializers.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        read_only=True,
+        source="payment_amt_for_payout",
+    )
 
     class Meta:
         extra_kwargs = {

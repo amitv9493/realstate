@@ -126,7 +126,7 @@ class BaseTask(TrackingModel):
     @property
     def payment_amt_for_payout(self):
         if self.payment_amount:
-            return self.payment_amount * (1 - (settings.PLATFORM_FEES_PERCENT / 100))
+            return self.payment_amount * (1 - (Decimal(settings.PLATFORM_FEES_PERCENT) / 100))
         return Decimal(0)
 
     @property
