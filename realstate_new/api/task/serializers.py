@@ -62,7 +62,14 @@ PROPERTY_FIELDS = [
 
 DASHBOARD_COMMON_FIELDS = {
     "SHOWING": [*TASK_COMMON_FIELDS, "property_address"],
-    "SIGN": [*TASK_COMMON_FIELDS, "task_type"],
+    "SIGN": [
+        *TASK_COMMON_FIELDS,
+        "task_type",
+        "install_address",
+        "pickup_address",
+        "remove_address",
+        "dropoff_address",
+    ],
     "RUNNER": [*TASK_COMMON_FIELDS, "task_type", "property_address"],
     "PROFESSIONAL": [*TASK_COMMON_FIELDS, "service_type"],
     "OPENHOUSE": [*TASK_COMMON_FIELDS, "property_address"],
