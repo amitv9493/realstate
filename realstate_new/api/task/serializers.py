@@ -26,7 +26,6 @@ from realstate_new.utils.serializers import DynamicModelSerializer
 from realstate_new.utils.serializers import TrackingModelSerializer
 
 JOB_CREATER_SPECIFIC_FIELDS = [
-    "type_of_task",
     "payment_verified",
     "txn_ids",
     "applications",
@@ -40,6 +39,7 @@ TASK_COMMON_FIELDS = [
     "assigned_to",
     "status",
     "notes",
+    "type_of_task",
 ]
 
 PROPERTY_FIELDS = [
