@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from realstate_new.application.models import JobApplication
 from realstate_new.notification.models import Notification
+from realstate_new.payment.models.stripe import StripeTranscation
 from realstate_new.utils.base_models import TrackingModel
 
 from .choices import BrokerageType
@@ -72,6 +73,8 @@ class BaseTask(TrackingModel):
     # GenericRelations
     notifications = GenericRelation(Notification)
     applications = GenericRelation(JobApplication)
+    txn = GenericRelation(StripeTranscation)
+
     verification_images = GenericRelation(VerificationDocument)
     payment_verified = models.BooleanField(default=False)
 

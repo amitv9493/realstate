@@ -1,7 +1,6 @@
 from django.db import models
 
 from realstate_new.notification.models import Notification
-from realstate_new.task.models.choices import TaskStatusChoices
 from realstate_new.utils.base_models import GenericModel
 
 
@@ -36,7 +35,7 @@ class StripeTranscation(GenericModel):
             self.content_object.payment_verified = True
             self.content_object.save(update_fields=["payment_verified"])
             Notification.objects.create(
-                event=TaskStatusChoices.CREATED,
+                event="CREATED",
                 content_object=self.content_object,
                 user=self.user,
             )

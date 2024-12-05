@@ -248,6 +248,14 @@ class ShowingTaskViewSet(TaskViewSet):
                 queryset=Property.objects.select_related("lockbox"),
             ),
         )
+        .prefetch_related(
+            Prefetch(
+                "txn",
+                queryset=StripeTranscation.objects.filter(
+                    txn_type="PAYIN",
+                ),
+            ),
+        )
         .all()
     )
 
