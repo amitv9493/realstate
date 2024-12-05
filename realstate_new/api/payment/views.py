@@ -181,8 +181,6 @@ class StripeCreatePaymentIntentView(APIView):
                 data = {
                     "amt": task.payment_amount,
                     "client_secret": client_secret,
-                    "platform_fees": task.platform_fees,
-                    "stripe_fees": round(task.stripe_fees, 2),
                     "total_amt": task.payment_amt_for_task_creater,
                 }
                 return Response(data, 200)

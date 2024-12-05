@@ -121,12 +121,12 @@ class BaseTask(TrackingModel):
 
     @property
     def payment_amt_for_task_creater(self):
-        return round(self.stripe_fees + self.platform_fees + self.payment_amount, 2)
+        return self.payment_amount
 
     @property
     def payment_amt_for_payout(self):
         if self.payment_amount:
-            return self.payment_amount - Decimal(self.platform_fees)
+            return self.payment_amount * (1 - (settings.PLATFORM_FEES_PERCENT / 100))
         return Decimal(0)
 
     @property
