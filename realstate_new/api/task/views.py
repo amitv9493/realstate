@@ -35,9 +35,10 @@ from realstate_new.users.models import User
 from realstate_new.utils.permissions import AssigneeObjectPermission
 
 from .filters import filter_tasks
+from .serializers import JobCreaterDashboardSerializer
+from .serializers import JobSeekerDashboardSerializer
 from .serializers import LockBoxBSSerializer
 from .serializers import LockBoxIRSerializer
-from .serializers import OngoingTaskSerializer
 from .serializers import OpenForVendorTaskSerializer
 from .serializers import OpenHouseTaskSerializer
 from .serializers import ProfessionalTaskSerializer
@@ -50,13 +51,23 @@ from .serializers import VerificationDocumentSerializer
 
 
 class TaskListMixin:
+    def __init__(self) -> None:
+        self.dashboard = "seeker"
+
     def get_updated_serializer(self):
-        return OngoingTaskSerializer
+        if self.dashboard == "seeker":
+            return JobSeekerDashboardSerializer
+        if self.dashboard == "creater":
+            return JobCreaterDashboardSerializer
+        return None
 
     def get_tasks(
         self,
+        *,
         base_query,
+        dashboard,
     ):
+        self.dashboard = dashboard
         filter_data = self.get_filtered_qs(base_query)
         serialized_data = self.serialize_data(filter_data)
 
@@ -141,7 +152,7 @@ class JobCreaterDashboardView(APIView, TaskListMixin):
                 payment_verified=False,
             )
 
-        tasks = self.get_tasks(base_query)
+        tasks = self.get_tasks(base_query=base_query, dashboard="creater")
 
         # pagination related data
         page_size = params.get("page_size", 10)
@@ -211,7 +222,7 @@ class JobSeekerDashboardView(APIView, TaskListMixin):
                 ],
             )
 
-        tasks = self.get_tasks(query)
+        tasks = self.get_tasks(base_query=query, dashboard="seeker")
         paginated_response = self.get_paginated_response(page, page_size, tasks)
 
         return Response(paginated_response, 200)

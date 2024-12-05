@@ -3,6 +3,7 @@ from typing import Any
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from realstate_new.api.application.serializers import JobApplicationModelSerializer
 from realstate_new.api.payment.serializers import TransactionIDSerializer
 from realstate_new.api.property.serializers import LockBoxSerializer
 from realstate_new.api.property.serializers import PropertySerializer
@@ -24,8 +25,13 @@ from realstate_new.utils.exceptions import PropertyNotFound
 from realstate_new.utils.serializers import DynamicModelSerializer
 from realstate_new.utils.serializers import TrackingModelSerializer
 
-EXTRA_FIELD = ["type_of_task", "payment_verified", "txn_ids"]
-JOB_DASHBOARD_COMMON_FIELDS = [
+JOB_CREATER_SPECIFIC_FIELDS = [
+    "type_of_task",
+    "payment_verified",
+    "txn_ids",
+    "applications",
+]
+TASK_COMMON_FIELDS = [
     "id",
     "application_type",
     "task_time",
@@ -34,7 +40,6 @@ JOB_DASHBOARD_COMMON_FIELDS = [
     "assigned_to",
     "status",
     "notes",
-    *EXTRA_FIELD,
 ]
 
 PROPERTY_FIELDS = [
@@ -55,28 +60,31 @@ PROPERTY_FIELDS = [
     "delete",
 ]
 
-ONGOING_FIELDS = {
-    "SHOWING": [*JOB_DASHBOARD_COMMON_FIELDS, "property_address"],
-    "SIGN": [*JOB_DASHBOARD_COMMON_FIELDS, "task_type"],
-    "RUNNER": [*JOB_DASHBOARD_COMMON_FIELDS, "task_type", "property_address"],
-    "PROFESSIONAL": [*JOB_DASHBOARD_COMMON_FIELDS, "service_type"],
-    "OPENHOUSE": [*JOB_DASHBOARD_COMMON_FIELDS, "property_address"],
+DASHBOARD_COMMON_FIELDS = {
+    "SHOWING": [*TASK_COMMON_FIELDS, "property_address"],
+    "SIGN": [*TASK_COMMON_FIELDS, "task_type"],
+    "RUNNER": [*TASK_COMMON_FIELDS, "task_type", "property_address"],
+    "PROFESSIONAL": [*TASK_COMMON_FIELDS, "service_type"],
+    "OPENHOUSE": [*TASK_COMMON_FIELDS, "property_address"],
     "LOCKBOXBS": [
-        *JOB_DASHBOARD_COMMON_FIELDS,
+        *TASK_COMMON_FIELDS,
         "pickup_address",
         "task_type",
         "lockbox",
     ],
     "LOCKBOXIR": [
-        *JOB_DASHBOARD_COMMON_FIELDS,
+        *TASK_COMMON_FIELDS,
         "pickup_address",
         "installation_or_remove_address",
         "task_type",
         "lockbox",
     ],
-    "OPENFORVENDOR": [*JOB_DASHBOARD_COMMON_FIELDS, "property_address"],
+    "OPENFORVENDOR": [*TASK_COMMON_FIELDS, "property_address"],
 }
-LATEST_TASK_FIELDS = [*JOB_DASHBOARD_COMMON_FIELDS, "application_status"]
+JOB_CREATER_FIELDS = {
+    k: v + JOB_CREATER_SPECIFIC_FIELDS for k, v in DASHBOARD_COMMON_FIELDS.items()
+}
+JOB_SEEKER_FIELDS = DASHBOARD_COMMON_FIELDS
 
 
 class TaskSerializer(TrackingModelSerializer):
@@ -88,6 +96,7 @@ class TaskSerializer(TrackingModelSerializer):
 
     type_of_task = serializers.CharField(read_only=True)
     txn = TransactionIDSerializer(many=True, read_only=True)
+    applications = JobApplicationModelSerializer(read_only=True, many=True)
 
     class Meta:
         extra_kwargs = {
@@ -561,46 +570,90 @@ class OpenForVendorTaskSerializer(TaskSerializer):
         return super().update(instance, validated_data)
 
 
-class OngoingTaskSerializer(serializers.Serializer):
+class JobCreaterDashboardSerializer(serializers.Serializer):
     Showing = ShowingTaskSerializer(
         many=True,
-        fields=ONGOING_FIELDS["SHOWING"],
+        fields=JOB_CREATER_FIELDS["SHOWING"],
         required=False,
     )
     Sign = SignTaskSerializer(
         many=True,
-        fields=ONGOING_FIELDS["SIGN"],
+        fields=JOB_CREATER_FIELDS["SIGN"],
         required=False,
     )
     Runner = RunnerTaskSerializer(
         many=True,
-        fields=ONGOING_FIELDS["RUNNER"],
+        fields=JOB_CREATER_FIELDS["RUNNER"],
         required=False,
     )
     Professional = ProfessionalTaskSerializer(
         many=True,
-        fields=ONGOING_FIELDS["PROFESSIONAL"],
+        fields=JOB_CREATER_FIELDS["PROFESSIONAL"],
         required=False,
     )
     OpenHouse = OpenHouseTaskSerializer(
         many=True,
-        fields=ONGOING_FIELDS["OPENHOUSE"],
+        fields=JOB_CREATER_FIELDS["OPENHOUSE"],
         required=False,
     )
     LockBoxIR = LockBoxBSSerializer(
         many=True,
-        fields=ONGOING_FIELDS["LOCKBOXBS"],
+        fields=JOB_CREATER_FIELDS["LOCKBOXBS"],
         required=False,
     )
     LockBoxBS = LockBoxIRSerializer(
         many=True,
-        fields=ONGOING_FIELDS["LOCKBOXIR"],
+        fields=JOB_CREATER_FIELDS["LOCKBOXIR"],
         required=False,
     )
 
     OpenForVendor = OpenForVendorTaskSerializer(
         many=True,
-        fields=ONGOING_FIELDS["OPENFORVENDOR"],
+        fields=JOB_CREATER_FIELDS["OPENFORVENDOR"],
+        required=False,
+    )
+
+
+class JobSeekerDashboardSerializer(serializers.Serializer):
+    Showing = ShowingTaskSerializer(
+        many=True,
+        fields=JOB_SEEKER_FIELDS["SHOWING"],
+        required=False,
+    )
+    Sign = SignTaskSerializer(
+        many=True,
+        fields=JOB_SEEKER_FIELDS["SIGN"],
+        required=False,
+    )
+    Runner = RunnerTaskSerializer(
+        many=True,
+        fields=JOB_SEEKER_FIELDS["RUNNER"],
+        required=False,
+    )
+    Professional = ProfessionalTaskSerializer(
+        many=True,
+        fields=JOB_SEEKER_FIELDS["PROFESSIONAL"],
+        required=False,
+    )
+    OpenHouse = OpenHouseTaskSerializer(
+        many=True,
+        fields=JOB_SEEKER_FIELDS["OPENHOUSE"],
+        required=False,
+    )
+    LockBoxIR = LockBoxBSSerializer(
+        many=True,
+        fields=JOB_SEEKER_FIELDS["LOCKBOXBS"],
+        required=False,
+    )
+    LockBoxBS = LockBoxIRSerializer(
+        many=True,
+        fields=JOB_SEEKER_FIELDS["LOCKBOXIR"],
+        required=False,
+    )
+
+    OpenForVendor = OpenForVendorTaskSerializer(
+        many=True,
+        fields=JOB_SEEKER_FIELDS["OPENFORVENDOR"],
         required=False,
     )
 

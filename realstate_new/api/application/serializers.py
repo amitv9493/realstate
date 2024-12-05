@@ -1,6 +1,7 @@
 from django.db import IntegrityError
 from rest_framework import serializers
 
+from realstate_new.api.user.serializers import UserSerializer
 from realstate_new.application.models import JobApplication
 from realstate_new.task.models import JOB_TYPE_MAPPINGS
 from realstate_new.task.models.choices import TaskStatusChoices
@@ -69,7 +70,21 @@ class JobApplicationSerializer(DynamicSerializer):
         return res
 
 
-class Job(DynamicModelSerializer):
+class JobApplicationModelSerializer(DynamicModelSerializer):
     class Meta:
         model = JobApplication
-        fields = "__all__"
+        fields = ["applicant"]
+
+    def to_representation(self, instance):
+        return UserSerializer(
+            instance=instance.applicant,
+            many=False,
+            fields=(
+                "id",
+                "email",
+                "license_number",
+                "first_name",
+                "last_name",
+                "jobs_completed",
+            ),
+        ).data

@@ -64,6 +64,7 @@ select_related = {
     ],
     "Professional": ["property_address"],
     "OpenForVendor": [],
+    "common": ["created_by", "assigned_to"],
 }
 
 
@@ -78,7 +79,7 @@ def filter_tasks(request, base_query):
         queryset = (
             JOB_TYPE_MAPPINGS[task_type]
             .objects.filter(base_query)
-            .select_related(*select_related[task_type])
+            .select_related(*select_related[task_type] + select_related["common"])
         )
         task_filter = TaskFilter(
             request.query_params,
