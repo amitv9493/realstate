@@ -388,7 +388,7 @@ class RunnerTaskSerializer(TaskSerializer):
         return instance
 
     def update(self, instance: Any, validated_data: Any) -> Any:
-        property_address = validated_data.get("property_address", None)
+        property_address = validated_data.pop("property_address", None)
         if property_address:
             PropertySerializer(context={"request": self.request}).update(
                 instance.property_address,
@@ -486,10 +486,10 @@ class SignTaskSerializer(TaskSerializer):
         return rep
 
     def update(self, instance: Any, validated_data: Any) -> Any:
-        install_address = validated_data.get("install_address", None)
-        pickup_address = validated_data.get("pickup_address", None)
-        remove_address = validated_data.get("remove_address", None)
-        dropoff_address = validated_data.get("dropoff_address", None)
+        install_address = validated_data.pop("install_address", None)
+        pickup_address = validated_data.pop("pickup_address", None)
+        remove_address = validated_data.pop("remove_address", None)
+        dropoff_address = validated_data.pop("dropoff_address", None)
 
         if install_address and (ia_object := instance.install_address):
             PropertySerializer(context={"request": self.request}).update(
