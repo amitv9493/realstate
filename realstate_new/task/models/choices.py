@@ -32,12 +32,12 @@ class JobType(models.TextChoices):
 
 
 class BrokerageType(models.TextChoices):
-    my_brokerage = (
+    MY_BROKERAGE = (
         "MY-BROKERAGE",
         "My Brokerage",
     )
 
-    other_brokerage = (
+    OTHER_BROKERAGE = (
         "OTHER-BROKERAGE",
         "All Other Brokerages",
     )

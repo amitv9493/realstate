@@ -74,11 +74,7 @@ class TaskListMixin:
         return self.apply_sorting(flattened_response=serialized_data)
 
     def get_filtered_qs(self, base_query):
-        data = {}
-        filtered_tasks = filter_tasks(self.request, base_query)
-        for task_type, task_filter in filtered_tasks.items():
-            data[task_type] = task_filter.qs
-        return data
+        return filter_tasks(self.request, base_query)
 
     def serialize_data(self, data):
         serializer = self.get_updated_serializer()

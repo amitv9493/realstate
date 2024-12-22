@@ -2,6 +2,7 @@ import django_filters
 
 from realstate_new.task.models import JOB_TYPE_MAPPINGS
 from realstate_new.task.models import ShowingTask
+from realstate_new.task.models.choices import BrokerageType
 
 
 class TaskFilter(django_filters.FilterSet):
@@ -80,11 +81,21 @@ def filter_tasks(request, base_query):
             JOB_TYPE_MAPPINGS[task_type]
             .objects.filter(base_query)
             .select_related(*select_related[task_type] + select_related["common"])
+            .defer("created_by__password", "assigned_to__password")
         )
         task_filter = TaskFilter(
             request.query_params,
             queryset=queryset,
             request=request,
         )
-        filtered_tasks[task_type] = task_filter
+        filtered_tasks[task_type] = (
+            task_filter.qs.filter(
+                brokerage=BrokerageType.MY_BROKERAGE,
+                created_by__brokerage_name=request.user.brokerage_name,
+            )
+            .union(
+                task_filter.qs.filter(brokerage=BrokerageType.OTHER_BROKERAGE),
+            )
+            .order_by("asap", "task_time")
+        )
     return filtered_tasks

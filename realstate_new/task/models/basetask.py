@@ -50,7 +50,7 @@ class BaseTask(TrackingModel):
     brokerage = models.CharField(
         max_length=50,
         choices=BrokerageType.choices,
-        default=BrokerageType.my_brokerage,
+        default=BrokerageType.MY_BROKERAGE,
     )
 
     show_client_info = models.BooleanField(default=False)
@@ -74,7 +74,6 @@ class BaseTask(TrackingModel):
     notifications = GenericRelation(Notification)
     applications = GenericRelation(JobApplication)
     txn = GenericRelation(StripeTranscation)
-
     verification_images = GenericRelation(VerificationDocument)
     payment_verified = models.BooleanField(default=False)
 
