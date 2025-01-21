@@ -1,4 +1,5 @@
 import django_filters
+from django.db.models import Q
 
 from realstate_new.task.models import JOB_TYPE_MAPPINGS
 from realstate_new.task.models import ShowingTask
@@ -88,14 +89,11 @@ def filter_tasks(request, base_query):
             queryset=queryset,
             request=request,
         )
-        filtered_tasks[task_type] = (
-            task_filter.qs.filter(
+        filtered_tasks[task_type] = task_filter.qs.filter(
+            Q(
                 brokerage=BrokerageType.MY_BROKERAGE,
                 created_by__brokerage_name=request.user.brokerage_name,
             )
-            .union(
-                task_filter.qs.filter(brokerage=BrokerageType.OTHER_BROKERAGE),
-            )
-            .order_by("asap", "task_time")
-        )
+            | Q(brokerage=BrokerageType.OTHER_BROKERAGE),
+        ).order_by("asap", "task_time")
     return filtered_tasks
