@@ -193,7 +193,7 @@ class StripeCreatePaymentIntentView(APIView):
                 "enabled": True,
             },
         }
-        params["setup_future_usage"] = "off_session"
+        params["setup_future_usage"] = "on_session"
         intent = stripe.PaymentIntent.create(**params)
         return (
             intent.id,

@@ -1,6 +1,7 @@
 # ruff: noqa: ERA001, E501
 """Base settings to build other settings files upon."""
 
+import contextlib
 from datetime import timedelta
 from pathlib import Path
 
@@ -18,16 +19,19 @@ APPS_DIR = BASE_DIR / "realstate_new"
 FIREBASE_ADMIN_CERT = Path(BASE_DIR / "config" / "settings" / "servicekey.json")
 FIREBASE_PROJECT_ID = "realstate-ff80a"
 
-cred = credentials.Certificate(FIREBASE_ADMIN_CERT)
-initialize_app(cred)
-
-stripe.api_key = env("STRIPE_API_KEY")
-
-
 READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=True)
 if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     env.read_env(str(BASE_DIR / ".env"))
+
+cred = credentials.Certificate(FIREBASE_ADMIN_CERT)
+
+with contextlib.suppress(ValueError):
+    initialize_app(cred)
+
+
+stripe.api_key = env("STRIPE_API_KEY")
+
 # GENERAL
 # ------------------------------------------------------------------------------
 DEBUG = env.bool("DJANGO_DEBUG", False)
