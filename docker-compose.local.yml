@@ -1,7 +1,7 @@
 volumes:
-  realstate_new_local_postgres_data: {}
-  realstate_new_local_postgres_data_backups: {}
-  realstate_new_local_redis_data: {}
+  realstate_new_local_postgres_data: { }
+  realstate_new_local_postgres_data_backups: { }
+  realstate_new_local_redis_data: { }
 
 services:
   django: &django
@@ -34,6 +34,8 @@ services:
       - realstate_new_local_postgres_data_backups:/backups
     env_file:
       - ./.envs/.local/.postgres
+
+
   mailpit:
     image: docker.io/axllent/mailpit:latest
     container_name: realstate_new_local_mailpit
@@ -56,7 +58,7 @@ services:
       - redis
       - postgres
       - mailpit
-    ports: []
+    ports: [ ]
     command: /start-celeryworker
 
   celerybeat:
@@ -67,7 +69,7 @@ services:
       - redis
       - postgres
       - mailpit
-    ports: []
+    ports: [ ]
     command: /start-celerybeat
 
   flower:
@@ -96,4 +98,4 @@ services:
     depends_on:
       - postgres
     healthcheck:
-      test: ['CMD', 'pg_isready', '-h', 'localhost']
+      test: [ 'CMD', 'pg_isready', '-h', 'localhost' ]

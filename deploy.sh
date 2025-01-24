@@ -8,9 +8,9 @@ handle_error() {
 
 git pull || handle_error "Failed to pull latest changes from the repository"
 
-docker compose build django celeryworker celerybeat|| handle_error "Failed to build Docker container"
+docker compose build django traefik celeryworker celerybeat redis nginx flower || handle_error "Failed to build Docker container"
 
-docker compose up -d || handle_error "Failed to start containers"
+docker compose up django traefik celeryworker celerybeat redis nginx flower || handle_error "Failed to start containers"
 
-echo "Restarted Successfully"
+echo "Deployed Successfully"
 exit 0
